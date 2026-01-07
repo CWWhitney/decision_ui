@@ -1,14 +1,14 @@
-FROM docker.io/library/fedora:41
+FROM docker.io/library/fedora:43
 
 # update system
 RUN dnf update -y && dnf clean all && rm -rf /var/cache/dnf
 
-# install R build dependencies
-RUN dnf install -y gcc-c++ cmake openssl-devel libcurl-devel \
-                   libsodium-devel udunits2-devel gdal-devel \
-                   proj-devel geos-devel && \
-    dnf clean all && \
-    rm -rf /var/cache/dnf
+# install R build dependencies (in case CRAN packages need to be build from source, not necessary if available in COPR)
+# RUN dnf install -y gcc-c++ cmake openssl-devel libcurl-devel \
+#                    libsodium-devel udunits2-devel gdal-devel \
+#                    proj-devel geos-devel abseil-cpp-devel && \
+#     dnf clean all && \
+#     rm -rf /var/cache/dnf
 
 # install R
 RUN dnf install -y R R-core && \
@@ -31,10 +31,17 @@ RUN dnf install -y R-assertthat R-dplyr R-ggplot2 R-magrittr \
     dnf clean all && \
     rm -rf /var/cache/dnf
 
-# create directory to avoid R install error
+# enable R CRAN copr repository
+# see https://copr.fedorainfracloud.org/coprs/iucar/cran/
+RUN dnf copr enable -y iucar/cran && \
+    dnf install -y R-CoprManager && \
+    dnf clean all && \
+    rm -rf /var/cache/dnf
+
+# create directory to avoid R install error (in case CRAN packages need to be build from source)
 RUN mkdir -p /usr/share/doc/R/html/
 
-# set env variable to reduce install size of R dependencies
+# set env variable to reduce install size of R dependencies (in case CRAN packages need to be build from source)
 # see http://dirk.eddelbuettel.com/blog/2019/03/27/
 ENV _R_SHLIB_STRIP_=1
 
