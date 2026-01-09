@@ -12,20 +12,20 @@
     "start": "node build/src/run.js"
   },
   "dependencies": {
-    "compression": "^1.7.5",
-    "express": "^4.21.1",
-    "http-proxy-middleware": "^3.0.3",
+    "compression": "^1.8.1",
+    "express": "^5.2.1",
+    "http-proxy-middleware": "^3.0.5",
     "nocache": "^4.0.0",
-    "winston": "^3.17.0"
+    "winston": "^3.19.0"
   },
   "devDependencies": {
-    "@types/compression": "^1.7.5",
-    "@types/express": "^4.17.17",
-    "@typescript-eslint/parser": "^8.14.0",
-    "@typescript-eslint/eslint-plugin": "^8.14.0",
-    "concurrently": "^9.1.0",
-    "eslint": "^8.57.1",
-    "nodemon": "^3.1.7",
-    "typescript": "^5.6.3"
+    "@types/compression": "^1.8.1",
+    "@types/express": "^5.0.6",
+    "@typescript-eslint/parser": "^8.52.0",
+    "@typescript-eslint/eslint-plugin": "^8.52.0",
+    "concurrently": "^9.2.1",
+    "eslint": "^9.39.2",
+    "nodemon": "^3.1.11",
+    "typescript": "^5.9.3"
   }
 }
