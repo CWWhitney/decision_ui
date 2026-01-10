@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 
+import FlowPage from "./components/FlowPage.vue";
 import NodeEditor from "./components/NodeEditor.vue";
 import ResultsDashboard from "./components/ResultsDashboard.vue";
 import EstimatesDashboard from "./components/EstimatesDashboard.vue";
@@ -25,6 +26,10 @@ const routes = [
           {
             path: "",
             redirect: "/user/workspace/modeling"
+          },
+          {
+            path: "flow",
+            component: FlowPage
           },
           {
             path: "modeling",
