@@ -1,7 +1,5 @@
 <script setup lang="ts">
-  import { ref } from "vue";
-
-  import { VueFlow, Panel, useVueFlow, ConnectionMode, type GraphNode } from "@vue-flow/core";
+  import { VueFlow, Panel, useVueFlow, ConnectionMode } from "@vue-flow/core";
   import { Background } from "@vue-flow/background";
   import { Controls } from "@vue-flow/controls";
   import { MiniMap } from "@vue-flow/minimap";
@@ -10,10 +8,11 @@
   import FlowNode from "./FlowNode.vue";
   import FlowEdge from "./FlowEdge.vue";
   import FlowNodeEditDialog from "./FlowNodeEditDialog.vue";
+  import FlowToolbar from "./FlowToolbar.vue";
 
   const store = useFlowStore();
 
-  const { onConnect, onEdgesChange, onNodesChange, onNodeDoubleClick, findNode, removeNodes } = useVueFlow();
+  const { onConnect, onEdgesChange, onNodesChange, onNodeDoubleClick, removeNodes } = useVueFlow();
 
   // edge events
   onEdgesChange(changes => {
@@ -43,61 +42,50 @@
     removeNodes(nodeId);
   };
 
-  onConnect(connection => store.addVueFlowConnection(connection));
-
-  // edit dialog
-  const editDialogNode = ref<GraphNode | null>(null);
+  onConnect(connection => store.addEdgeFromVueFlowConnection(connection));
 
   onNodeDoubleClick(event => {
-    editDialogNode.value = event.node;
+    store.openNodeEditDialog(event.node.id);
   });
 
-  const onNodeEditDialogClose = () => {
-    editDialogNode.value = null;
-  };
-
   const onToolbarEditNodeClick = (nodeId: string) => {
-    editDialogNode.value = findNode(nodeId) ?? null;
+    store.openNodeEditDialog(nodeId);
   };
 </script>
 
 <template>
-  <FlowNodeEditDialog :node="editDialogNode" @close="onNodeEditDialogClose" />
-  <VueFlow
-    :nodes="store.getVueFlowNodes"
-    :edges="store.getVueFlowEdges"
-    :connection-mode="ConnectionMode.Loose"
-    fit-view-on-init
-    snap-to-grid
-  >
-    <!-- bind your custom node type to a component by using slots, slot names are always `node-<type>` -->
-    <template #node-custom="nodeProps">
-      <FlowNode
-        v-bind="nodeProps"
-        @toolbar-edit-node-click="onToolbarEditNodeClick"
-        @toolbar-remove-node-click="onToolbarRemoveNodeClick"
-      />
-    </template>
+  <div class="flowpage_container">
+    <FlowToolbar />
+    <VueFlow
+      :nodes="store.getVueFlowNodes"
+      :edges="store.getVueFlowEdges"
+      :connection-mode="ConnectionMode.Loose"
+      fit-view-on-init
+      snap-to-grid
+      elevate-edges-on-select
+    >
+      <!-- bind your custom node type to a component by using slots, slot names are always `node-<type>` -->
+      <template #node-custom="nodeProps">
+        <FlowNode
+          v-bind="nodeProps"
+          @toolbar-edit-node-click="onToolbarEditNodeClick"
+          @toolbar-remove-node-click="onToolbarRemoveNodeClick"
+        />
+      </template>
 
-    <!-- bind your custom edge type to a component by using slots, slot names are always `edge-<type>` -->
-    <template #edge-custom="edgeProps">
-      <FlowEdge v-bind="edgeProps" />
-    </template>
+      <!-- bind your custom edge type to a component by using slots, slot names are always `edge-<type>` -->
+      <template #edge-custom="edgeProps">
+        <FlowEdge v-bind="edgeProps" />
+      </template>
 
-    <Panel class="toolbar_panel" position="top-left">
-      <v-toolbar title="Toolbar" :elevation="2" class="toolbar">
-        <template #prepend> </template>
-        <template #append>
-          <v-btn icon="mdi-plus" text="add" @click="store.addNode"></v-btn>
-          <v-btn icon="mdi-close-circle-outline" text="reset" @click="store.reset"></v-btn>
-        </template>
-      </v-toolbar>
-    </Panel>
+      <Panel class="toolbar_panel" position="top-left"> </Panel>
 
-    <Controls />
-    <MiniMap pannable zoomable position="top-right" />
-    <Background variant="dots" />
-  </VueFlow>
+      <Controls v-if="false" />
+      <MiniMap v-if="false" pannable zoomable position="top-right" />
+      <Background variant="dots" />
+    </VueFlow>
+  </div>
+  <FlowNodeEditDialog />
 </template>
 
 <style>
@@ -107,15 +95,10 @@
   @import "@vue-flow/minimap/dist/style.css";
   @import "@vue-flow/node-resizer/dist/style.css";
 
-  .vue-flow__panel.toolbar_panel {
-    .toolbar {
-      border-radius: 0.5em;
-      background: #fff;
-
-      .v-toolbar__content {
-        gap: 1em;
-      }
-    }
+  .flowpage_container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
   }
 
   .vue-flow__panel.vue-flow__minimap {

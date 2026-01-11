@@ -1,14 +1,20 @@
 <script setup lang="ts">
-  import { Position, Handle } from "@vue-flow/core";
+  import { Position, Handle, useVueFlow } from "@vue-flow/core";
   import type { NodeProps } from "@vue-flow/core";
   import { NodeResizer } from "@vue-flow/node-resizer";
   import { NodeToolbar } from "@vue-flow/node-toolbar";
+  import { computed } from "vue";
+
+  const { getSelectedNodes } = useVueFlow();
 
   const props = defineProps<NodeProps>();
+
+  const showToolbar = computed(() => getSelectedNodes.value.length == 1 && getSelectedNodes.value[0]?.id == props.id);
 
   const emit = defineEmits<{
     (e: "toolbarEditNodeClick", nodeId: string): void;
     (e: "toolbarRemoveNodeClick", nodeId: string): void;
+    (e: "updateNodeInternals"): void;
   }>();
 
   const onToolbarNodeEditClick = () => {
@@ -23,7 +29,7 @@
 <template>
   <NodeResizer :min-width="150" :min-height="50" :is-visible="props.selected" />
 
-  <NodeToolbar :is-visible="props.selected" :position="Position.Top">
+  <NodeToolbar :is-visible="showToolbar" :position="Position.Top">
     <v-btn-group divided>
       <v-btn icon="mdi-square-edit-outline" @click="onToolbarNodeEditClick"></v-btn>
       <v-btn icon="mdi-palette-outline"></v-btn>
@@ -59,11 +65,24 @@
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      border: 1.5px solid #000;
-      border-radius: 0.5em;
-      background-color: #fff;
-
       padding: 0.75em;
+      overflow: hidden;
+    }
+
+    &.estimate .content {
+      background-color: rgba(135, 238, 238, 0.8);
+      border: 1.5px solid #2e8e8e;
+    }
+
+    &.operation .content {
+      background-color: rgb(255, 255, 255, 0.8);
+      border: 1.5px solid #333;
+      border-radius: 0.5em;
+    }
+
+    &.result .content {
+      background-color: rgba(235, 168, 235, 0.8);
+      border: 1.5px solid #ac31ac;
     }
 
     .vue-flow__handle {
