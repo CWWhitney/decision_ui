@@ -8,7 +8,7 @@
       <v-list density="compact" nav>
         <v-tooltip location="right" text="Flow editor" open-delay="500">
           <template #activator="{ props }">
-            <v-list-item to="/user/workspace/flow" v-bind="props" prepend-icon="mdi-graph mdi-rotate-90" />
+            <v-list-item to="/user/workspace/flow" v-bind="props" prepend-icon="mdi-sitemap mdi-rotate-90" />
           </template>
         </v-tooltip>
         <v-tooltip location="right" text="Model editor" open-delay="500">

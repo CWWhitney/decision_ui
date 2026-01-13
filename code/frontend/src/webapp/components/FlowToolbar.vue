@@ -1,9 +1,54 @@
 <script setup lang="ts">
-  import { AVAILABLE_NODE_TYPES, DEFAULT_NODE_TYPE_TITLES, useFlowStore, type NodeTypes } from "@/state/flow";
-  import { useVueFlow, type Rect } from "@vue-flow/core";
+  import { useStore } from "@/state";
+  import {
+    AVAILABLE_NODE_TYPES,
+    DEFAUL_NODE_DIMENSIONS,
+    DEFAULT_NODE_TYPE_TITLES,
+    useFlowGraphStore,
+    type NodeState,
+    type NodeTypes
+  } from "@/state/flow/graph";
+  import { useFlowOptionsStore } from "@/state/flow/options";
+  import {
+    BEZIER_EDGE_TYPE,
+    DOTS_BACKGROUND,
+    LINES_BACKGROUND,
+    STRAIGHT_EDGE_TYPE,
+    useFlowStyleStore
+  } from "@/state/flow/style";
+  import { useVueFlow, type Rect, type XYPosition } from "@vue-flow/core";
 
-  const store = useFlowStore();
-  const { fitView, screenToFlowCoordinate, getIntersectingNodes, zoomTo } = useVueFlow();
+  const {
+    fitView,
+    screenToFlowCoordinate,
+    getIntersectingNodes,
+    zoomTo,
+    removeSelectedNodes,
+    getSelectedNodes,
+    setInteractive
+  } = useVueFlow();
+
+  const optionsStore = useFlowOptionsStore();
+  const graphStore = useFlowGraphStore();
+  const styleStore = useFlowStyleStore();
+
+  const determineParentNode = (position: XYPosition) => {
+    // determine which node could be the best parent node based on cursor position
+    // (there might be multiple in case of nested nodes or overlapping nodes)
+    const intersectingGraphNodes = getIntersectingNodes({ ...position, width: 1, height: 1 } as Rect, false);
+    const intersectingNodes = intersectingGraphNodes.map(n => graphStore.getNode(n.id).value);
+
+    // remove any ancestor nodes from the list of intersecting nodes
+    const ancestorsNodeIds = intersectingNodes
+      .reduce((p, n) => [...p, ...graphStore.getAncestorNodes(n).value], [] as NodeState[])
+      .map(n => n.id);
+
+    // consider only child nodes (remove any ancestor nodes)
+    const candidateParentNodes = intersectingNodes.filter(n => !ancestorsNodeIds.includes(n.id));
+
+    // pick the first one (even though there still might be more than one)
+    return candidateParentNodes.length > 0 ? candidateParentNodes[0] : null;
+  };
 
   const onNodeDragEnd = (event: DragEvent, nodeType: NodeTypes) => {
     const topleft = screenToFlowCoordinate({
@@ -11,18 +56,40 @@
       y: event.clientY
     });
 
-    const intersectingNodes = getIntersectingNodes({ ...topleft, width: 1, height: 1 } as Rect, false);
-    const parentNodeId = intersectingNodes.length == 1 ? intersectingNodes[0]?.id : null;
+    const parentNode = determineParentNode(topleft);
+    const ancestorNodes = parentNode ? graphStore.getAncestorNodes(parentNode).value : [];
+    const ancestorOffset = [parentNode, ...ancestorNodes].reduce(
+      (p, n) => ({ x: p.x + (n?.position.x ?? 0), y: p.y + (n?.position.y ?? 0) }),
+      { x: 0, y: 0 } as XYPosition
+    );
+    const newNodeDimensions = DEFAUL_NODE_DIMENSIONS[nodeType];
+    const newNodePosition = {
+      x: topleft.x - newNodeDimensions.width / 2 - ancestorOffset.x,
+      y: topleft.y - newNodeDimensions.height / 2 - ancestorOffset.y
+    };
 
-    store.addNode(nodeType, {
-      position: { x: topleft.x - 100, y: topleft.y - 25 },
-      dimensions: { width: 200, height: 50 },
-      parentNodeId: parentNodeId
+    graphStore.addNode(nodeType, {
+      position: newNodePosition,
+      dimensions: newNodeDimensions,
+      parentNodeId: parentNode?.id
     });
+
+    removeSelectedNodes(getSelectedNodes.value);
   };
 
   const onNodeClick = (nodeType: NodeTypes) => {
-    store.addNode(nodeType);
+    graphStore.addNode(nodeType);
+  };
+
+  const onLockGraphClick = () => {
+    if (optionsStore.locked) {
+      setInteractive(true);
+      optionsStore.setLocked(false);
+    } else {
+      removeSelectedNodes(getSelectedNodes.value);
+      setInteractive(false);
+      optionsStore.setLocked(true);
+    }
   };
 </script>
 
@@ -56,7 +123,7 @@
         <template #activator="{ props }">
           <v-btn
             v-bind="props"
-            icon="mdi-magnify-scan"
+            icon="mdi-numeric-1-box-outline"
             variant="outlined"
             size="small"
             @click="() => zoomTo(1.0)"
@@ -64,14 +131,14 @@
         </template>
       </v-tooltip>
 
-      <v-tooltip location="bottom" text="change edge style" open-delay="500">
+      <v-tooltip location="bottom" :text="optionsStore.locked ? 'unlock graph' : 'lock graph'" open-delay="500">
         <template #activator="{ props }">
           <v-btn
             v-bind="props"
-            icon="mdi-vector-triangle"
+            :icon="optionsStore.locked ? 'mdi-lock-outline' : 'mdi-lock-open-variant-outline'"
             variant="outlined"
             size="small"
-            @click="store.switchEdgeType"
+            @click="onLockGraphClick"
           ></v-btn>
         </template>
       </v-tooltip>
@@ -87,10 +154,55 @@
       >
         <div class="content">{{ DEFAULT_NODE_TYPE_TITLES[nodeType] }}</div>
       </div>
+      <!--<v-btn
+        icon="mdi-dots-vertical"
+        variant="outlined"
+        size="small"
+        disabled
+        rounded="0"
+        style="border-width: 1.5px"
+      ></v-btn>-->
     </div>
     <div class="toolbar_group">
+      <v-tooltip location="bottom" text="change edge style" open-delay="500">
+        <template #activator="{ props }">
+          <v-btn
+            v-bind="props"
+            :icon="
+              styleStore.edgeType == STRAIGHT_EDGE_TYPE
+                ? 'mdi-vector-polyline'
+                : styleStore.edgeType == BEZIER_EDGE_TYPE
+                  ? 'mdi-vector-bezier'
+                  : 'mdi-square-wave'
+            "
+            variant="outlined"
+            size="small"
+            @click="styleStore.switchEdgeType"
+          ></v-btn>
+        </template>
+      </v-tooltip>
+      <v-tooltip location="bottom" text="change background" open-delay="500">
+        <template #activator="{ props }">
+          <v-btn
+            v-bind="props"
+            :icon="
+              styleStore.background == DOTS_BACKGROUND
+                ? 'mdi-dots-grid'
+                : styleStore.background == LINES_BACKGROUND
+                  ? 'mdi-grid'
+                  : ''
+            "
+            variant="outlined"
+            size="small"
+            @click="styleStore.switchBackground"
+          ></v-btn>
+        </template>
+      </v-tooltip>
+
       <p>Debug:</p>
-      <v-btn prepend-icon="mdi-close-circle-outline" variant="outlined" text="reset" @click="store.reset">Reset</v-btn>
+      <v-btn prepend-icon="mdi-close-circle-outline" variant="outlined" text="reset" @click="useStore().reset"
+        >Reset</v-btn
+      >
     </div>
   </div>
 </template>
@@ -98,6 +210,7 @@
 <style lang="scss">
   .flowpage_toolbar {
     display: flex;
+    flex-wrap: wrap;
     gap: 0.5em;
     justify-content: space-between;
 
@@ -106,6 +219,7 @@
 
     .toolbar_group {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       gap: 0.5em;
       background: #fff;
@@ -113,10 +227,11 @@
 
     .vue-flow__node {
       position: relative;
-      min-width: 5em;
+      min-width: 6em;
 
       .content {
-        padding: 0.5em 0.75em;
+        padding: 0.4em 0.75em;
+        box-shadow: none;
       }
     }
   }

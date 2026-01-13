@@ -1,33 +1,32 @@
 <script setup lang="ts">
+  import { useDialogsNodeEditStore } from "@/state/dialogs/nodeEdit";
   import { Position, Handle, useVueFlow } from "@vue-flow/core";
   import type { NodeProps } from "@vue-flow/core";
   import { NodeResizer } from "@vue-flow/node-resizer";
   import { NodeToolbar } from "@vue-flow/node-toolbar";
   import { computed } from "vue";
 
-  const { getSelectedNodes } = useVueFlow();
+  const { getSelectedNodes, removeNodes } = useVueFlow();
+  const nodeEditStore = useDialogsNodeEditStore();
 
-  const props = defineProps<NodeProps>();
-
-  const showToolbar = computed(() => getSelectedNodes.value.length == 1 && getSelectedNodes.value[0]?.id == props.id);
-
-  const emit = defineEmits<{
-    (e: "toolbarEditNodeClick", nodeId: string): void;
-    (e: "toolbarRemoveNodeClick", nodeId: string): void;
+  defineEmits<{
     (e: "updateNodeInternals"): void;
   }>();
 
+  const node = defineProps<NodeProps>();
+  const showToolbar = computed(() => getSelectedNodes.value.length == 1 && getSelectedNodes.value[0]?.id == node.id);
+
   const onToolbarNodeEditClick = () => {
-    emit("toolbarEditNodeClick", props.id);
+    nodeEditStore.openDialog(node.id);
   };
 
   const onToolbarRemoveNodeClick = () => {
-    emit("toolbarRemoveNodeClick", props.id);
+    removeNodes(node.id);
   };
 </script>
 
 <template>
-  <NodeResizer :min-width="150" :min-height="50" :is-visible="props.selected" />
+  <NodeResizer :min-width="150" :min-height="50" :is-visible="node.selected" />
 
   <NodeToolbar :is-visible="showToolbar" :position="Position.Top">
     <v-btn-group divided>
@@ -37,7 +36,7 @@
     </v-btn-group>
   </NodeToolbar>
 
-  <div class="content">{{ props.data.label }}</div>
+  <div class="content">{{ node.data.label }}</div>
 
   <Handle id="top" type="source" :position="Position.Top" style="" />
   <Handle id="bottom" type="source" :position="Position.Bottom" />
@@ -75,14 +74,26 @@
     }
 
     &.operation .content {
-      background-color: rgb(255, 255, 255, 0.8);
+      background-color: rgba(250, 250, 250, 0.8);
       border: 1.5px solid #333;
+      border-radius: 0.5em;
+    }
+
+    &.loop .content {
+      background-color: rgba(212, 212, 212, 0.8);
+      border: 1.5px solid #5e5e5e;
       border-radius: 0.5em;
     }
 
     &.result .content {
       background-color: rgba(235, 168, 235, 0.8);
       border: 1.5px solid #ac31ac;
+    }
+
+    &.collection .content {
+      background-color: rgba(209, 209, 209, 0.2);
+      border-radius: 0.5em;
+      border: 1.5px dashed #828282;
     }
 
     .vue-flow__handle {

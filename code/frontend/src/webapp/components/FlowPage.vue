@@ -1,76 +1,86 @@
 <script setup lang="ts">
-  import { VueFlow, Panel, useVueFlow, ConnectionMode } from "@vue-flow/core";
+  import { VueFlow, Panel, useVueFlow, ConnectionMode, type NodeRemoveChange, type NodeChange } from "@vue-flow/core";
   import { Background } from "@vue-flow/background";
   import { Controls } from "@vue-flow/controls";
   import { MiniMap } from "@vue-flow/minimap";
 
-  import { useFlowStore } from "@/state/flow";
   import FlowNode from "./FlowNode.vue";
   import FlowEdge from "./FlowEdge.vue";
   import FlowNodeEditDialog from "./FlowNodeEditDialog.vue";
   import FlowToolbar from "./FlowToolbar.vue";
 
-  const store = useFlowStore();
+  import { useFlowOptionsStore } from "@/state/flow/options";
+  import { useFlowGraphStore } from "@/state/flow/graph";
+  import { useDialogsNodeEditStore } from "@/state/dialogs/nodeEdit";
+  import { useFlowStyleStore } from "@/state/flow/style";
 
-  const { onConnect, onEdgesChange, onNodesChange, onNodeDoubleClick, removeNodes } = useVueFlow();
+  const optionsStore = useFlowOptionsStore();
+  const graphStore = useFlowGraphStore();
+  const styleStore = useFlowStyleStore();
+  const nodeEditStore = useDialogsNodeEditStore();
+
+  const { onConnect, onEdgesChange, onNodesChange, onNodeDoubleClick, applyNodeChanges, applyEdgeChanges } =
+    useVueFlow();
 
   // edge events
   onEdgesChange(changes => {
     for (const change of changes) {
       if (change.type == "remove" && change.id) {
-        store.removeEdge(change.id);
+        graphStore.removeEdge(change.id);
       }
     }
+    applyEdgeChanges(changes);
   });
 
   // node events
   onNodesChange(changes => {
+    const additionalNodeChanges: NodeChange[] = [];
     for (const change of changes) {
       if (change.type == "remove" && change.id) {
-        store.removeNode(change.id);
+        for (const node of graphStore.getDescendantNodes(graphStore.getNode(change.id).value).value) {
+          additionalNodeChanges.push({
+            type: "remove",
+            id: node.id
+          } as NodeRemoveChange);
+        }
+        graphStore.removeNode(change.id);
       }
       if (change.type == "position" && change.id && change.position) {
-        store.updateNodePosition(change.id, change.position);
+        graphStore.updateNodePosition(change.id, change.position);
       }
       if (change.type == "dimensions" && change.id && change.dimensions) {
-        store.updateNodeDimensions(change.id, change.dimensions);
+        graphStore.updateNodeDimensions(change.id, change.dimensions);
       }
     }
+    applyNodeChanges([...changes, ...additionalNodeChanges]);
   });
 
-  const onToolbarRemoveNodeClick = (nodeId: string) => {
-    removeNodes(nodeId);
-  };
-
-  onConnect(connection => store.addEdgeFromVueFlowConnection(connection));
+  onConnect(connection => graphStore.addEdgeFromVueFlowConnection(connection));
 
   onNodeDoubleClick(event => {
-    store.openNodeEditDialog(event.node.id);
+    if (!optionsStore.locked) {
+      nodeEditStore.openDialog(event.node.id);
+    }
   });
-
-  const onToolbarEditNodeClick = (nodeId: string) => {
-    store.openNodeEditDialog(nodeId);
-  };
 </script>
 
 <template>
   <div class="flowpage_container">
     <FlowToolbar />
     <VueFlow
-      :nodes="store.getVueFlowNodes"
-      :edges="store.getVueFlowEdges"
+      :nodes="graphStore.getVueFlowNodes().value"
+      :edges="graphStore.getVueFlowEdges().value"
       :connection-mode="ConnectionMode.Loose"
-      fit-view-on-init
-      snap-to-grid
+      :snap-to-grid="optionsStore.snapToGrid"
+      :snap-grid="[10, 10]"
+      :apply-default="false"
+      :zoom-on-double-click="false"
+      :min-zoom="0.4"
       elevate-edges-on-select
     >
       <!-- bind your custom node type to a component by using slots, slot names are always `node-<type>` -->
       <template #node-custom="nodeProps">
-        <FlowNode
-          v-bind="nodeProps"
-          @toolbar-edit-node-click="onToolbarEditNodeClick"
-          @toolbar-remove-node-click="onToolbarRemoveNodeClick"
-        />
+        <FlowNode v-bind="nodeProps" />
       </template>
 
       <!-- bind your custom edge type to a component by using slots, slot names are always `edge-<type>` -->
@@ -82,7 +92,7 @@
 
       <Controls v-if="false" />
       <MiniMap v-if="false" pannable zoomable position="top-right" />
-      <Background variant="dots" />
+      <Background v-if="styleStore.background != 'none'" :variant="styleStore.background" />
     </VueFlow>
   </div>
   <FlowNodeEditDialog />
