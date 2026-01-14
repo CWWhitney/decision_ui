@@ -199,10 +199,7 @@
         </template>
       </v-tooltip>
 
-      <p>Debug:</p>
-      <v-btn prepend-icon="mdi-close-circle-outline" variant="outlined" text="reset" @click="useStore().reset"
-        >Reset</v-btn
-      >
+      <v-btn prepend-icon="mdi-bug-outline" variant="outlined" text="reset" @click="useStore().reset">Reset</v-btn>
     </div>
   </div>
 </template>

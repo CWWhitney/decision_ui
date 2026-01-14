@@ -1,5 +1,12 @@
 <script setup lang="ts">
-  import { useDialogsNodeEditStore } from "@/state/dialogs/nodeEdit";
+  import {
+    NODE_EDIT_DATA_TAB,
+    NODE_EDIT_DEBUG_TAB,
+    NODE_EDIT_FUNCTION_TAB,
+    NODE_EDIT_GENERAL_TAB,
+    NODE_EDIT_STYLE_TAB,
+    useDialogsNodeEditStore
+  } from "@/state/dialogs/nodeEdit";
   import { Position, Handle, useVueFlow } from "@vue-flow/core";
   import type { NodeProps } from "@vue-flow/core";
   import { NodeResizer } from "@vue-flow/node-resizer";
@@ -15,14 +22,6 @@
 
   const node = defineProps<NodeProps>();
   const showToolbar = computed(() => getSelectedNodes.value.length == 1 && getSelectedNodes.value[0]?.id == node.id);
-
-  const onToolbarNodeEditClick = () => {
-    nodeEditStore.openDialog(node.id);
-  };
-
-  const onToolbarRemoveNodeClick = () => {
-    removeNodes(node.id);
-  };
 </script>
 
 <template>
@@ -30,9 +29,12 @@
 
   <NodeToolbar :is-visible="showToolbar" :position="Position.Top">
     <v-btn-group divided>
-      <v-btn icon="mdi-square-edit-outline" @click="onToolbarNodeEditClick"></v-btn>
-      <v-btn icon="mdi-palette-outline"></v-btn>
-      <v-btn icon="mdi-trash-can-outline" @click="onToolbarRemoveNodeClick"></v-btn>
+      <v-btn icon="mdi-information-outline" @click="nodeEditStore.openDialog(node.id, NODE_EDIT_GENERAL_TAB)"></v-btn>
+      <v-btn icon="mdi-function" @click="nodeEditStore.openDialog(node.id, NODE_EDIT_FUNCTION_TAB)"></v-btn>
+      <v-btn icon="mdi-chart-histogram" @click="nodeEditStore.openDialog(node.id, NODE_EDIT_DATA_TAB)"></v-btn>
+      <v-btn icon="mdi-palette-outline" @click="nodeEditStore.openDialog(node.id, NODE_EDIT_STYLE_TAB)"></v-btn>
+      <v-btn icon="mdi-bug-outline" @click="nodeEditStore.openDialog(node.id, NODE_EDIT_DEBUG_TAB)"></v-btn>
+      <v-btn icon="mdi-trash-can-outline" @click="removeNodes(node.id)"></v-btn>
     </v-btn-group>
   </NodeToolbar>
 

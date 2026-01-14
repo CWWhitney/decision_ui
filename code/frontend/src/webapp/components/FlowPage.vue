@@ -1,7 +1,6 @@
 <script setup lang="ts">
-  import { VueFlow, Panel, useVueFlow, ConnectionMode, type NodeRemoveChange, type NodeChange } from "@vue-flow/core";
+  import { VueFlow, useVueFlow, ConnectionMode, type NodeRemoveChange, type NodeChange } from "@vue-flow/core";
   import { Background } from "@vue-flow/background";
-  import { Controls } from "@vue-flow/controls";
   import { MiniMap } from "@vue-flow/minimap";
 
   import FlowNode from "./FlowNode.vue";
@@ -88,9 +87,6 @@
         <FlowEdge v-bind="edgeProps" />
       </template>
 
-      <Panel class="toolbar_panel" position="top-left"> </Panel>
-
-      <Controls v-if="false" />
       <MiniMap v-if="false" pannable zoomable position="top-right" />
       <Background v-if="styleStore.background != 'none'" :variant="styleStore.background" />
     </VueFlow>
