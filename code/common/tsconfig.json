@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "module": "esnext",
+        "moduleResolution": "node",
+        "target": "es6",
+        "outDir": "build",
+        "declaration": true,
+        "rootDir": ".",
+        "sourceRoot": "src",
+        "allowJs": false,
+        "newLine": "LF",
+        "noImplicitAny": true,
+        "sourceMap": true,
+        "resolveJsonModule": true,
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "lib": ["ES2020", "DOM"]
+    },
+    "include": ["src/**/*.ts", "src/**/*.tsx", "unknown.d.ts"]
+}

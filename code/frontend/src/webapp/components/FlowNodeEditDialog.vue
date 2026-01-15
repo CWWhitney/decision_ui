@@ -8,20 +8,22 @@
     NODE_EDIT_STYLE_TAB,
     useDialogsNodeEditStore
   } from "@/state/dialogs/nodeEdit";
-  import { ESTIMATE_NODE_TYPE, OPERATION_NODE_TYPE, RESULT_NODE_TYPE } from "@/state/flow/graph";
+  import { useFlowGraphStore } from "@/state/flow/graph";
+  import { ESTIMATE_NODE_TYPE, OPERATION_NODE_TYPE, RESULT_NODE_TYPE } from "@decision-support-ui/common";
 
   const store = useDialogsNodeEditStore();
+  const graphStore = useFlowGraphStore();
 
   const onResultVariableChange = (index: number, value: string) => {
-    if (store.node && store.node.type == "result") {
-      if (index < store.node.results.variables.length) {
+    if (store.node && store.node.type == RESULT_NODE_TYPE) {
+      if (index < store.node.options.variables.length) {
         if (value.trim() == "") {
-          store.node.results.variables = store.node.results.variables.filter((_, i) => i != index);
+          store.node.options.variables = store.node.options.variables.filter((_, i) => i != index);
         } else {
-          store.node.results.variables[index] = value;
+          store.node.options.variables[index] = value;
         }
       } else if (value.trim() !== "") {
-        store.node.results.variables.push(value.trim());
+        store.node.options.variables.push(value.trim());
       }
     }
   };
@@ -31,7 +33,7 @@
   <v-dialog v-if="store.node" v-model="store.isOpen" class="dialog" @click:outside="store.closeDialog()">
     <v-card>
       <v-toolbar>
-        <v-toolbar-title>{{ store.node.title }}</v-toolbar-title>
+        <v-toolbar-title>{{ store.node.visualization.title }}</v-toolbar-title>
         <v-toolbar-items>
           <v-btn icon="mdi-close" @click="store.closeDialog()"></v-btn>
         </v-toolbar-items>
@@ -47,37 +49,37 @@
         </v-tabs>
         <v-tabs-window v-model="store.tab">
           <v-tabs-window-item :value="NODE_EDIT_GENERAL_TAB">
-            <v-text-field v-model="store.node.title" label="Title" required></v-text-field>
+            <v-text-field v-model="store.node.visualization.title" label="Title" required></v-text-field>
             <div v-if="store.node.type == ESTIMATE_NODE_TYPE">
-              <v-text-field v-model="store.node.estimate.comment" label="Comment for Estimate in CSV"></v-text-field>
+              <v-text-field v-model="store.node.options.comment" label="Comment for Estimate in CSV"></v-text-field>
             </div>
           </v-tabs-window-item>
           <v-tabs-window-item :value="NODE_EDIT_FUNCTION_TAB">
             <div v-if="store.node.type == ESTIMATE_NODE_TYPE">
               <v-combobox
-                v-model="store.node.estimate.distribution"
+                v-model="store.node.options.distribution"
                 label="Distribution"
                 :items="AVAILABLE_DISTRIBUTIONS"
               ></v-combobox>
               <div class="lower-upper-inputs">
                 <v-number-input
-                  v-model="store.node.estimate.lower"
+                  v-model="store.node.options.lower"
                   label="Lower"
                   control-variant="split"
                 ></v-number-input>
                 <v-number-input
-                  v-model="store.node.estimate.upper"
+                  v-model="store.node.options.upper"
                   label="Upper"
                   control-variant="split"
                 ></v-number-input>
               </div>
             </div>
             <div v-if="store.node.type == OPERATION_NODE_TYPE">
-              <v-text-field v-model="store.node.operation.expression" label="Expression or Formula"></v-text-field>
+              <v-text-field v-model="store.node.options.expression" label="Expression or Formula"></v-text-field>
             </div>
             <div v-if="store.node.type == RESULT_NODE_TYPE">
               <v-text-field
-                v-for="(item, i) in [...store.node.results.variables, '']"
+                v-for="(item, i) in [...store.node.options.variables, '']"
                 :key="i"
                 :model-value="item"
                 :label="`Result Variable ${i + 1}`"
@@ -92,7 +94,8 @@
             <p>Style Tab</p>
           </v-tabs-window-item>
           <v-tabs-window-item :value="NODE_EDIT_DEBUG_TAB">
-            <p>Debug Tab</p>
+            <h4>Node Data</h4>
+            <pre>{{ JSON.stringify(graphStore.getComputedComputationResult(store.node.id).value, null, 2) }}</pre>
           </v-tabs-window-item>
         </v-tabs-window>
       </v-card-text>

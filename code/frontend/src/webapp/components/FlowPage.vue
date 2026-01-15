@@ -25,7 +25,7 @@
   onEdgesChange(changes => {
     for (const change of changes) {
       if (change.type == "remove" && change.id) {
-        graphStore.removeEdge(change.id);
+        graphStore.removeEdgeAction(change.id);
       }
     }
     applyEdgeChanges(changes);
@@ -36,25 +36,25 @@
     const additionalNodeChanges: NodeChange[] = [];
     for (const change of changes) {
       if (change.type == "remove" && change.id) {
-        for (const node of graphStore.getDescendantNodes(graphStore.getNode(change.id).value).value) {
+        for (const node of graphStore.getComputedDescendantNodes(change.id).value) {
           additionalNodeChanges.push({
             type: "remove",
             id: node.id
           } as NodeRemoveChange);
         }
-        graphStore.removeNode(change.id);
+        graphStore.removeNodeAction(change.id);
       }
       if (change.type == "position" && change.id && change.position) {
-        graphStore.updateNodePosition(change.id, change.position);
+        graphStore.updateNodePositionAction(change.id, change.position);
       }
       if (change.type == "dimensions" && change.id && change.dimensions) {
-        graphStore.updateNodeDimensions(change.id, change.dimensions);
+        graphStore.updateNodeSizeAction(change.id, change.dimensions);
       }
     }
     applyNodeChanges([...changes, ...additionalNodeChanges]);
   });
 
-  onConnect(connection => graphStore.addEdgeFromVueFlowConnection(connection));
+  onConnect(connection => graphStore.addEdgeFromVueFlowConnectionAction(connection));
 
   onNodeDoubleClick(event => {
     if (!optionsStore.locked) {
@@ -67,8 +67,8 @@
   <div class="flowpage_container">
     <FlowToolbar />
     <VueFlow
-      :nodes="graphStore.getVueFlowNodes().value"
-      :edges="graphStore.getVueFlowEdges().value"
+      :nodes="graphStore.getComputedVueFlowNodes().value"
+      :edges="graphStore.getComputedVueFlowEdges().value"
       :connection-mode="ConnectionMode.Loose"
       :snap-to-grid="optionsStore.snapToGrid"
       :snap-grid="[10, 10]"
@@ -97,7 +97,6 @@
 <style>
   @import "@vue-flow/core/dist/style.css";
   @import "@vue-flow/core/dist/theme-default.css";
-  @import "@vue-flow/controls/dist/style.css";
   @import "@vue-flow/minimap/dist/style.css";
   @import "@vue-flow/node-resizer/dist/style.css";
 

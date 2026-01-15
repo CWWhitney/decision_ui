@@ -1,5 +1,5 @@
 {
-  "name": "decision-support-ui",
+  "name": "@decision-support-ui/frontend",
   "version": "0.2.1",
   "author": "Institute of Crop Science and Resource Conservation, University of Bonn",
   "description": "A tool to support decision making using Monte Carlo simulations",
@@ -19,6 +19,7 @@
     "analyze": "vite-bundle-visualizer"
   },
   "dependencies": {
+    "@decision-support-ui/common": "file:../common",
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
     "@highlightjs/vue-plugin": "^2.1.0",

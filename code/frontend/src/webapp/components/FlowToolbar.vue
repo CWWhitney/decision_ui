@@ -1,13 +1,6 @@
 <script setup lang="ts">
   import { useStore } from "@/state";
-  import {
-    AVAILABLE_NODE_TYPES,
-    DEFAUL_NODE_DIMENSIONS,
-    DEFAULT_NODE_TYPE_TITLES,
-    useFlowGraphStore,
-    type NodeState,
-    type NodeTypes
-  } from "@/state/flow/graph";
+  import { useFlowGraphStore } from "@/state/flow/graph";
   import { useFlowOptionsStore } from "@/state/flow/options";
   import {
     BEZIER_EDGE_TYPE,
@@ -16,6 +9,13 @@
     STRAIGHT_EDGE_TYPE,
     useFlowStyleStore
   } from "@/state/flow/style";
+  import {
+    AVAILABLE_NODE_TYPES,
+    DEFAUL_NODE_DIMENSIONS,
+    DEFAULT_NODE_TYPE_TITLES,
+    type Node,
+    type NodeType
+  } from "@decision-support-ui/common";
   import { useVueFlow, type Rect, type XYPosition } from "@vue-flow/core";
 
   const {
@@ -36,11 +36,11 @@
     // determine which node could be the best parent node based on cursor position
     // (there might be multiple in case of nested nodes or overlapping nodes)
     const intersectingGraphNodes = getIntersectingNodes({ ...position, width: 1, height: 1 } as Rect, false);
-    const intersectingNodes = intersectingGraphNodes.map(n => graphStore.getNode(n.id).value);
+    const intersectingNodes = intersectingGraphNodes.map(n => graphStore.getComputedNode(n.id).value);
 
     // remove any ancestor nodes from the list of intersecting nodes
     const ancestorsNodeIds = intersectingNodes
-      .reduce((p, n) => [...p, ...graphStore.getAncestorNodes(n).value], [] as NodeState[])
+      .reduce((p, n) => [...p, ...graphStore.getComputedAncestorNodes(n.id).value], [] as Node[])
       .map(n => n.id);
 
     // consider only child nodes (remove any ancestor nodes)
@@ -50,35 +50,35 @@
     return candidateParentNodes.length > 0 ? candidateParentNodes[0] : null;
   };
 
-  const onNodeDragEnd = (event: DragEvent, nodeType: NodeTypes) => {
+  const onNodeDragEnd = (event: DragEvent, nodeType: NodeType) => {
     const topleft = screenToFlowCoordinate({
       x: event.clientX,
       y: event.clientY
     });
 
     const parentNode = determineParentNode(topleft);
-    const ancestorNodes = parentNode ? graphStore.getAncestorNodes(parentNode).value : [];
+    const ancestorNodes = parentNode ? graphStore.getComputedAncestorNodes(parentNode.id).value : [];
     const ancestorOffset = [parentNode, ...ancestorNodes].reduce(
-      (p, n) => ({ x: p.x + (n?.position.x ?? 0), y: p.y + (n?.position.y ?? 0) }),
+      (p, n) => ({ x: p.x + (n?.visualization.position.x ?? 0), y: p.y + (n?.visualization.position.y ?? 0) }),
       { x: 0, y: 0 } as XYPosition
     );
-    const newNodeDimensions = DEFAUL_NODE_DIMENSIONS[nodeType];
+    const newNodeSize = DEFAUL_NODE_DIMENSIONS[nodeType];
     const newNodePosition = {
-      x: topleft.x - newNodeDimensions.width / 2 - ancestorOffset.x,
-      y: topleft.y - newNodeDimensions.height / 2 - ancestorOffset.y
+      x: topleft.x - newNodeSize.width / 2 - ancestorOffset.x,
+      y: topleft.y - newNodeSize.height / 2 - ancestorOffset.y
     };
 
-    graphStore.addNode(nodeType, {
+    graphStore.addNewNodeAction(nodeType, {
       position: newNodePosition,
-      dimensions: newNodeDimensions,
+      size: newNodeSize,
       parentNodeId: parentNode?.id
     });
 
     removeSelectedNodes(getSelectedNodes.value);
   };
 
-  const onNodeClick = (nodeType: NodeTypes) => {
-    graphStore.addNode(nodeType);
+  const onNodeClick = (nodeType: NodeType) => {
+    graphStore.addNewNodeAction(nodeType);
   };
 
   const onLockGraphClick = () => {

@@ -7,6 +7,7 @@
     NODE_EDIT_STYLE_TAB,
     useDialogsNodeEditStore
   } from "@/state/dialogs/nodeEdit";
+
   import { Position, Handle, useVueFlow } from "@vue-flow/core";
   import type { NodeProps } from "@vue-flow/core";
   import { NodeResizer } from "@vue-flow/node-resizer";
@@ -38,7 +39,7 @@
     </v-btn-group>
   </NodeToolbar>
 
-  <div class="content">{{ node.data.label }}</div>
+  <div class="content">{{ node.data.label }} <br /></div>
 
   <Handle id="top" type="source" :position="Position.Top" style="" />
   <Handle id="bottom" type="source" :position="Position.Bottom" />

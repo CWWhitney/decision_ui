@@ -1,4 +1,3 @@
-import { reactive } from "vue";
 import { useFlowGraphStore } from "./graph";
 import { useFlowStyleStore } from "./style";
 import { useFlowOptionsStore } from "./options";
@@ -14,10 +13,10 @@ export const useFlowStore = () => {
     options.reset();
   };
 
-  return reactive({
+  return {
     graph,
     style,
     options,
     reset
-  });
+  };
 };

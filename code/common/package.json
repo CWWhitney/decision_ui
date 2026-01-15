@@ -1,0 +1,31 @@
+{
+  "name": "@decision-support-ui/common",
+  "version": "0.0.1",
+  "description": "common types and functions",
+  "author": "Thomas Low <code@thomaslow.com>",
+  "private": true,
+  "main": "build/cjs/src/index.js",
+  "module": "build/esm/src/index.js",
+  "types": "build/esm/src/index.d.ts",
+  "scripts": {
+    "build": "rm -rf build && npm run build-esm && npm run build-cjs",
+    "build-esm": "rm -rf build/esm && tsc -p tsconfig.esm.json",
+    "build-cjs": "rm -rf build/cjs && tsc -p tsconfig.cjs.json",
+    "watch": "concurrently -c auto -n esm,cjs \"npm run watch-esm\" \"npm run watch-cjs\"",
+    "watch-esm": "tsc -p tsconfig.esm.json --watch --preserveWatchOutput",
+    "watch-cjs": "tsc -p tsconfig.cjs.json --watch --preserveWatchOutput",
+    "lint": "eslint .",
+    "clean": "rm -rf node_modules && rm -rf build"
+  },
+  "dependencies": {
+    "gaussian": "^1.3.0"
+  },
+  "devDependencies": {
+    "@types/gaussian": "^1.2.2",
+    "concurrently": "^9.2.0",
+    "eslint": "^9.31.0",
+    "nodemon": "^3.1.10",
+    "typescript": "5.8.3",
+    "typescript-eslint": "^8.37.0"
+  }
+}
