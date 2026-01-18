@@ -6,6 +6,7 @@ See https://observablehq.com/@chrispahm/skew-normal-distributions
 for further information.
 */
 
+import { getNormalDistributionParameter } from "./normal";
 import { validateLowerUpperBounds } from "./validate";
 
 const random_trunc_normal = ({
@@ -61,7 +62,7 @@ const random_trunc_normal = ({
     return randomSkewNormal(rng, mean, stddev, skew);
 };
 
-export const validateTruncNormalDistributionParameters = (lower: number, upper: number) => {
+export const validatePositiveNormalDistributionParameters = (lower: number, upper: number) => {
     validateLowerUpperBounds(lower, upper);
 
     if (lower <= 0) {
@@ -76,15 +77,36 @@ export const validateTruncNormalDistributionParameters = (lower: number, upper: 
     return true;
 };
 
-export const getTruncNormalDistributionParameters = (lower: number, upper: number) => {
-    const q95_Z = 1.6448536269514722;
-    const mean = (lower + upper) / 2;
-    const stddev = (upper - mean) / q95_Z;
-
-    return { mean, stddev };
+export const getPositiveNormalDistributionSample = (lower: number, upper: number, size: number) => {
+    const { mean, stddev } = getNormalDistributionParameter(lower, upper);
+    return [...Array(size).keys()].map(() => random_trunc_normal({ range: [0, Infinity], mean, stddev }));
 };
 
-export const getTruncNormalDistributionSample = (lower: number, upper: number, size: number) => {
-    const { mean, stddev } = getTruncNormalDistributionParameters(lower, upper);
-    return [...Array(size).keys()].map(() => random_trunc_normal({ range: [0, Infinity], mean, stddev }));
+export const validate01TruncatedNormalDistributionParameters = (lower: number, upper: number) => {
+    validateLowerUpperBounds(lower, upper);
+
+    if (lower <= 0) {
+        throw new Error(`Lower bound '${lower}' needs to be larger than 0.`);
+    }
+    if (upper < 0) {
+        throw new Error(`Upper bound '${upper}' needs to be larger than 0.`);
+    }
+    if (!(lower >= upper * 0.1)) {
+        throw new Error(`Lower bound '${lower}' needs to be at least 1/10th of the upper bound '${upper}'.`);
+    }
+    if (lower < 0 || lower > 1) {
+        throw new Error(`Lower bound '${lower}' needs to be between 0 and 1.`);
+    }
+    if (upper < 0 || upper > 1) {
+        throw new Error(`Upper bound '${upper}' needs to be between 0 and 1.`);
+    }
+    if (!(lower + (1 - lower) * 0.9 >= upper)) {
+        throw new Error(`Lower bound '${lower}' and upper bound '${upper}' need to be closer.`);
+    }
+    return true;
+};
+
+export const get01TruncatedNormalDistributionSample = (lower: number, upper: number, size: number) => {
+    const { mean, stddev } = getNormalDistributionParameter(lower, upper);
+    return [...Array(size).keys()].map(() => random_trunc_normal({ range: [0, 1], mean, stddev }));
 };

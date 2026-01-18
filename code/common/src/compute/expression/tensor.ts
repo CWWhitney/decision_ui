@@ -1,54 +1,71 @@
 import * as tf from "@tensorflow/tfjs";
 
 import grammar from "./expression.ohm-bundle";
-import {
-    ComputationValue,
-    DETERMINISTIC_COMPUTATION_VALUE_TYPE,
-    PROBABILISTIC_COMPUTATION_VALUE_TYPE,
-    SERIES_COMPUTATION_VALUE_TYPE
-} from "../result";
+
 import { VariableDependencies } from "./dependencies";
 import { ESTIMATE_NODE_TYPE, Node, NodeId, OPERATION_NODE_TYPE } from "../../graph";
-import { getNormalDistributionParameter } from "../math";
+import { getNormalDistributionParameter, validateLowerUpperBounds } from "../math";
 import { ComputationContext } from "../context";
-import { getTruncNormalDistributionSample } from "../math/distributions/trunc_normal";
+import {
+    get01TruncatedNormalDistributionSample,
+    getPositiveNormalDistributionSample,
+    validate01TruncatedNormalDistributionParameters,
+    validatePositiveNormalDistributionParameters
+} from "../math/distributions/trunc_normal";
+import {
+    DeterministcType,
+    DETERMINISTIC_TYPE,
+    PROBABILISTIC_TYPE,
+    ProbabilisticType,
+    SERIES_TYPE,
+    SeriesType
+} from "../value";
 
 export interface ExpressionTensorContext {
     tensorByVariable: { [variable: string]: tf.Tensor };
 }
 
 tf.ready().then(() => {
-    console.log(`tensorflow is ready with backend '${tf.getBackend()}'`);
+    const backend = tf.getBackend();
+    const float32support = tf.ENV.getBool("WEBGL_RENDER_FLOAT32_CAPABLE");
+    const float32enabled = tf.ENV.getBool("WEBGL_RENDER_FLOAT32_ENABLED");
+    console.log(`tensorflow is ready with backend '${backend}' (float32 = ${float32support && float32enabled})`);
 });
 
-export async function tensorToComputationValue(tensor: tf.Tensor): Promise<ComputationValue> {
-    const data = await tensor.array();
+export interface TensorDescriptor {
+    type: DeterministcType | ProbabilisticType | SeriesType;
+    shape: [] | [number] | [number, number];
+    dtype: string;
+}
+
+export const tensorToDescriptor = (tensor: tf.Tensor): TensorDescriptor => {
     const shape = tensor.shape;
+    const dtype = `${tensor.dtype}`;
 
     switch (shape.length) {
         case 0:
             return {
-                type: DETERMINISTIC_COMPUTATION_VALUE_TYPE,
-                data: data as number,
-                shape: []
+                type: DETERMINISTIC_TYPE,
+                shape: [],
+                dtype
             };
         case 1:
             return {
-                type: PROBABILISTIC_COMPUTATION_VALUE_TYPE,
-                data: data as number[],
-                shape: shape as [number]
+                type: PROBABILISTIC_TYPE,
+                shape: shape as [number],
+                dtype
             };
         case 2: {
             return {
-                type: SERIES_COMPUTATION_VALUE_TYPE,
-                data: data as number[][],
-                shape: shape as [number, number]
+                type: SERIES_TYPE,
+                shape: shape as [number, number],
+                dtype
             };
         }
         default:
-            throw new Error(`Unsupported tensor shape: ${JSON.stringify(shape)}`);
+            throw new Error(`unsupported tensor shape: ${JSON.stringify(shape)}`);
     }
-}
+};
 
 export const createTensorEvaluationSemantics = () => {
     return grammar.createSemantics().addOperation<tf.Tensor>("eval(context)", {
@@ -146,10 +163,17 @@ export const getTensorForEstimateNode = (node: Node, context: ComputationContext
     if (node.options.distribution == "deterministic") {
         return tf.scalar(node.options.lower);
     } else if (node.options.distribution == "norm") {
+        validateLowerUpperBounds(node.options.lower, node.options.upper);
         const { mean, stddev } = getNormalDistributionParameter(node.options.lower, node.options.upper);
         return tf.randomNormal([context.mcRuns], mean, stddev);
     } else if (node.options.distribution == "posnorm") {
-        return tf.tensor1d(getTruncNormalDistributionSample(node.options.lower, node.options.upper, context.mcRuns));
+        validatePositiveNormalDistributionParameters(node.options.lower, node.options.upper);
+        return tf.tensor1d(getPositiveNormalDistributionSample(node.options.lower, node.options.upper, context.mcRuns));
+    } else if (node.options.distribution == "tnorm_0_1") {
+        validate01TruncatedNormalDistributionParameters(node.options.lower, node.options.upper);
+        return tf.tensor1d(
+            get01TruncatedNormalDistributionSample(node.options.lower, node.options.upper, context.mcRuns)
+        );
     }
 
     throw new Error(`distribution '${node.options.distribution}' tensor calculation not implemented`);
@@ -197,13 +221,4 @@ export const getTensorForNodeRecursion = (
         );
     }
     throw new Error(`unknown node type ${node.type}`);
-};
-
-export const getComputationValueForNode = async (
-    nodeId: string,
-    getTensorForNode: (nodeId: string) => tf.Tensor
-): Promise<ComputationValue> => {
-    const tensor = getTensorForNode(nodeId);
-    const value = await tensorToComputationValue(tensor);
-    return value;
 };
