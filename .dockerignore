@@ -1,3 +1,5 @@
+code/common/node_modules
+code/common/build
 code/frontend/node_modules
 code/frontend/dist
 code/backend/.pytest_cache
