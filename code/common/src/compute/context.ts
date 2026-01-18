@@ -1,3 +1,3 @@
 export interface ComputationContext {
-  mcRuns: number;
+    mcRuns: number;
 }

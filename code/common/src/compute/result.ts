@@ -16,43 +16,40 @@ export const PROBABILISTIC_COMPUTATION_VALUE_TYPE = "probabilistic";
 export const SERIES_COMPUTATION_VALUE_TYPE = "series";
 
 export type ComputationValueType =
-  | DeterministicComputationValueType
-  | ProbabilisticComputationValueType
-  | SeriesComputationValueType;
+    | DeterministicComputationValueType
+    | ProbabilisticComputationValueType
+    | SeriesComputationValueType;
 
 export interface AbstractComputationValue<T> {
-  type: T;
+    type: T;
 }
 
 export interface DeterministicComputationValue extends AbstractComputationValue<DeterministicComputationValueType> {
-  data: number;
-  shape: [];
+    data: number;
+    shape: [];
 }
 
 export interface ProbabilisticComputationValue extends AbstractComputationValue<ProbabilisticComputationValueType> {
-  data: number[];
-  shape: [number];
+    data: number[];
+    shape: [number];
 }
 
 export interface SeriesComputationValue extends AbstractComputationValue<SeriesComputationValueType> {
-  data: number[][];
-  shape: [number, number];
+    data: number[][];
+    shape: [number, number];
 }
-export type ComputationValue =
-  | DeterministicComputationValue
-  | ProbabilisticComputationValue
-  | SeriesComputationValue;
+export type ComputationValue = DeterministicComputationValue | ProbabilisticComputationValue | SeriesComputationValue;
 
 export interface AbstractComputationResult<T> {
-  type: T;
+    type: T;
 }
 
 export interface ComputationValueResult extends AbstractComputationResult<ComputationResultValueType> {
-  value: ComputationValue;
+    value: ComputationValue;
 }
 
 export interface ComputationErrorResult extends AbstractComputationResult<ComputationResultErrorType> {
-  message: string;
+    message: string;
 }
 
 export type ComputationResult = ComputationValueResult | ComputationErrorResult;

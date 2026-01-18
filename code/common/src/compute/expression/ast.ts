@@ -24,7 +24,7 @@ export const getExpressionAstSemantics = () => {
         type: "binary",
         operator: "+",
         left: left.ast(),
-        right: right.ast(),
+        right: right.ast()
       };
     },
     AddExp_minus(left, operator, right) {
@@ -32,7 +32,7 @@ export const getExpressionAstSemantics = () => {
         type: "binary",
         operator: "-",
         left: left.ast(),
-        right: right.ast(),
+        right: right.ast()
       };
     },
     MulExp(e) {
@@ -43,7 +43,7 @@ export const getExpressionAstSemantics = () => {
         type: "binary",
         operator: "*",
         left: left.ast(),
-        right: right.ast(),
+        right: right.ast()
       };
     },
     MulExp_divide(left, operator, right) {
@@ -51,7 +51,7 @@ export const getExpressionAstSemantics = () => {
         type: "binary",
         operator: "/",
         left: left.ast(),
-        right: right.ast(),
+        right: right.ast()
       };
     },
     ExpExp(e) {
@@ -61,7 +61,7 @@ export const getExpressionAstSemantics = () => {
       return {
         type: "exp",
         base: base.ast(),
-        exponent: exponent.ast(),
+        exponent: exponent.ast()
       };
     },
     PriExp(e) {
@@ -75,7 +75,7 @@ export const getExpressionAstSemantics = () => {
         type: "binary",
         operator: "*",
         left: { type: "number", value: 1 },
-        right: right.ast(),
+        right: right.ast()
       };
     },
     PriExp_neg(operator, right) {
@@ -83,7 +83,7 @@ export const getExpressionAstSemantics = () => {
         type: "binary",
         operator: "*",
         left: { type: "number", value: -1 },
-        right: right.ast(),
+        right: right.ast()
       };
     },
     ident(_l, _ns) {
@@ -94,7 +94,7 @@ export const getExpressionAstSemantics = () => {
     },
     number_whole(_chars) {
       return { type: "number", value: parseInt(this.sourceString, 10) };
-    },
+    }
   });
 };
 

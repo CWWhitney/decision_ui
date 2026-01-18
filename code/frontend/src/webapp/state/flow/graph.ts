@@ -227,7 +227,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
             getTensorForNode,
             computedComputationContext.value
           )
-        };
+        } as ComputedTensor;
       } catch (e) {
         return {
           type: "error",

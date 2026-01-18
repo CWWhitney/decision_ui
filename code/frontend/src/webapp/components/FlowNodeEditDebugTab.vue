@@ -1,4 +1,6 @@
 <script setup lang="ts">
+  import * as tf from "@tensorflow/tfjs";
+
   import { useFlowGraphStore } from "@/state/flow/graph";
   import { type Node } from "@decision-support-ui/common";
   import { computedAsync } from "@vueuse/core";
@@ -17,6 +19,8 @@
   </p>
   <p>Computed Data:</p>
   <pre>{{ JSON.stringify(computedValue, null, 2) }}</pre>
+  <p>Tensorflow Memory:</p>
+  <pre>{{ JSON.stringify(tf.memory(), null, 2) }}</pre>
 </template>
 
 <style scoped lang="scss"></style>

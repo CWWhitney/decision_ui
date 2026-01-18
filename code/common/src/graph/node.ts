@@ -15,71 +15,66 @@ export type CollectionNodeType = "collection";
 
 export type NodeId = string;
 
-export type NodeType =
-  | EstimateNodeType
-  | OperationNodeType
-  | LoopNodeType
-  | ResultNodeType
-  | CollectionNodeType;
+export type NodeType = EstimateNodeType | OperationNodeType | LoopNodeType | ResultNodeType | CollectionNodeType;
 
 export const AVAILABLE_NODE_TYPES: NodeType[] = [
-  ESTIMATE_NODE_TYPE,
-  OPERATION_NODE_TYPE,
-  LOOP_NODE_TYPE,
-  RESULT_NODE_TYPE,
-  COLLECTION_NODE_TYPE,
+    ESTIMATE_NODE_TYPE,
+    OPERATION_NODE_TYPE,
+    LOOP_NODE_TYPE,
+    RESULT_NODE_TYPE,
+    COLLECTION_NODE_TYPE
 ];
 
 export const DEFAULT_NODE_TYPE_TITLES: { [key in NodeType]: string } = {
-  [ESTIMATE_NODE_TYPE]: "Estimate",
-  [OPERATION_NODE_TYPE]: "Operation",
-  [LOOP_NODE_TYPE]: "Loop",
-  [RESULT_NODE_TYPE]: "Result",
-  [COLLECTION_NODE_TYPE]: "Collection",
+    [ESTIMATE_NODE_TYPE]: "Estimate",
+    [OPERATION_NODE_TYPE]: "Operation",
+    [LOOP_NODE_TYPE]: "Loop",
+    [RESULT_NODE_TYPE]: "Result",
+    [COLLECTION_NODE_TYPE]: "Collection"
 };
 
 export const getDefaultNodeSize = (nodeType: NodeType): Size => {
-  switch (nodeType) {
-    case ESTIMATE_NODE_TYPE:
-    case OPERATION_NODE_TYPE:
-    case RESULT_NODE_TYPE:
-      return { width: 200, height: 50 };
-    case LOOP_NODE_TYPE:
-    case COLLECTION_NODE_TYPE:
-      return { width: 500, height: 400 };
-    default:
-      throw new Error(`unknown node type '${nodeType}'`);
-  }
+    switch (nodeType) {
+        case ESTIMATE_NODE_TYPE:
+        case OPERATION_NODE_TYPE:
+        case RESULT_NODE_TYPE:
+            return { width: 200, height: 50 };
+        case LOOP_NODE_TYPE:
+        case COLLECTION_NODE_TYPE:
+            return { width: 500, height: 400 };
+        default:
+            throw new Error(`unknown node type '${nodeType}'`);
+    }
 };
 
 export interface AbstractNode<T, O> {
-  id: NodeId;
-  type: T;
-  parentNodeId: NodeId | null;
+    id: NodeId;
+    type: T;
+    parentNodeId: NodeId | null;
 
-  visualization: {
-    title: string;
-    position: Position;
-    size: Size;
-  };
+    visualization: {
+        title: string;
+        position: Position;
+        size: Size;
+    };
 
-  options: O;
+    options: O;
 }
 
 export interface EstimateNodeOptions {
-  distribution: DistributionFunctionType;
-  lower: number;
-  upper: number;
-  comment: string;
+    distribution: DistributionFunctionType;
+    lower: number;
+    upper: number;
+    comment: string;
 }
 
 export interface OperationNodeOptions {
-  expression: string;
+    expression: string;
 }
 
 export interface ResultNodeOptions {
-  variables: string[];
-  colors: string[];
+    variables: string[];
+    colors: string[];
 }
 
 export type ResultNode = AbstractNode<ResultNodeType, ResultNodeOptions>;
@@ -87,53 +82,45 @@ export type ResultNode = AbstractNode<ResultNodeType, ResultNodeOptions>;
 export type CollectionNode = AbstractNode<CollectionNodeType, null>;
 export type LoopNode = AbstractNode<LoopNodeType, null>;
 
-export type OperationNode = AbstractNode<
-  OperationNodeType,
-  OperationNodeOptions
->;
+export type OperationNode = AbstractNode<OperationNodeType, OperationNodeOptions>;
 export type EstimateNode = AbstractNode<EstimateNodeType, EstimateNodeOptions>;
 
 export type NodeOptionsTypeMap = {
-  [ESTIMATE_NODE_TYPE]: EstimateNodeOptions;
-  [OPERATION_NODE_TYPE]: OperationNodeOptions;
-  [LOOP_NODE_TYPE]: null;
-  [RESULT_NODE_TYPE]: ResultNodeOptions;
-  [COLLECTION_NODE_TYPE]: null;
+    [ESTIMATE_NODE_TYPE]: EstimateNodeOptions;
+    [OPERATION_NODE_TYPE]: OperationNodeOptions;
+    [LOOP_NODE_TYPE]: null;
+    [RESULT_NODE_TYPE]: ResultNodeOptions;
+    [COLLECTION_NODE_TYPE]: null;
 };
 
 export const getDefaultNodeOptions = (nodeType: NodeType) => {
-  switch (nodeType) {
-    case ESTIMATE_NODE_TYPE:
-      return {
-        distribution: "deterministic",
-        lower: 1,
-        upper: 1,
-        comment: "",
-      } as EstimateNodeOptions;
-    case OPERATION_NODE_TYPE:
-      return {
-        expression: "",
-      };
-    case LOOP_NODE_TYPE:
-      return null;
-    case RESULT_NODE_TYPE:
-      return {
-        variables: [],
-        colors: [],
-      } as ResultNodeOptions;
-    case COLLECTION_NODE_TYPE:
-      return null;
-    default:
-      throw new Error(`unkown node type '${nodeType}'`);
-  }
+    switch (nodeType) {
+        case ESTIMATE_NODE_TYPE:
+            return {
+                distribution: "deterministic",
+                lower: 1,
+                upper: 1,
+                comment: ""
+            } as EstimateNodeOptions;
+        case OPERATION_NODE_TYPE:
+            return {
+                expression: ""
+            };
+        case LOOP_NODE_TYPE:
+            return null;
+        case RESULT_NODE_TYPE:
+            return {
+                variables: [],
+                colors: []
+            } as ResultNodeOptions;
+        case COLLECTION_NODE_TYPE:
+            return null;
+        default:
+            throw new Error(`unkown node type '${nodeType}'`);
+    }
 };
 
-export type Node =
-  | ResultNode
-  | OperationNode
-  | LoopNode
-  | EstimateNode
-  | CollectionNode;
+export type Node = ResultNode | OperationNode | LoopNode | EstimateNode | CollectionNode;
 
 export type NodeByIdMap = Map<NodeId, Node>;
 export type NodeChildrenByParentIdMap = Map<NodeId, Node[]>;
@@ -145,112 +132,101 @@ export type NodeChildrenByParentIdMap = Map<NodeId, Node[]>;
  * @returns a map of nodes from id to node state
  */
 export const getNodeByIdMap = (nodes: Node[]): NodeByIdMap => {
-  return new Map(nodes.map((n) => [n.id, n]));
+    return new Map(nodes.map(n => [n.id, n]));
 };
 
 export const getNodeByIdFromMap = (nodeId: NodeId, nodeMap: NodeByIdMap) => {
-  const node = nodeMap.get(nodeId);
-  if (!node) {
-    throw new Error(`could not find node '${nodeId}' in graph`);
-  }
-  return node;
+    const node = nodeMap.get(nodeId);
+    if (!node) {
+        throw new Error(`could not find node '${nodeId}' in graph`);
+    }
+    return node;
 };
 
-export const getChildrenByParentIdMap = (
-  nodes: Node[],
-): NodeChildrenByParentIdMap => {
-  const map = new Map<NodeId, Node[]>();
+export const getChildrenByParentIdMap = (nodes: Node[]): NodeChildrenByParentIdMap => {
+    const map = new Map<NodeId, Node[]>();
 
-  for (const node of nodes) {
-    if (!node.parentNodeId) {
-      continue;
+    for (const node of nodes) {
+        if (!node.parentNodeId) {
+            continue;
+        }
+
+        const children = map.get(node.parentNodeId);
+        if (children) {
+            children.push(node);
+        } else {
+            map.set(node.parentNodeId, [node]);
+        }
     }
 
-    const children = map.get(node.parentNodeId);
-    if (children) {
-      children.push(node);
-    } else {
-      map.set(node.parentNodeId, [node]);
-    }
-  }
-
-  return map;
+    return map;
 };
 
 export const getNodePositionRecursion = (
-  nodeId: NodeId,
-  getNode: (nodeId: NodeId) => Node,
-  self: (nodeId: NodeId, getNode: (nodeId: NodeId) => Node) => Position,
+    nodeId: NodeId,
+    getNode: (nodeId: NodeId) => Node,
+    self: (nodeId: NodeId, getNode: (nodeId: NodeId) => Node) => Position
 ): Position => {
-  const node = getNode(nodeId);
+    const node = getNode(nodeId);
 
-  if (!node.parentNodeId) {
-    return node.visualization.position;
-  }
+    if (!node.parentNodeId) {
+        return node.visualization.position;
+    }
 
-  return {
-    x: node.visualization.position.x + self(node.parentNodeId, getNode).x,
-    y: node.visualization.position.y + self(node.parentNodeId, getNode).y,
-  } as Position;
+    return {
+        x: node.visualization.position.x + self(node.parentNodeId, getNode).x,
+        y: node.visualization.position.y + self(node.parentNodeId, getNode).y
+    } as Position;
 };
 
-export const getNodePosition = (
-  nodeId: NodeId,
-  getNode: (nodeId: NodeId) => Node,
-): Position => getNodePositionRecursion(nodeId, getNode, getNodePosition);
+export const getNodePosition = (nodeId: NodeId, getNode: (nodeId: NodeId) => Node): Position =>
+    getNodePositionRecursion(nodeId, getNode, getNodePosition);
 
 export const getNextNodeId = (nodes: Node[]): NodeId => {
-  return `${
-    nodes.reduce((i: number, node) => Math.max(parseInt(node.id) ?? 0, i), 0) +
-    1
-  }`;
+    return `${nodes.reduce((i: number, node) => Math.max(parseInt(node.id) ?? 0, i), 0) + 1}`;
 };
 
 export interface NewNodeOptions {
-  parentNodeId?: NodeId | null;
-  position?: Position;
-  size?: Size;
+    parentNodeId?: NodeId | null;
+    position?: Position;
+    size?: Size;
 }
 
-export const getNewNode = (
-  nodeType: NodeType,
-  nodes: Node[],
-  options?: NewNodeOptions,
-): Node => {
-  const nextNodeId = getNextNodeId(nodes);
-  return {
-    id: nextNodeId,
-    type: nodeType,
-    parentNodeId: options?.parentNodeId ?? null,
-    visualization: {
-      title: `${DEFAULT_NODE_TYPE_TITLES[nodeType]} ${nextNodeId}`,
-      position: options?.position ?? { x: 0, y: 0 },
-      size: options?.size ?? getDefaultNodeSize(nodeType),
-    },
-    options: getDefaultNodeOptions(nodeType),
-  } as Node;
+export const getNewNode = (nodeType: NodeType, nodes: Node[], options?: NewNodeOptions): Node => {
+    const nextNodeId = getNextNodeId(nodes);
+    return {
+        id: nextNodeId,
+        type: nodeType,
+        parentNodeId: options?.parentNodeId ?? null,
+        visualization: {
+            title: `${DEFAULT_NODE_TYPE_TITLES[nodeType]} ${nextNodeId}`,
+            position: options?.position ?? { x: 0, y: 0 },
+            size: options?.size ?? getDefaultNodeSize(nodeType)
+        },
+        options: getDefaultNodeOptions(nodeType)
+    } as Node;
 };
 
 export const getAncestorNodesRecursion = (
-  nodeId: NodeId,
-  getNode: (nodeId: string) => Node,
-  self: (nodeId: NodeId, getNode: (nodeId: string) => Node) => Node[],
+    nodeId: NodeId,
+    getNode: (nodeId: string) => Node,
+    self: (nodeId: NodeId, getNode: (nodeId: string) => Node) => Node[]
 ): Node[] => {
-  const node = getNode(nodeId);
-  if (node.parentNodeId) {
-    const parentNode = getNode(node.parentNodeId);
-    return [parentNode, ...self(parentNode.id, getNode)];
-  }
-  return [] as Node[];
+    const node = getNode(nodeId);
+    if (node.parentNodeId) {
+        const parentNode = getNode(node.parentNodeId);
+        return [parentNode, ...self(parentNode.id, getNode)];
+    }
+    return [] as Node[];
 };
 
 export const getDescendantNodesRecursion = (
-  nodeId: NodeId,
-  childrenByParentIdMap: Map<NodeId, Node[]>,
-  self: (nodeId: NodeId, childrenByParentIdMap: Map<NodeId, Node[]>) => Node[],
+    nodeId: NodeId,
+    childrenByParentIdMap: Map<NodeId, Node[]>,
+    self: (nodeId: NodeId, childrenByParentIdMap: Map<NodeId, Node[]>) => Node[]
 ): Node[] => {
-  return (childrenByParentIdMap.get(nodeId) ?? []).reduce(
-    (p, n) => [...p, n, ...self(n.id, childrenByParentIdMap)],
-    [] as Node[],
-  );
+    return (childrenByParentIdMap.get(nodeId) ?? []).reduce(
+        (p, n) => [...p, n, ...self(n.id, childrenByParentIdMap)],
+        [] as Node[]
+    );
 };
