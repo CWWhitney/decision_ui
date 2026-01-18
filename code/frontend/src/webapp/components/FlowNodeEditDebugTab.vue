@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import * as tf from "@tensorflow/tfjs";
+    import { memory } from "@tensorflow/tfjs";
 
     import { useFlowGraphStore } from "@/state/flow/graph";
     import { type Node } from "@decision-support-ui/common";
@@ -17,12 +17,12 @@
 
 <template>
     <p v-if="variableDependencies.type == 'success'">
-        Variable Dependencies: {{ JSON.stringify(variableDependencies.list) }}
+        Variable Dependencies: {{ JSON.stringify(variableDependencies.value) }}
     </p>
     <p>Computed Tensor Descriptor:</p>
     <pre>{{ JSON.stringify(computedTensorDescriptor, null, 2) }}</pre>
     <p>Tensorflow Memory:</p>
-    <pre>{{ JSON.stringify(tf.memory(), null, 2) }}</pre>
+    <pre>{{ JSON.stringify(memory(), null, 2) }}</pre>
 </template>
 
 <style scoped lang="scss"></style>

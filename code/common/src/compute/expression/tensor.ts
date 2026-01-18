@@ -1,4 +1,20 @@
-import * as tf from "@tensorflow/tfjs";
+import {
+    getBackend,
+    ready as tensorflowReady,
+    ENV as tensorflowENV,
+    type Tensor,
+    add,
+    sub,
+    mul,
+    div,
+    pow,
+    neg,
+    keep,
+    scalar,
+    randomNormal,
+    tensor1d,
+    tidy
+} from "@tensorflow/tfjs";
 
 import grammar from "./expression.ohm-bundle";
 
@@ -12,33 +28,21 @@ import {
     validate01TruncatedNormalDistributionParameters,
     validatePositiveNormalDistributionParameters
 } from "../math/distributions/trunc_normal";
-import {
-    DeterministcType,
-    DETERMINISTIC_TYPE,
-    PROBABILISTIC_TYPE,
-    ProbabilisticType,
-    SERIES_TYPE,
-    SeriesType
-} from "../value";
+import { DETERMINISTIC_TYPE, PROBABILISTIC_TYPE, SERIES_TYPE } from "../value";
+import { TensorDescriptor } from "../tensor";
 
 export interface ExpressionTensorContext {
-    tensorByVariable: { [variable: string]: tf.Tensor };
+    tensorByVariable: { [variable: string]: Tensor };
 }
 
-tf.ready().then(() => {
-    const backend = tf.getBackend();
-    const float32support = tf.ENV.getBool("WEBGL_RENDER_FLOAT32_CAPABLE");
-    const float32enabled = tf.ENV.getBool("WEBGL_RENDER_FLOAT32_ENABLED");
+tensorflowReady().then(() => {
+    const backend = getBackend();
+    const float32support = tensorflowENV.getBool("WEBGL_RENDER_FLOAT32_CAPABLE");
+    const float32enabled = tensorflowENV.getBool("WEBGL_RENDER_FLOAT32_ENABLED");
     console.log(`tensorflow is ready with backend '${backend}' (float32 = ${float32support && float32enabled})`);
 });
 
-export interface TensorDescriptor {
-    type: DeterministcType | ProbabilisticType | SeriesType;
-    shape: [] | [number] | [number, number];
-    dtype: string;
-}
-
-export const tensorToDescriptor = (tensor: tf.Tensor): TensorDescriptor => {
+export const tensorToDescriptor = (tensor: Tensor): TensorDescriptor => {
     const shape = tensor.shape;
     const dtype = `${tensor.dtype}`;
 
@@ -68,17 +72,17 @@ export const tensorToDescriptor = (tensor: tf.Tensor): TensorDescriptor => {
 };
 
 export const createTensorEvaluationSemantics = () => {
-    return grammar.createSemantics().addOperation<tf.Tensor>("eval(context)", {
+    return grammar.createSemantics().addOperation<Tensor>("eval(context)", {
         Exp(e) {
             return e.eval(this.args.context);
         },
 
         AddExp_plus(a, _op, b) {
-            return tf.add(a.eval(this.args.context), b.eval(this.args.context));
+            return add(a.eval(this.args.context), b.eval(this.args.context));
         },
 
         AddExp_minus(a, _op, b) {
-            return tf.sub(a.eval(this.args.context), b.eval(this.args.context));
+            return sub(a.eval(this.args.context), b.eval(this.args.context));
         },
 
         AddExp(e) {
@@ -86,11 +90,11 @@ export const createTensorEvaluationSemantics = () => {
         },
 
         MulExp_times(a, _op, b) {
-            return tf.mul(a.eval(this.args.context), b.eval(this.args.context));
+            return mul(a.eval(this.args.context), b.eval(this.args.context));
         },
 
         MulExp_divide(a, _op, b) {
-            return tf.div(a.eval(this.args.context), b.eval(this.args.context));
+            return div(a.eval(this.args.context), b.eval(this.args.context));
         },
 
         MulExp(e) {
@@ -98,7 +102,7 @@ export const createTensorEvaluationSemantics = () => {
         },
 
         ExpExp_power(a, _op, b) {
-            return tf.pow(a.eval(this.args.context), b.eval(this.args.context));
+            return pow(a.eval(this.args.context), b.eval(this.args.context));
         },
 
         ExpExp(e) {
@@ -114,7 +118,7 @@ export const createTensorEvaluationSemantics = () => {
         },
 
         PriExp_neg(_op, e) {
-            return tf.neg(e.eval(this.args.context));
+            return neg(e.eval(this.args.context));
         },
 
         ident(_l, _ns) {
@@ -123,11 +127,11 @@ export const createTensorEvaluationSemantics = () => {
             if (!(variable in context.tensorByVariable)) {
                 throw new Error(`Undefined variable: ${variable}`);
             }
-            return tf.keep(context.tensorByVariable[variable]);
+            return keep(context.tensorByVariable[variable]);
         },
 
         number(n) {
-            return tf.scalar(parseFloat(n.sourceString));
+            return scalar(parseFloat(n.sourceString));
         }
     });
 };
@@ -141,39 +145,37 @@ export const getExpressionEvaluatorForTensor = () => {
             throw Error("expression invalid: " + match.shortMessage);
         }
 
-        return semantics(match).eval(context) as tf.Tensor;
+        return semantics(match).eval(context) as Tensor;
     };
 };
 
 export type ComputedTensor =
     | {
           type: "success";
-          value: tf.Tensor;
+          value: Tensor;
       }
     | {
           type: "error";
           message: string;
       };
 
-export const getTensorForEstimateNode = (node: Node, context: ComputationContext): tf.Tensor => {
+export const getTensorForEstimateNode = (node: Node, context: ComputationContext): Tensor => {
     if (node.type != ESTIMATE_NODE_TYPE) {
         throw new Error(`cannot calculate estimate node tensor for node of type '${node.type}'`);
     }
 
     if (node.options.distribution == "deterministic") {
-        return tf.scalar(node.options.lower);
+        return scalar(node.options.lower);
     } else if (node.options.distribution == "norm") {
         validateLowerUpperBounds(node.options.lower, node.options.upper);
         const { mean, stddev } = getNormalDistributionParameter(node.options.lower, node.options.upper);
-        return tf.randomNormal([context.mcRuns], mean, stddev);
+        return randomNormal([context.mcRuns], mean, stddev);
     } else if (node.options.distribution == "posnorm") {
         validatePositiveNormalDistributionParameters(node.options.lower, node.options.upper);
-        return tf.tensor1d(getPositiveNormalDistributionSample(node.options.lower, node.options.upper, context.mcRuns));
+        return tensor1d(getPositiveNormalDistributionSample(node.options.lower, node.options.upper, context.mcRuns));
     } else if (node.options.distribution == "tnorm_0_1") {
         validate01TruncatedNormalDistributionParameters(node.options.lower, node.options.upper);
-        return tf.tensor1d(
-            get01TruncatedNormalDistributionSample(node.options.lower, node.options.upper, context.mcRuns)
-        );
+        return tensor1d(get01TruncatedNormalDistributionSample(node.options.lower, node.options.upper, context.mcRuns));
     }
 
     throw new Error(`distribution '${node.options.distribution}' tensor calculation not implemented`);
@@ -183,9 +185,9 @@ export const getTensorForOperationNode = (
     node: Node,
     getVariableDependencies: (nodeId: string) => VariableDependencies,
     getNodeIdForVariable: (variable: string) => NodeId,
-    evaluateExpressionForTensor: (expression: string, expressionContext: ExpressionTensorContext) => tf.Tensor,
-    getTensorForNode: (nodeId: string) => tf.Tensor
-): tf.Tensor => {
+    evaluateExpressionForTensor: (expression: string, expressionContext: ExpressionTensorContext) => Tensor,
+    getTensorForNode: (nodeId: string) => Tensor
+): Tensor => {
     if (node.type != OPERATION_NODE_TYPE) {
         throw new Error(`cannot calculate operation node tensor for node of type '${node.type}'`);
     }
@@ -196,7 +198,7 @@ export const getTensorForOperationNode = (
         expressionContext.tensorByVariable[variable] = getTensorForNode(getNodeIdForVariable(variable));
     }
 
-    return tf.tidy(() => evaluateExpressionForTensor(node.options.expression, expressionContext));
+    return tidy(() => evaluateExpressionForTensor(node.options.expression, expressionContext));
 };
 
 export const getTensorForNodeRecursion = (
@@ -204,10 +206,10 @@ export const getTensorForNodeRecursion = (
     getNode: (nodeId: string) => Node,
     getVariableDependencies: (nodeId: string) => VariableDependencies,
     getNodeIdForVariable: (variable: string) => NodeId,
-    evaluateExpressionForTensor: (expression: string, expressionContext: ExpressionTensorContext) => tf.Tensor,
-    getTensorForNode: (nodeId: string) => tf.Tensor,
+    evaluateExpressionForTensor: (expression: string, expressionContext: ExpressionTensorContext) => Tensor,
+    getTensorForNode: (nodeId: string) => Tensor,
     computationContext: ComputationContext
-): tf.Tensor => {
+): Tensor => {
     const node = getNode(nodeId);
     if (node.type == ESTIMATE_NODE_TYPE) {
         return getTensorForEstimateNode(node, computationContext);

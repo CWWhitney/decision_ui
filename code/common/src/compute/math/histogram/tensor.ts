@@ -1,42 +1,36 @@
-import * as tf from "@tensorflow/tfjs";
+import { keep, onesLike, scalar, Tensor1D, topk, unsortedSegmentSum, type Tensor, tidy } from "@tensorflow/tfjs";
 
 export interface HistogramData {
     bins: number[];
     counts: number[];
 }
 
-export const getHistogramBinsFromTensor = async (
-    tensor: tf.Tensor,
-    numBins: number,
-    lowerQ = 0.001,
-    upperQ = 0.999
-) => {
+export const getHistogramBinsFromTensor = async (tensor: Tensor, numBins: number, lowerQ = 0.001, upperQ = 0.999) => {
     if (tensor.shape.length !== 1) {
         throw new Error("can only calculate histogram for probabilistic sample (Tensor1D)");
     }
 
-    const { minTensor, maxTensor, countsTensor } = tf.tidy(() => {
+    const { minTensor, maxTensor, countsTensor } = tidy(() => {
         const n = tensor.size;
 
         const loRank = Math.floor(lowerQ * n);
         const hiRank = Math.ceil(upperQ * n);
 
-        const maxTensor = tf.topk(tf.keep(tensor), n - hiRank).values.min();
-        const minTensor = tf.topk(tf.keep(tensor).neg(), loRank).values.min().neg();
+        const maxTensor = topk(keep(tensor), n - hiRank).values.min();
+        const minTensor = topk(keep(tensor).neg(), loRank).values.min().neg();
 
-        const range = maxTensor.sub(minTensor).maximum(tf.scalar(1e-12));
+        const range = maxTensor.sub(minTensor).maximum(scalar(1e-12));
         const binWidth = range.div(numBins);
 
-        const indices = tf
-            .keep(tensor)
+        const indices = keep(tensor)
             .sub(minTensor)
             .div(binWidth)
             .floor()
             .toInt()
-            .clipByValue(0, numBins - 1) as tf.Tensor1D;
+            .clipByValue(0, numBins - 1) as Tensor1D;
 
-        const ones = tf.onesLike(indices);
-        const countsTensor = tf.unsortedSegmentSum(ones, indices, numBins);
+        const ones = onesLike(indices);
+        const countsTensor = unsortedSegmentSum(ones, indices, numBins);
         return {
             minTensor,
             maxTensor,

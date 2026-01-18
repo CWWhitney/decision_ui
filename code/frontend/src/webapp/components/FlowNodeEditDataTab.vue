@@ -13,7 +13,7 @@
     const computedDeterministicValue = computedAsync(async () => {
         if (
             computedTensorDescriptor.value.type == "success" &&
-            computedTensorDescriptor.value.descriptor.type == DETERMINISTIC_TYPE
+            computedTensorDescriptor.value.value.type == DETERMINISTIC_TYPE
         ) {
             return await graphStore.getComputedDeterministicValue(node.value.id).value;
         }
@@ -22,7 +22,7 @@
     const computedProbabilisticHistogramData = computedAsync(async () => {
         if (
             computedTensorDescriptor.value.type == "success" &&
-            computedTensorDescriptor.value.descriptor.type == PROBABILISTIC_TYPE
+            computedTensorDescriptor.value.value.type == PROBABILISTIC_TYPE
         ) {
             return await graphStore.getComputedProbabilisticHistogramData(node.value.id).value;
         }
@@ -36,11 +36,11 @@
         </div>
         <div v-if="computedProbabilisticHistogramData && computedProbabilisticHistogramData.type == 'success'">
             <FlowVisualizeProbabilisticValue
-                :bins="computedProbabilisticHistogramData.data.bins"
-                :counts="computedProbabilisticHistogramData.data.counts"
+                :bins="computedProbabilisticHistogramData.value.bins"
+                :counts="computedProbabilisticHistogramData.value.counts"
             />
         </div>
-        <div v-if="computedTensorDescriptor.descriptor.type == SERIES_TYPE">
+        <div v-if="computedTensorDescriptor.value.type == SERIES_TYPE">
             <!-- visualize series value -->
         </div>
     </div>

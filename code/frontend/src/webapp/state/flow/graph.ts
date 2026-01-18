@@ -1,5 +1,4 @@
-import { computed, type ComputedRef } from "vue";
-import * as tf from "@tensorflow/tfjs";
+import { computed, toRefs, type ComputedRef } from "vue";
 
 import {
     type Node as VueFlowNode,
@@ -35,60 +34,21 @@ import {
     getExpressionEvaluatorForTensor,
     getTensorForNodeRecursion,
     tensorToDescriptor,
-    type TensorDescriptor,
     getHistogramBinsFromTensor,
-    type HistogramData,
-    PROBABILISTIC_TYPE
+    type Tensor,
+    PROBABILISTIC_TYPE,
+    type TensorDescriptor,
+    type HistogramData
 } from "@decision-support-ui/common";
 import { useProjectSettingsStore } from "../projects/settings";
 import { generateVariableName } from "@/editor/common/variables";
 
 export const FLOW_GRAPH_STORE_ID = "flow.graph";
 
-export type ComputedVariableDependencies =
+export type ComputedResult<T> =
     | {
           type: "success";
-          list: VariableDependencies;
-      }
-    | {
-          type: "error";
-          message: string;
-      };
-
-export type ComputedTensor =
-    | {
-          type: "success";
-          value: tf.Tensor;
-      }
-    | {
-          type: "error";
-          message: string;
-      };
-
-export type ComputedTensorDescriptor =
-    | {
-          type: "success";
-          descriptor: TensorDescriptor;
-      }
-    | {
-          type: "error";
-          message: string;
-      };
-
-export type ComputedDeterministicValue =
-    | {
-          type: "success";
-          value: number;
-      }
-    | {
-          type: "error";
-          message: string;
-      };
-
-export type ComputedHistogramData =
-    | {
-          type: "success";
-          data: HistogramData;
+          value: T;
       }
     | {
           type: "error";
@@ -114,9 +74,12 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
     const evaluateExpressionForTensor = getExpressionEvaluatorForTensor();
 
     // --- persisted state
+    const state = useSessionStorage(FLOW_GRAPH_STORE_ID, {
+        nodes: [] as Node[],
+        edges: [] as Edge[]
+    });
 
-    const nodes = useSessionStorage(`${FLOW_GRAPH_STORE_ID}.nodes`, [] as Node[]);
-    const edges = useSessionStorage(`${FLOW_GRAPH_STORE_ID}.edges`, [] as Edge[]);
+    const { nodes, edges } = toRefs(state.value);
 
     // --- computed state
 
@@ -205,13 +168,13 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         generateVariableName(getComputedNode(nodeId).value.visualization.title)
     );
 
-    const getComputedVariableDependencies = computedByNodeId((nodeId: NodeId): ComputedVariableDependencies => {
+    const getComputedVariableDependencies = computedByNodeId((nodeId: NodeId): ComputedResult<VariableDependencies> => {
         const node = getComputedNode(nodeId).value;
         if (node.type == OPERATION_NODE_TYPE) {
             try {
                 return {
                     type: "success",
-                    list: evaluateExpressionForVariableDependencies(node.options.expression)
+                    value: evaluateExpressionForVariableDependencies(node.options.expression)
                 };
             } catch (e) {
                 return {
@@ -222,12 +185,12 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         }
         return {
             type: "success",
-            list: []
+            value: []
         };
     });
 
     const getComputedTensor = computedByNodeId(
-        (nodeId: NodeId, previousTensor: ComputedTensor | undefined): ComputedTensor => {
+        (nodeId: NodeId, previousTensor: ComputedResult<Tensor> | undefined): ComputedResult<Tensor> => {
             if (previousTensor && previousTensor.type == "success") {
                 previousTensor.value.dispose();
             }
@@ -237,7 +200,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
                 const getVariableDependencies = (nodeId: string) => {
                     const computedDependencies = getComputedVariableDependencies(nodeId).value;
                     if (computedDependencies.type == "error") throw new Error(computedDependencies.message);
-                    return computedDependencies.list;
+                    return computedDependencies.value;
                 };
                 const getNodeIdForVariable = (variable: string) => {
                     const nodeId = _nodeIdByVariableMap.value.get(variable);
@@ -260,7 +223,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
                         getTensorForNode,
                         computedComputationContext.value
                     )
-                } as ComputedTensor;
+                } as ComputedResult<Tensor>;
             } catch (e) {
                 return {
                     type: "error",
@@ -270,7 +233,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         }
     );
 
-    const getComputedTensorDescriptor = computedByNodeId((nodeId: NodeId): ComputedTensorDescriptor => {
+    const getComputedTensorDescriptor = computedByNodeId((nodeId: NodeId): ComputedResult<TensorDescriptor> => {
         const tensorResult = getComputedTensor(nodeId).value;
         if (tensorResult.type == "error") {
             return {
@@ -280,28 +243,26 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         }
         return {
             type: "success",
-            descriptor: tensorToDescriptor(tensorResult.value)
+            value: tensorToDescriptor(tensorResult.value)
         };
     });
 
-    const getComputedDeterministicValue = computedByNodeId(
-        async (nodeId: NodeId): Promise<ComputedDeterministicValue> => {
-            const tensorResult = getComputedTensor(nodeId).value;
-            if (tensorResult.type == "error") {
-                return {
-                    type: "error",
-                    message: tensorResult.message
-                };
-            }
+    const getComputedDeterministicValue = computedByNodeId(async (nodeId: NodeId): Promise<ComputedResult<number>> => {
+        const tensorResult = getComputedTensor(nodeId).value;
+        if (tensorResult.type == "error") {
             return {
-                type: "success",
-                value: (await tensorResult.value.array()) as number
+                type: "error",
+                message: tensorResult.message
             };
         }
-    );
+        return {
+            type: "success",
+            value: (await tensorResult.value.array()) as number
+        };
+    });
 
     const getComputedProbabilisticHistogramData = computedByNodeId(
-        async (nodeId: NodeId): Promise<ComputedHistogramData> => {
+        async (nodeId: NodeId): Promise<ComputedResult<HistogramData>> => {
             const tensorDescriptor = getComputedTensorDescriptor(nodeId).value;
             const tensorResult = getComputedTensor(nodeId).value;
 
@@ -317,7 +278,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
                     message: tensorDescriptor.message
                 };
             }
-            if (tensorDescriptor.descriptor.type !== PROBABILISTIC_TYPE) {
+            if (tensorDescriptor.value.type !== PROBABILISTIC_TYPE) {
                 return {
                     type: "error",
                     message: `Can only calculate histogram for probabilistic value`
@@ -325,7 +286,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
             }
             return {
                 type: "success",
-                data: await getHistogramBinsFromTensor(tensorResult.value, projectSettings.histogramBins)
+                value: await getHistogramBinsFromTensor(tensorResult.value, projectSettings.histogramBins)
             };
         }
     );

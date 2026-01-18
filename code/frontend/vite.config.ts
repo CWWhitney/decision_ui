@@ -17,57 +17,50 @@ import { nodePolyfills } from "vite-plugin-node-polyfills";
 const commitHash = childProcess.execSync("git rev-parse --short HEAD").toString().trim();
 
 export default defineConfig({
-  root: "src/webapp/",
-  envDir: "../../config",
-  publicDir: "../../public",
-  build: {
-    outDir: "../../dist/webapp",
-    emptyOutDir: true,
-    chunkSizeWarningLimit: 4096
-  },
-  server: {
-    proxy: {
-      "/api": {
-        target: "http://localhost:8000",
-        secure: false,
-        changeOrigin: true
-      }
-    }
-  },
-  plugins: [
-    viteStaticCopy({
-      targets: [
-        {
-          src: normalizePath(resolve(__dirname, "../../documentation")),
-          dest: "static"
+    root: "src/webapp/",
+    envDir: "../../config",
+    publicDir: "../../public",
+    build: {
+        outDir: "../../dist/webapp",
+        emptyOutDir: true,
+        chunkSizeWarningLimit: 8192
+    },
+    server: {
+        proxy: {
+            "/api": {
+                target: "http://localhost:8000",
+                secure: false,
+                changeOrigin: true
+            }
         }
-      ],
-      watch: {
-        reloadPageOnChange: true
-      }
-    }),
-    vue(),
-    svgLoader(),
-    vueJsx(),
-    nodePolyfills(),
-    vuetify(),
-    legacy({
-      targets: ["defaults", "not IE 11"]
-    })
-  ],
-  resolve: {
-    alias: {
-      "@": fileURLToPath(new URL("./src/webapp", import.meta.url))
+    },
+    plugins: [
+        viteStaticCopy({
+            targets: [
+                {
+                    src: normalizePath(resolve(__dirname, "../../documentation")),
+                    dest: "static"
+                }
+            ],
+            watch: {
+                reloadPageOnChange: true
+            }
+        }),
+        vue(),
+        svgLoader(),
+        vueJsx(),
+        nodePolyfills(),
+        vuetify(),
+        legacy({
+            targets: ["defaults", "not IE 11"]
+        })
+    ],
+    resolve: {
+        alias: {
+            "@": fileURLToPath(new URL("./src/webapp", import.meta.url))
+        }
+    },
+    define: {
+        "import.meta.env.VITE_APP_VERSION": JSON.stringify(commitHash)
     }
-  },
-  define: {
-    "import.meta.env.VITE_APP_VERSION": JSON.stringify(commitHash)
-  },
-  css: {
-    preprocessorOptions: {
-      scss: {
-        api: "modern-compiler"
-      }
-    }
-  }
 });
