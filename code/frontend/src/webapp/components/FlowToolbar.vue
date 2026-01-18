@@ -11,8 +11,8 @@
   } from "@/state/flow/style";
   import {
     AVAILABLE_NODE_TYPES,
-    DEFAUL_NODE_DIMENSIONS,
     DEFAULT_NODE_TYPE_TITLES,
+    getDefaultNodeSize,
     type Node,
     type NodeType
   } from "@decision-support-ui/common";
@@ -62,7 +62,7 @@
       (p, n) => ({ x: p.x + (n?.visualization.position.x ?? 0), y: p.y + (n?.visualization.position.y ?? 0) }),
       { x: 0, y: 0 } as XYPosition
     );
-    const newNodeSize = DEFAUL_NODE_DIMENSIONS[nodeType];
+    const newNodeSize = getDefaultNodeSize(nodeType);
     const newNodePosition = {
       x: topleft.x - newNodeSize.width / 2 - ancestorOffset.x,
       y: topleft.y - newNodeSize.height / 2 - ancestorOffset.y

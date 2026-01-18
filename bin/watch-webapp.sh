@@ -5,4 +5,4 @@
 
 cd "$(dirname "$0")/../"
 
-concurrently -k -c auto -n frontend,backend "bash code/frontend/bin/watch-webapp.sh" "bash code/backend/bin/watch.sh"
+concurrently -k -c auto -n common,frontend,backend "bash code/common/bin/watch.sh" "bash code/frontend/bin/watch-webapp.sh" "bash code/backend/bin/watch.sh"

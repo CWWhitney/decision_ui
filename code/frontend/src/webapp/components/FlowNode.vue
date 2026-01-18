@@ -1,7 +1,6 @@
 <script setup lang="ts">
   import {
     NODE_EDIT_DATA_TAB,
-    NODE_EDIT_DEBUG_TAB,
     NODE_EDIT_FUNCTION_TAB,
     NODE_EDIT_GENERAL_TAB,
     NODE_EDIT_STYLE_TAB,
@@ -34,7 +33,6 @@
       <v-btn icon="mdi-function" @click="nodeEditStore.openDialog(node.id, NODE_EDIT_FUNCTION_TAB)"></v-btn>
       <v-btn icon="mdi-chart-histogram" @click="nodeEditStore.openDialog(node.id, NODE_EDIT_DATA_TAB)"></v-btn>
       <v-btn icon="mdi-palette-outline" @click="nodeEditStore.openDialog(node.id, NODE_EDIT_STYLE_TAB)"></v-btn>
-      <v-btn icon="mdi-bug-outline" @click="nodeEditStore.openDialog(node.id, NODE_EDIT_DEBUG_TAB)"></v-btn>
       <v-btn icon="mdi-trash-can-outline" @click="removeNodes(node.id)"></v-btn>
     </v-btn-group>
   </NodeToolbar>

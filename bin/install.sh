@@ -2,6 +2,7 @@
 
 cd "$(dirname "$0")/../"
 
+bash code/common/bin/install.sh
 bash code/backend/bin/install.sh
 bash code/frontend/bin/install.sh
 bash code/server/bin/install.sh

@@ -7,7 +7,7 @@
         "declaration": true,
         "rootDir": ".",
         "sourceRoot": "src",
-        "allowJs": false,
+        "allowJs": true,
         "newLine": "LF",
         "noImplicitAny": true,
         "sourceMap": true,
@@ -16,5 +16,5 @@
         "esModuleInterop": true,
         "lib": ["ES2020", "DOM"]
     },
-    "include": ["src/**/*.ts", "src/**/*.tsx", "unknown.d.ts"]
+    "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.ohm-bundle.js", "unknown.d.ts"]
 }

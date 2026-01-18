@@ -1,6 +1,5 @@
-import { ComputationResult } from "../compute";
 import { Position, Size } from "../draw";
-import { DistributionFunctionType } from "../math";
+import { DistributionFunctionType } from "../compute/math";
 
 export const ESTIMATE_NODE_TYPE = "estimate";
 export const OPERATION_NODE_TYPE = "operation";
@@ -39,12 +38,18 @@ export const DEFAULT_NODE_TYPE_TITLES: { [key in NodeType]: string } = {
   [COLLECTION_NODE_TYPE]: "Collection",
 };
 
-export const DEFAUL_NODE_DIMENSIONS: { [key in NodeType]: Size } = {
-  [ESTIMATE_NODE_TYPE]: { width: 200, height: 50 },
-  [OPERATION_NODE_TYPE]: { width: 200, height: 50 },
-  [LOOP_NODE_TYPE]: { width: 500, height: 400 },
-  [RESULT_NODE_TYPE]: { width: 200, height: 50 },
-  [COLLECTION_NODE_TYPE]: { width: 500, height: 400 },
+export const getDefaultNodeSize = (nodeType: NodeType): Size => {
+  switch (nodeType) {
+    case ESTIMATE_NODE_TYPE:
+    case OPERATION_NODE_TYPE:
+    case RESULT_NODE_TYPE:
+      return { width: 200, height: 50 };
+    case LOOP_NODE_TYPE:
+    case COLLECTION_NODE_TYPE:
+      return { width: 500, height: 400 };
+    default:
+      throw new Error(`unknown node type '${nodeType}'`);
+  }
 };
 
 export interface AbstractNode<T, O> {
@@ -59,11 +64,6 @@ export interface AbstractNode<T, O> {
   };
 
   options: O;
-
-  computation: {
-    result: ComputationResult;
-    errors: string[];
-  };
 }
 
 export interface EstimateNodeOptions {
@@ -101,24 +101,31 @@ export type NodeOptionsTypeMap = {
   [COLLECTION_NODE_TYPE]: null;
 };
 
-export const DEFAULT_NODE_OPTIONS: {
-  [nodeType in NodeType]: NodeOptionsTypeMap[nodeType];
-} = {
-  [ESTIMATE_NODE_TYPE]: {
-    distribution: "deterministic",
-    lower: 1,
-    upper: 1,
-    comment: "",
-  },
-  [OPERATION_NODE_TYPE]: {
-    expression: "",
-  },
-  [LOOP_NODE_TYPE]: null,
-  [RESULT_NODE_TYPE]: {
-    variables: [],
-    colors: [],
-  },
-  [COLLECTION_NODE_TYPE]: null,
+export const getDefaultNodeOptions = (nodeType: NodeType) => {
+  switch (nodeType) {
+    case ESTIMATE_NODE_TYPE:
+      return {
+        distribution: "deterministic",
+        lower: 1,
+        upper: 1,
+        comment: "",
+      } as EstimateNodeOptions;
+    case OPERATION_NODE_TYPE:
+      return {
+        expression: "",
+      };
+    case LOOP_NODE_TYPE:
+      return null;
+    case RESULT_NODE_TYPE:
+      return {
+        variables: [],
+        colors: [],
+      } as ResultNodeOptions;
+    case COLLECTION_NODE_TYPE:
+      return null;
+    default:
+      throw new Error(`unkown node type '${nodeType}'`);
+  }
 };
 
 export type Node =
@@ -150,7 +157,7 @@ export const getNodeByIdFromMap = (nodeId: NodeId, nodeMap: NodeByIdMap) => {
 };
 
 export const getChildrenByParentIdMap = (
-  nodes: Node[]
+  nodes: Node[],
 ): NodeChildrenByParentIdMap => {
   const map = new Map<NodeId, Node[]>();
 
@@ -173,7 +180,7 @@ export const getChildrenByParentIdMap = (
 export const getNodePositionRecursion = (
   nodeId: NodeId,
   getNode: (nodeId: NodeId) => Node,
-  self: (nodeId: NodeId, getNode: (nodeId: NodeId) => Node) => Position
+  self: (nodeId: NodeId, getNode: (nodeId: NodeId) => Node) => Position,
 ): Position => {
   const node = getNode(nodeId);
 
@@ -189,7 +196,7 @@ export const getNodePositionRecursion = (
 
 export const getNodePosition = (
   nodeId: NodeId,
-  getNode: (nodeId: NodeId) => Node
+  getNode: (nodeId: NodeId) => Node,
 ): Position => getNodePositionRecursion(nodeId, getNode, getNodePosition);
 
 export const getNextNodeId = (nodes: Node[]): NodeId => {
@@ -208,7 +215,7 @@ export interface NewNodeOptions {
 export const getNewNode = (
   nodeType: NodeType,
   nodes: Node[],
-  options?: NewNodeOptions
+  options?: NewNodeOptions,
 ): Node => {
   const nextNodeId = getNextNodeId(nodes);
   return {
@@ -218,23 +225,16 @@ export const getNewNode = (
     visualization: {
       title: `${DEFAULT_NODE_TYPE_TITLES[nodeType]} ${nextNodeId}`,
       position: options?.position ?? { x: 0, y: 0 },
-      size: options?.size ?? DEFAUL_NODE_DIMENSIONS[nodeType],
+      size: options?.size ?? getDefaultNodeSize(nodeType),
     },
-    computation: {
-      result: {
-        value: null,
-        type: null,
-      },
-      errors: [],
-    },
-    options: DEFAULT_NODE_OPTIONS[nodeType],
+    options: getDefaultNodeOptions(nodeType),
   } as Node;
 };
 
 export const getAncestorNodesRecursion = (
   nodeId: NodeId,
   getNode: (nodeId: string) => Node,
-  self: (nodeId: NodeId, getNode: (nodeId: string) => Node) => Node[]
+  self: (nodeId: NodeId, getNode: (nodeId: string) => Node) => Node[],
 ): Node[] => {
   const node = getNode(nodeId);
   if (node.parentNodeId) {
@@ -247,10 +247,10 @@ export const getAncestorNodesRecursion = (
 export const getDescendantNodesRecursion = (
   nodeId: NodeId,
   childrenByParentIdMap: Map<NodeId, Node[]>,
-  self: (nodeId: NodeId, childrenByParentIdMap: Map<NodeId, Node[]>) => Node[]
+  self: (nodeId: NodeId, childrenByParentIdMap: Map<NodeId, Node[]>) => Node[],
 ): Node[] => {
   return (childrenByParentIdMap.get(nodeId) ?? []).reduce(
     (p, n) => [...p, n, ...self(n.id, childrenByParentIdMap)],
-    [] as Node[]
+    [] as Node[],
   );
 };

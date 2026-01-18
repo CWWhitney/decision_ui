@@ -1,5 +1,4 @@
 <script setup lang="ts">
-  import { AVAILABLE_DISTRIBUTIONS } from "@/editor/distributions";
   import {
     NODE_EDIT_DATA_TAB,
     NODE_EDIT_DEBUG_TAB,
@@ -8,25 +7,12 @@
     NODE_EDIT_STYLE_TAB,
     useDialogsNodeEditStore
   } from "@/state/dialogs/nodeEdit";
-  import { useFlowGraphStore } from "@/state/flow/graph";
-  import { ESTIMATE_NODE_TYPE, OPERATION_NODE_TYPE, RESULT_NODE_TYPE } from "@decision-support-ui/common";
+
+  import FlowNodeEditGeneralTab from "./FlowNodeEditGeneralTab.vue";
+  import FlowNodeEditFunctionTab from "./FlowNodeEditFunctionTab.vue";
+  import FlowNodeEditDebugTab from "./FlowNodeEditDebugTab.vue";
 
   const store = useDialogsNodeEditStore();
-  const graphStore = useFlowGraphStore();
-
-  const onResultVariableChange = (index: number, value: string) => {
-    if (store.node && store.node.type == RESULT_NODE_TYPE) {
-      if (index < store.node.options.variables.length) {
-        if (value.trim() == "") {
-          store.node.options.variables = store.node.options.variables.filter((_, i) => i != index);
-        } else {
-          store.node.options.variables[index] = value;
-        }
-      } else if (value.trim() !== "") {
-        store.node.options.variables.push(value.trim());
-      }
-    }
-  };
 </script>
 
 <template>
@@ -49,43 +35,10 @@
         </v-tabs>
         <v-tabs-window v-model="store.tab">
           <v-tabs-window-item :value="NODE_EDIT_GENERAL_TAB">
-            <v-text-field v-model="store.node.visualization.title" label="Title" required></v-text-field>
-            <div v-if="store.node.type == ESTIMATE_NODE_TYPE">
-              <v-text-field v-model="store.node.options.comment" label="Comment for Estimate in CSV"></v-text-field>
-            </div>
+            <FlowNodeEditGeneralTab v-model="store.node" />
           </v-tabs-window-item>
           <v-tabs-window-item :value="NODE_EDIT_FUNCTION_TAB">
-            <div v-if="store.node.type == ESTIMATE_NODE_TYPE">
-              <v-combobox
-                v-model="store.node.options.distribution"
-                label="Distribution"
-                :items="AVAILABLE_DISTRIBUTIONS"
-              ></v-combobox>
-              <div class="lower-upper-inputs">
-                <v-number-input
-                  v-model="store.node.options.lower"
-                  label="Lower"
-                  control-variant="split"
-                ></v-number-input>
-                <v-number-input
-                  v-model="store.node.options.upper"
-                  label="Upper"
-                  control-variant="split"
-                ></v-number-input>
-              </div>
-            </div>
-            <div v-if="store.node.type == OPERATION_NODE_TYPE">
-              <v-text-field v-model="store.node.options.expression" label="Expression or Formula"></v-text-field>
-            </div>
-            <div v-if="store.node.type == RESULT_NODE_TYPE">
-              <v-text-field
-                v-for="(item, i) in [...store.node.options.variables, '']"
-                :key="i"
-                :model-value="item"
-                :label="`Result Variable ${i + 1}`"
-                @update:model-value="event => onResultVariableChange(i, event)"
-              ></v-text-field>
-            </div>
+            <FlowNodeEditFunctionTab v-model="store.node" />
           </v-tabs-window-item>
           <v-tabs-window-item :value="NODE_EDIT_DATA_TAB">
             <p>Data Tab</p>
@@ -94,8 +47,7 @@
             <p>Style Tab</p>
           </v-tabs-window-item>
           <v-tabs-window-item :value="NODE_EDIT_DEBUG_TAB">
-            <h4>Node Data</h4>
-            <pre>{{ JSON.stringify(graphStore.getComputedComputationResult(store.node.id).value, null, 2) }}</pre>
+            <FlowNodeEditDebugTab v-model="store.node" />
           </v-tabs-window-item>
         </v-tabs-window>
       </v-card-text>
@@ -110,7 +62,7 @@
 <style scoped lang="scss">
   .dialog {
     .v-toolbar {
-      background: #fff;
+      background: transparent;
     }
 
     .tabCard {
@@ -125,34 +77,12 @@
       overflow: auto;
     }
 
-    .v-number-input {
-      min-width: 13em;
-    }
-
-    .v-text-field {
-      min-width: 18em;
-    }
-
     .v-card {
       min-width: 20em;
       max-width: 90%;
       margin: 0 auto;
       padding: 0.5em;
       width: auto;
-
-      h4 {
-        margin-bottom: 1em;
-      }
-
-      .lower-upper-inputs {
-        display: flex;
-        gap: 1em;
-      }
-    }
-
-    .v-card-title {
-      margin-top: 0.25em;
-      margin-left: 0.25em;
     }
 
     .v-card-text {
