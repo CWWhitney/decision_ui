@@ -29,11 +29,47 @@
 
   <NodeToolbar :is-visible="showToolbar" :position="Position.Top">
     <v-btn-group divided>
-      <v-btn icon="mdi-information-outline" @click="nodeEditStore.openDialog(node.id, NODE_EDIT_GENERAL_TAB)"></v-btn>
-      <v-btn icon="mdi-function" @click="nodeEditStore.openDialog(node.id, NODE_EDIT_FUNCTION_TAB)"></v-btn>
-      <v-btn icon="mdi-chart-histogram" @click="nodeEditStore.openDialog(node.id, NODE_EDIT_DATA_TAB)"></v-btn>
-      <v-btn icon="mdi-palette-outline" @click="nodeEditStore.openDialog(node.id, NODE_EDIT_STYLE_TAB)"></v-btn>
-      <v-btn icon="mdi-trash-can-outline" @click="removeNodes(node.id)"></v-btn>
+      <v-tooltip location="top" text="general information" open-delay="500">
+        <template #activator="{ props }">
+          <v-btn
+            v-bind="props"
+            icon="mdi-information-outline"
+            @click="nodeEditStore.openDialog(node.id, NODE_EDIT_GENERAL_TAB)"
+          ></v-btn>
+        </template>
+      </v-tooltip>
+      <v-tooltip location="top" text="function definition" open-delay="500">
+        <template #activator="{ props }">
+          <v-btn
+            v-bind="props"
+            icon="mdi-function"
+            @click="nodeEditStore.openDialog(node.id, NODE_EDIT_FUNCTION_TAB)"
+          ></v-btn>
+        </template>
+      </v-tooltip>
+      <v-tooltip location="top" text="data visualization" open-delay="500">
+        <template #activator="{ props }">
+          <v-btn
+            v-bind="props"
+            icon="mdi-chart-histogram"
+            @click="nodeEditStore.openDialog(node.id, NODE_EDIT_DATA_TAB)"
+          ></v-btn>
+        </template>
+      </v-tooltip>
+      <v-tooltip location="top" text="node style options" open-delay="500">
+        <template #activator="{ props }">
+          <v-btn
+            v-bind="props"
+            icon="mdi-palette-outline"
+            @click="nodeEditStore.openDialog(node.id, NODE_EDIT_STYLE_TAB)"
+          ></v-btn>
+        </template>
+      </v-tooltip>
+      <v-tooltip location="top" text="remove node" open-delay="500">
+        <template #activator="{ props }">
+          <v-btn v-bind="props" icon="mdi-trash-can-outline" @click="removeNodes(node.id)"></v-btn>
+        </template>
+      </v-tooltip>
     </v-btn-group>
   </NodeToolbar>
 
