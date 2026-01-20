@@ -133,7 +133,7 @@ export const getDefaultNodeOptions = (nodeType: NodeType) => {
         case LOOP_OPERATION_NODE_TYPE:
             return {
                 initExpression: "",
-                iterExpression: ""
+                iterExpression: "previous"
             } as LoopOperationNodeOptions;
         case RESULT_NODE_TYPE:
             return {
