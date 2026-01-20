@@ -55,7 +55,7 @@
                 <v-list density="compact" nav>
                     <v-tooltip location="right" text="Files" open-delay="500">
                         <template #activator="{ props }">
-                            <v-list-item v-bind="props" to="/user/files" prepend-icon="mdi-format-list-text" />
+                            <v-list-item v-bind="props" to="/user/files" prepend-icon="mdi-format-list-text" disabled />
                         </template>
                     </v-tooltip>
                     <v-tooltip location="right" text="Help" open-delay="500">
