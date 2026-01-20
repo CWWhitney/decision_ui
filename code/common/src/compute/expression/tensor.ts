@@ -127,7 +127,7 @@ export const createTensorEvaluationSemantics = () => {
             if (!(variable in context.tensorByVariable)) {
                 throw new Error(`Undefined variable: ${variable}`);
             }
-            return keep(context.tensorByVariable[variable]);
+            return keep(context.tensorByVariable[variable]).clone();
         },
 
         number(n) {
