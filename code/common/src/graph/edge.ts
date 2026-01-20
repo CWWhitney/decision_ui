@@ -16,14 +16,14 @@ export const getComputationEdges = (
     nodes: Node[],
     getComputedVariableDependencies: (nodeId: string) => string[],
     isVariableNameValid: (variableName: string) => boolean,
-    getNodeFromVariableName: (variableName: string) => NodeId
+    getNodeIdFromVariableName: (variableName: string) => NodeId
 ) => {
     return nodes.reduce((p, node) => {
         const dependencies = getComputedVariableDependencies(node.id);
         return [
             ...p,
             ...dependencies.filter(isVariableNameValid).map(d => {
-                const source = getNodeFromVariableName(d);
+                const source = getNodeIdFromVariableName(d);
                 const target = node.id;
                 return {
                     id: getEdgeIdForNodes(source, target),

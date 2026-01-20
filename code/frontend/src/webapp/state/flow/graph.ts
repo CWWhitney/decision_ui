@@ -118,7 +118,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
     );
 
     const getComputedNode = computedByKey((nodeId: NodeId) => getFromMapOrThrow(nodeId, _nodesByIdMap.value));
-    const getComputedNodeFromVariableName = computedByKey((variableName: string) =>
+    const getComputedNodeIdFromVariableName = computedByKey((variableName: string) =>
         getFromMapOrThrow(variableName, _nodeIdByVariableMap.value)
     );
     const isVariableNameValid = (variableName: string) => _nodeIdByVariableMap.value.has(variableName);
@@ -162,7 +162,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
                     return dependencies.type == "success" ? dependencies.value : [];
                 },
                 variableName => isVariableNameValid(variableName),
-                variableName => getComputedNodeFromVariableName(variableName).value
+                variableName => getComputedNodeIdFromVariableName(variableName).value
             );
 
             return [
@@ -231,11 +231,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
                     if (computedDependencies.type == "error") throw new Error(computedDependencies.message);
                     return computedDependencies.value;
                 };
-                const getNodeIdForVariable = (variable: string) => {
-                    const nodeId = _nodeIdByVariableMap.value.get(variable);
-                    if (!nodeId) throw new Error(`variable '${variable}' unknown`);
-                    return nodeId;
-                };
+                const getNodeIdForVariable = (variable: string) => getComputedNodeIdFromVariableName(variable).value;
                 const getTensorForNode = (nodeId: string) => {
                     const computedTensor = getComputedTensor(nodeId).value;
                     if (computedTensor.type == "error") throw new Error(computedTensor.message);
