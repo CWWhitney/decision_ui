@@ -19,7 +19,7 @@ import {
 import grammar from "./expression.ohm-bundle";
 
 import { VariableDependencies } from "./dependencies";
-import { ESTIMATE_NODE_TYPE, Node, NodeId, OPERATION_NODE_TYPE } from "../../graph";
+import { ESTIMATE_NODE_TYPE, Node, NodeId, OPERATION_NODE_TYPE, RESULT_NODE_TYPE } from "../../graph";
 import { getNormalDistributionParameter, validateLowerUpperBounds } from "../math";
 import { ComputationContext } from "../context";
 import {
@@ -181,14 +181,14 @@ export const getTensorForEstimateNode = (node: Node, context: ComputationContext
     throw new Error(`distribution '${node.options.distribution}' tensor calculation not implemented`);
 };
 
-export const getTensorForOperationNode = (
+export const getTensorForNodeWithExpression = (
     node: Node,
     getVariableDependencies: (nodeId: string) => VariableDependencies,
     getNodeIdForVariable: (variable: string) => NodeId,
     evaluateExpressionForTensor: (expression: string, expressionContext: ExpressionTensorContext) => Tensor,
     getTensorForNode: (nodeId: string) => Tensor
 ): Tensor => {
-    if (node.type != OPERATION_NODE_TYPE) {
+    if (!(node.type == OPERATION_NODE_TYPE || node.type == RESULT_NODE_TYPE)) {
         throw new Error(`cannot calculate operation node tensor for node of type '${node.type}'`);
     }
 
@@ -213,8 +213,8 @@ export const getTensorForNodeRecursion = (
     const node = getNode(nodeId);
     if (node.type == ESTIMATE_NODE_TYPE) {
         return getTensorForEstimateNode(node, computationContext);
-    } else if (node.type == OPERATION_NODE_TYPE) {
-        return getTensorForOperationNode(
+    } else if (node.type == OPERATION_NODE_TYPE || node.type == RESULT_NODE_TYPE) {
+        return getTensorForNodeWithExpression(
             node,
             getVariableDependencies,
             getNodeIdForVariable,

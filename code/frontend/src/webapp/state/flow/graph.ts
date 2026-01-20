@@ -4,7 +4,8 @@ import {
     type Node as VueFlowNode,
     type Edge as VueFlowEdge,
     MarkerType,
-    type Connection as VueFlowConnection
+    type Connection as VueFlowConnection,
+    type Styles
 } from "@vue-flow/core";
 
 import { getHandlePositions } from "@/common/layout";
@@ -17,7 +18,6 @@ import {
     type NodeType,
     getNodeByIdMap,
     getChildrenByParentIdMap,
-    getNodeByIdFromMap,
     type NodeId,
     getEdgeIdForNodes,
     getNodePositionRecursion,
@@ -38,7 +38,11 @@ import {
     type Tensor,
     PROBABILISTIC_TYPE,
     type TensorDescriptor,
-    type HistogramData
+    type HistogramData,
+    RESULT_NODE_TYPE,
+    getFromMapOrThrow,
+    getComputationEdges,
+    filterManualEdgesByComputationEdges
 } from "@decision-support-ui/common";
 import { useProjectSettingsStore } from "../projects/settings";
 import { generateVariableName } from "@/editor/common/variables";
@@ -55,17 +59,34 @@ export type ComputedResult<T> =
           message: string;
       };
 
-const computedByNodeId = <T>(get: (nodeId: NodeId, previous: T | undefined) => T) => {
-    const cache = new Map<NodeId, ComputedRef<T>>();
-    return (nodeId: NodeId): ComputedRef<T> => {
-        if (!cache.has(nodeId)) {
+const computedByKey = <K, T>(get: (key: K, previous: T | undefined) => T) => {
+    const cache = new Map<K, ComputedRef<T>>();
+    return (key: K): ComputedRef<T> => {
+        if (!cache.has(key)) {
             cache.set(
-                nodeId,
-                computed(previous => get(nodeId, previous))
+                key,
+                computed(previous => get(key, previous))
             );
         }
-        return cache.get(nodeId)!;
+        return cache.get(key)!;
     };
+};
+
+const getVueFlowEdge = (edge: Edge, getComputedNodePosition: (nodeId: string) => Position, style: Styles = {}) => {
+    const sourceNodePosition = getComputedNodePosition(edge.source);
+    const targetNodePosition = getComputedNodePosition(edge.target);
+
+    const [sourceHandle, targetHandle] = getHandlePositions(sourceNodePosition, targetNodePosition);
+    return {
+        id: edge.id,
+        source: `${edge.source}`,
+        target: `${edge.target}`,
+        sourceHandle: sourceHandle,
+        targetHandle: targetHandle,
+        type: "custom",
+        style,
+        markerEnd: MarkerType.Arrow
+    } as VueFlowEdge;
 };
 
 export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
@@ -96,9 +117,13 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         () => new Map(nodes.value.map(n => [getComputedVariableName(n.id).value, n.id]))
     );
 
-    const getComputedNode = computedByNodeId((nodeId: NodeId) => getNodeByIdFromMap(nodeId, _nodesByIdMap.value));
+    const getComputedNode = computedByKey((nodeId: NodeId) => getFromMapOrThrow(nodeId, _nodesByIdMap.value));
+    const getComputedNodeFromVariableName = computedByKey((variableName: string) =>
+        getFromMapOrThrow(variableName, _nodeIdByVariableMap.value)
+    );
+    const isVariableNameValid = (variableName: string) => _nodeIdByVariableMap.value.has(variableName);
 
-    const getComputedNodePosition = computedByNodeId(
+    const getComputedNodePosition = computedByKey(
         (nodeId: NodeId): Position =>
             getNodePositionRecursion(
                 nodeId,
@@ -130,25 +155,29 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
 
     const getComputedVueFlowEdges = () =>
         computed(() => {
-            return edges.value.map(edge => {
-                const sourceNodePosition = getComputedNodePosition(edge.source).value;
-                const targetNodePosition = getComputedNodePosition(edge.target).value;
+            const computationEdges = getComputationEdges(
+                nodes.value,
+                (nodeId: string) => {
+                    const dependencies = getComputedVariableDependencies(nodeId).value;
+                    return dependencies.type == "success" ? dependencies.value : [];
+                },
+                variableName => isVariableNameValid(variableName),
+                variableName => getComputedNodeFromVariableName(variableName).value
+            );
 
-                const [sourceHandle, targetHandle] = getHandlePositions(sourceNodePosition, targetNodePosition);
-
-                return {
-                    id: edge.id,
-                    source: `${edge.source}`,
-                    target: `${edge.target}`,
-                    sourceHandle: sourceHandle,
-                    targetHandle: targetHandle,
-                    type: "custom",
-                    markerEnd: MarkerType.Arrow
-                } as VueFlowEdge;
-            });
+            return [
+                ...computationEdges.map(edge =>
+                    getVueFlowEdge(edge, (nodeId: string) => getComputedNodePosition(nodeId).value)
+                ),
+                ...filterManualEdgesByComputationEdges(edges.value, computationEdges).map(edge =>
+                    getVueFlowEdge(edge, (nodeId: string) => getComputedNodePosition(nodeId).value, {
+                        strokeDasharray: 5
+                    })
+                )
+            ];
         });
 
-    const getComputedAncestorNodes = computedByNodeId((nodeId: NodeId): Node[] =>
+    const getComputedAncestorNodes = computedByKey((nodeId: NodeId): Node[] =>
         getAncestorNodesRecursion(
             nodeId,
             (nodeId: NodeId) => getComputedNode(nodeId).value,
@@ -156,7 +185,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         )
     );
 
-    const getComputedDescendantNodes = computedByNodeId((nodeId: NodeId): Node[] =>
+    const getComputedDescendantNodes = computedByKey((nodeId: NodeId): Node[] =>
         getDescendantNodesRecursion(
             nodeId,
             _childrenByParentIdMap.value,
@@ -164,13 +193,13 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         )
     );
 
-    const getComputedVariableName = computedByNodeId((nodeId: NodeId): string =>
+    const getComputedVariableName = computedByKey((nodeId: NodeId): string =>
         generateVariableName(getComputedNode(nodeId).value.visualization.title)
     );
 
-    const getComputedVariableDependencies = computedByNodeId((nodeId: NodeId): ComputedResult<VariableDependencies> => {
+    const getComputedVariableDependencies = computedByKey((nodeId: NodeId): ComputedResult<VariableDependencies> => {
         const node = getComputedNode(nodeId).value;
-        if (node.type == OPERATION_NODE_TYPE) {
+        if (node.type == OPERATION_NODE_TYPE || node.type == RESULT_NODE_TYPE) {
             try {
                 return {
                     type: "success",
@@ -189,7 +218,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         };
     });
 
-    const getComputedTensor = computedByNodeId(
+    const getComputedTensor = computedByKey(
         (nodeId: NodeId, previousTensor: ComputedResult<Tensor> | undefined): ComputedResult<Tensor> => {
             if (previousTensor && previousTensor.type == "success") {
                 previousTensor.value.dispose();
@@ -233,7 +262,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         }
     );
 
-    const getComputedTensorDescriptor = computedByNodeId((nodeId: NodeId): ComputedResult<TensorDescriptor> => {
+    const getComputedTensorDescriptor = computedByKey((nodeId: NodeId): ComputedResult<TensorDescriptor> => {
         const tensorResult = getComputedTensor(nodeId).value;
         if (tensorResult.type == "error") {
             return {
@@ -247,7 +276,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         };
     });
 
-    const getComputedDeterministicValue = computedByNodeId(async (nodeId: NodeId): Promise<ComputedResult<number>> => {
+    const getComputedDeterministicValue = computedByKey(async (nodeId: NodeId): Promise<ComputedResult<number>> => {
         const tensorResult = getComputedTensor(nodeId).value;
         if (tensorResult.type == "error") {
             return {
@@ -261,7 +290,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         };
     });
 
-    const getComputedProbabilisticHistogramData = computedByNodeId(
+    const getComputedProbabilisticHistogramData = computedByKey(
         async (nodeId: NodeId): Promise<ComputedResult<HistogramData>> => {
             const tensorDescriptor = getComputedTensorDescriptor(nodeId).value;
             const tensorResult = getComputedTensor(nodeId).value;
@@ -333,9 +362,9 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         edges.value = edges.value.filter(e => !removeEdgeIds.includes(e.id));
     };
 
-    const setEstimateNodeExpressionAction = (nodeId: NodeId, expression: string) => {
+    const setNodeExpressionAction = (nodeId: NodeId, expression: string) => {
         const node = getComputedNode(nodeId).value;
-        if (node.type == OPERATION_NODE_TYPE) {
+        if (node.type == OPERATION_NODE_TYPE || node.type == RESULT_NODE_TYPE) {
             node.options.expression = expression;
         } else {
             throw new Error(`cannot set expression for node ${node.id} of type ${node.type}`);
@@ -367,7 +396,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         updateNodeSizeAction,
         addNewNodeAction,
         removeNodeAction,
-        setEstimateNodeExpressionAction,
+        setNodeExpressionAction,
         reset
     };
 });

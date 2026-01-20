@@ -67,8 +67,8 @@
                 :color="modelStore.isValidationSuccess ? 'primary' : 'error'"
                 v-bind="props"
                 :loading="loading"
-                @click="callBackend"
                 disabled
+                @click="callBackend"
             >
                 <span v-if="getEvpi" class="button_text"> Calculate EVPI&nbsp;</span>
                 <v-icon v-if="!getEvpi" class="onhover"> mdi-rocket-launch-outline </v-icon>

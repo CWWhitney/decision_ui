@@ -73,8 +73,7 @@ export interface OperationNodeOptions {
 }
 
 export interface ResultNodeOptions {
-    variables: string[];
-    colors: string[];
+    expression: string;
 }
 
 export type ResultNode = AbstractNode<ResultNodeType, ResultNodeOptions>;
@@ -110,8 +109,7 @@ export const getDefaultNodeOptions = (nodeType: NodeType) => {
             return null;
         case RESULT_NODE_TYPE:
             return {
-                variables: [],
-                colors: []
+                expression: ""
             } as ResultNodeOptions;
         case COLLECTION_NODE_TYPE:
             return null;
