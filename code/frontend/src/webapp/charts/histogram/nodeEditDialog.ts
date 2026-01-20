@@ -1,10 +1,12 @@
 import { Chart, type ChartDataset } from "chart.js";
 
-import { getDefaultHistogramOptions, getDefaultHistogramScales } from "./common";
+import { getDefaultHistogramOptions, getDefaultHistogramScales, getDefaultScatterOptions } from "./common";
 
 const TEXT_COLOR = "rgba(0, 0, 0, 1)";
 const GRID_COLOR = "rgba(255, 255, 255, 0.2)";
 const BAR_COLOR = "rgb(63, 149, 203)";
+const STDDEV_COLOR = "rgb(153, 189, 211)";
+const POINT_COLOR = "rgb(63, 149, 203)";
 
 export const drawNodeEditDialogHistogram = (
     chart: Chart<"bar"> | null,
@@ -31,7 +33,51 @@ export const drawNodeEditDialogHistogram = (
         },
         options: {
             ...getDefaultHistogramOptions(),
-            ...getDefaultHistogramScales(max_ticks, bins, TEXT_COLOR, GRID_COLOR),
+            ...getDefaultHistogramScales(max_ticks, TEXT_COLOR, GRID_COLOR, true),
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+};
+
+export const drawNodeEditDialogSeriesPlot = (
+    chart: Chart<"bar"> | null,
+    ctx: CanvasRenderingContext2D,
+    means: number[],
+    stddevs: number[]
+): Chart<"bar" | "scatter"> => {
+    const max_ticks = 7;
+
+    if (chart) chart.destroy();
+
+    const indexes = Array.from(Array(means.length).keys()).map(i => `${i + 1}`);
+
+    return new Chart<"bar">(ctx, {
+        type: "bar",
+        data: {
+            labels: indexes,
+            datasets: [
+                {
+                    data: means.map((m, i) => [m - stddevs[i]!, m + stddevs[i]!] as [number, number]),
+                    categoryPercentage: 1.0,
+                    maxBarThickness: 3,
+                    barPercentage: 1.0,
+                    backgroundColor: STDDEV_COLOR,
+                    order: 1
+                },
+                {
+                    data: means,
+                    type: "scatter",
+                    order: 0,
+                    backgroundColor: POINT_COLOR
+                } as any
+            ]
+        },
+        options: {
+            ...getDefaultHistogramOptions(),
+            ...(getDefaultScatterOptions() as any),
+            ...getDefaultHistogramScales(max_ticks, TEXT_COLOR, GRID_COLOR, false),
             plugins: {
                 legend: { display: false }
             }

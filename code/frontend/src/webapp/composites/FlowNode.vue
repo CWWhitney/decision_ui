@@ -110,7 +110,8 @@
             border: 1.5px solid #2e8e8e;
         }
 
-        &.operation .content {
+        &.operation .content,
+        &.loop_operation .content {
             background-color: rgba(250, 250, 250, 0.8);
             border: 1.5px solid #333;
             border-radius: 0.5em;

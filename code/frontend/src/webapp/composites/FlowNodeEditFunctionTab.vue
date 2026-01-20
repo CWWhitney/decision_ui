@@ -5,11 +5,16 @@
     import {
         ESTIMATE_NODE_TYPE,
         getExpressionError,
+        LOOP_NODE_TYPE,
+        LOOP_OPERATION_NODE_TYPE,
         OPERATION_NODE_TYPE,
         RESULT_NODE_TYPE,
         type Node
     } from "@decision-support-ui/common";
     import { computed, ref, watch } from "vue";
+
+    import FlowLoopNodeFunctionTab from "../components/flow/FlowLoopNodeFunctionTab.vue";
+    import FlowLoopOperationNodeFunctionTab from "../components/flow/FlowLoopOperationNodeFunctionTab.vue";
 
     const node = defineModel<Node>({ required: true });
     const graphStore = useFlowGraphStore();
@@ -108,6 +113,15 @@
         <v-text-field v-model="nodeWithExpressionInputValue" label="Expression or Formula"></v-text-field>
         <v-alert v-if="!!expressionError" color="error" :text="expressionError" />
     </div>
+    <div v-if="node.type == LOOP_NODE_TYPE">
+        <FlowLoopNodeFunctionTab v-model="node" />
+    </div>
+    <div v-if="node.type == LOOP_OPERATION_NODE_TYPE">
+        <FlowLoopOperationNodeFunctionTab
+            v-model="node"
+            :variable-name="graphStore.getComputedVariableName(node.id).value"
+        />
+    </div>
     <div v-if="node.type == RESULT_NODE_TYPE">
         <v-text-field
             v-model="graphStore.getComputedVariableName(node.id).value"
@@ -121,11 +135,11 @@
 
 <style scoped lang="scss">
     .v-text-field {
-        min-width: 18em;
+        min-width: 25em;
     }
 
     .v-number-input {
-        min-width: 13em;
+        min-width: 15em;
     }
 
     .lower-upper-inputs {

@@ -1,8 +1,9 @@
 <script setup lang="ts">
     import { useFlowGraphStore } from "@/state/flow/graph";
     import { DETERMINISTIC_TYPE, PROBABILISTIC_TYPE, SERIES_TYPE, type Node } from "@decision-support-ui/common";
-    import FlowVisualizeDeterministicValue from "./FlowVisualizeDeterministicValue.vue";
-    import FlowVisualizeProbabilisticValue from "./FlowVisualizeProbabilisticValue.vue";
+    import FlowVisualizeDeterministicValue from "../components/flow/FlowVisualizeDeterministicValue.vue";
+    import FlowVisualizeProbabilisticValue from "../components/flow/FlowVisualizeProbabilisticValue.vue";
+    import FlowVisualizeSeriesValue from "../components/flow/FlowVisualizeSeriesValue.vue";
     import { computedAsync } from "@vueuse/core";
 
     const node = defineModel<Node>({ required: true });
@@ -27,6 +28,15 @@
             return await graphStore.getComputedProbabilisticHistogramData(node.value.id).value;
         }
     });
+
+    const computedSeriesPlotData = computedAsync(async () => {
+        if (
+            computedTensorDescriptor.value.type == "success" &&
+            computedTensorDescriptor.value.value.type == SERIES_TYPE
+        ) {
+            return await graphStore.getComputedSeriesPlotData(node.value.id).value;
+        }
+    });
 </script>
 
 <template>
@@ -40,8 +50,11 @@
                 :counts="computedProbabilisticHistogramData.value.counts"
             />
         </div>
-        <div v-if="computedTensorDescriptor.value.type == SERIES_TYPE">
-            <!-- visualize series value -->
+        <div v-if="computedSeriesPlotData && computedSeriesPlotData.type == 'success'">
+            <FlowVisualizeSeriesValue
+                :means="computedSeriesPlotData.value.means"
+                :stddevs="computedSeriesPlotData.value.stddevs"
+            />
         </div>
     </div>
 </template>

@@ -13,13 +13,22 @@ import {
     scalar,
     randomNormal,
     tensor1d,
-    tidy
+    tidy,
+    stack
 } from "@tensorflow/tfjs";
 
 import grammar from "./expression.ohm-bundle";
 
 import { VariableDependencies } from "./dependencies";
-import { ESTIMATE_NODE_TYPE, Node, NodeId, OPERATION_NODE_TYPE, RESULT_NODE_TYPE } from "../../graph";
+import {
+    ESTIMATE_NODE_TYPE,
+    LOOP_NODE_TYPE,
+    LOOP_OPERATION_NODE_TYPE,
+    Node,
+    NodeId,
+    OPERATION_NODE_TYPE,
+    RESULT_NODE_TYPE
+} from "../../graph";
 import { getNormalDistributionParameter, validateLowerUpperBounds } from "../math";
 import { ComputationContext } from "../context";
 import {
@@ -127,6 +136,9 @@ export const createTensorEvaluationSemantics = () => {
             if (!(variable in context.tensorByVariable)) {
                 throw new Error(`Undefined variable: ${variable}`);
             }
+            if (variable == "previous" || variable == "i") {
+                return context.tensorByVariable[variable];
+            }
             return keep(context.tensorByVariable[variable]).clone();
         },
 
@@ -201,6 +213,52 @@ export const getTensorForNodeWithExpression = (
     return tidy(() => evaluateExpressionForTensor(node.options.expression, expressionContext));
 };
 
+export const getTensorForLoopOperationNode = (
+    node: Node,
+    getNode: (nodeId: string) => Node,
+    getVariableDependencies: (nodeId: string) => VariableDependencies,
+    getNodeIdForVariable: (variable: string) => NodeId,
+    evaluateExpressionForTensor: (expression: string, expressionContext: ExpressionTensorContext) => Tensor,
+    getTensorForNode: (nodeId: string) => Tensor
+): Tensor => {
+    if (node.type != LOOP_OPERATION_NODE_TYPE) {
+        throw new Error(`cannot calculate loop operation node tensor for node of type '${node.type}'`);
+    }
+
+    if (!node.parentNodeId) {
+        throw new Error(`cannot calculate loop operation node without a parent node`);
+    }
+
+    const parentNode = getNode(node.parentNodeId);
+    if (parentNode.type != LOOP_NODE_TYPE) {
+        throw new Error(`cannot calculate loop operation node if parent node is not of type '${LOOP_NODE_TYPE}}`);
+    }
+
+    // determine all required variable values as tensors
+    const expressionContext: ExpressionTensorContext = { tensorByVariable: {} };
+    for (const variable of getVariableDependencies(node.id)) {
+        expressionContext.tensorByVariable[variable] = getTensorForNode(getNodeIdForVariable(variable));
+    }
+
+    const stacked = tidy(() => {
+        const tensorList = [] as Tensor[];
+        const initTensor = tidy(() => evaluateExpressionForTensor(node.options.initExpression, expressionContext));
+        tensorList.push(initTensor);
+        for (let i = 1; i < parentNode.options.iterations; i++) {
+            const iterTensor = evaluateExpressionForTensor(node.options.iterExpression, {
+                tensorByVariable: {
+                    ...expressionContext.tensorByVariable,
+                    i: scalar(i),
+                    previous: tensorList[i - 1]
+                }
+            });
+            tensorList.push(iterTensor);
+        }
+        return stack(tensorList, -1);
+    });
+    return stacked;
+};
+
 export const getTensorForNodeRecursion = (
     nodeId: string,
     getNode: (nodeId: string) => Node,
@@ -216,6 +274,15 @@ export const getTensorForNodeRecursion = (
     } else if (node.type == OPERATION_NODE_TYPE || node.type == RESULT_NODE_TYPE) {
         return getTensorForNodeWithExpression(
             node,
+            getVariableDependencies,
+            getNodeIdForVariable,
+            evaluateExpressionForTensor,
+            getTensorForNode
+        );
+    } else if (node.type == LOOP_OPERATION_NODE_TYPE) {
+        return getTensorForLoopOperationNode(
+            node,
+            getNode,
             getVariableDependencies,
             getNodeIdForVariable,
             evaluateExpressionForTensor,

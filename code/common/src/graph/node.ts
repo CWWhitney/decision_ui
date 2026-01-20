@@ -4,23 +4,32 @@ import { DistributionFunctionType } from "../compute/math";
 export const ESTIMATE_NODE_TYPE = "estimate";
 export const OPERATION_NODE_TYPE = "operation";
 export const LOOP_NODE_TYPE = "loop";
+export const LOOP_OPERATION_NODE_TYPE = "loop_operation";
 export const RESULT_NODE_TYPE = "result";
 export const COLLECTION_NODE_TYPE = "collection";
 
 export type EstimateNodeType = "estimate";
 export type OperationNodeType = "operation";
 export type LoopNodeType = "loop";
+export type LoopOperationNodeType = "loop_operation";
 export type ResultNodeType = "result";
 export type CollectionNodeType = "collection";
 
 export type NodeId = string;
 
-export type NodeType = EstimateNodeType | OperationNodeType | LoopNodeType | ResultNodeType | CollectionNodeType;
+export type NodeType =
+    | EstimateNodeType
+    | OperationNodeType
+    | LoopNodeType
+    | LoopOperationNodeType
+    | ResultNodeType
+    | CollectionNodeType;
 
 export const AVAILABLE_NODE_TYPES: NodeType[] = [
     ESTIMATE_NODE_TYPE,
     OPERATION_NODE_TYPE,
     LOOP_NODE_TYPE,
+    LOOP_OPERATION_NODE_TYPE,
     RESULT_NODE_TYPE,
     COLLECTION_NODE_TYPE
 ];
@@ -29,6 +38,7 @@ export const DEFAULT_NODE_TYPE_TITLES: { [key in NodeType]: string } = {
     [ESTIMATE_NODE_TYPE]: "Estimate",
     [OPERATION_NODE_TYPE]: "Operation",
     [LOOP_NODE_TYPE]: "Loop",
+    [LOOP_OPERATION_NODE_TYPE]: "Loop Operation",
     [RESULT_NODE_TYPE]: "Result",
     [COLLECTION_NODE_TYPE]: "Collection"
 };
@@ -37,6 +47,7 @@ export const getDefaultNodeSize = (nodeType: NodeType): Size => {
     switch (nodeType) {
         case ESTIMATE_NODE_TYPE:
         case OPERATION_NODE_TYPE:
+        case LOOP_OPERATION_NODE_TYPE:
         case RESULT_NODE_TYPE:
             return { width: 200, height: 50 };
         case LOOP_NODE_TYPE:
@@ -72,6 +83,15 @@ export interface OperationNodeOptions {
     expression: string;
 }
 
+export interface LoopNodeOptions {
+    iterations: number;
+}
+
+export interface LoopOperationNodeOptions {
+    initExpression: string;
+    iterExpression: string;
+}
+
 export interface ResultNodeOptions {
     expression: string;
 }
@@ -79,15 +99,16 @@ export interface ResultNodeOptions {
 export type ResultNode = AbstractNode<ResultNodeType, ResultNodeOptions>;
 
 export type CollectionNode = AbstractNode<CollectionNodeType, null>;
-export type LoopNode = AbstractNode<LoopNodeType, null>;
-
+export type LoopNode = AbstractNode<LoopNodeType, LoopNodeOptions>;
+export type LoopOperationNode = AbstractNode<LoopOperationNodeType, LoopOperationNodeOptions>;
 export type OperationNode = AbstractNode<OperationNodeType, OperationNodeOptions>;
 export type EstimateNode = AbstractNode<EstimateNodeType, EstimateNodeOptions>;
 
 export type NodeOptionsTypeMap = {
     [ESTIMATE_NODE_TYPE]: EstimateNodeOptions;
     [OPERATION_NODE_TYPE]: OperationNodeOptions;
-    [LOOP_NODE_TYPE]: null;
+    [LOOP_NODE_TYPE]: LoopNodeOptions;
+    [LOOP_OPERATION_NODE_TYPE]: LoopOperationNodeOptions;
     [RESULT_NODE_TYPE]: ResultNodeOptions;
     [COLLECTION_NODE_TYPE]: null;
 };
@@ -106,7 +127,14 @@ export const getDefaultNodeOptions = (nodeType: NodeType) => {
                 expression: ""
             };
         case LOOP_NODE_TYPE:
-            return null;
+            return {
+                iterations: 10
+            } as LoopNodeOptions;
+        case LOOP_OPERATION_NODE_TYPE:
+            return {
+                initExpression: "",
+                iterExpression: ""
+            } as LoopOperationNodeOptions;
         case RESULT_NODE_TYPE:
             return {
                 expression: ""
@@ -118,7 +146,7 @@ export const getDefaultNodeOptions = (nodeType: NodeType) => {
     }
 };
 
-export type Node = ResultNode | OperationNode | LoopNode | EstimateNode | CollectionNode;
+export type Node = ResultNode | OperationNode | LoopNode | LoopOperationNode | EstimateNode | CollectionNode;
 
 export type NodeByIdMap = Map<NodeId, Node>;
 export type NodeChildrenByParentIdMap = Map<NodeId, Node[]>;

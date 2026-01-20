@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import type { Chart } from "chart.js";
     import { onBeforeUnmount, onMounted, onUpdated, ref, useTemplateRef } from "vue";
-    import { drawNodeEditDialogHistogram } from "../charts/histogram/nodeEditDialog";
+    import { drawNodeEditDialogHistogram } from "../../charts/histogram/nodeEditDialog";
 
     const { bins, counts } = defineProps<{ bins: number[]; counts: number[] }>();
 

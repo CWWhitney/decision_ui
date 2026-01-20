@@ -12,38 +12,7 @@ import { getHandlePositions } from "@/common/layout";
 import { defineStore } from "pinia";
 import { useSessionStorage } from "@vueuse/core";
 
-import {
-    type Node,
-    type Edge,
-    type NodeType,
-    getNodeByIdMap,
-    getChildrenByParentIdMap,
-    type NodeId,
-    getEdgeIdForNodes,
-    getNodePositionRecursion,
-    type Position,
-    type NewNodeOptions,
-    getNewNode,
-    getAncestorNodesRecursion,
-    getDescendantNodesRecursion,
-    type ComputationContext,
-    type Size,
-    OPERATION_NODE_TYPE,
-    type VariableDependencies,
-    getExpressionEvaluatorForVariableDependencies,
-    getExpressionEvaluatorForTensor,
-    getTensorForNodeRecursion,
-    tensorToDescriptor,
-    getHistogramBinsFromTensor,
-    type Tensor,
-    PROBABILISTIC_TYPE,
-    type TensorDescriptor,
-    type HistogramData,
-    RESULT_NODE_TYPE,
-    getFromMapOrThrow,
-    getComputationEdges,
-    filterManualEdgesByComputationEdges
-} from "@decision-support-ui/common";
+import * as common from "@decision-support-ui/common";
 import { useProjectSettingsStore } from "../projects/settings";
 import { generateVariableName } from "@/editor/common/variables";
 
@@ -72,7 +41,11 @@ const computedByKey = <K, T>(get: (key: K, previous: T | undefined) => T) => {
     };
 };
 
-const getVueFlowEdge = (edge: Edge, getComputedNodePosition: (nodeId: string) => Position, style: Styles = {}) => {
+const getVueFlowEdge = (
+    edge: common.Edge,
+    getComputedNodePosition: (nodeId: string) => common.Position,
+    style: Styles = {}
+) => {
     const sourceNodePosition = getComputedNodePosition(edge.source);
     const targetNodePosition = getComputedNodePosition(edge.target);
 
@@ -91,13 +64,13 @@ const getVueFlowEdge = (edge: Edge, getComputedNodePosition: (nodeId: string) =>
 
 export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
     const projectSettings = useProjectSettingsStore();
-    const evaluateExpressionForVariableDependencies = getExpressionEvaluatorForVariableDependencies();
-    const evaluateExpressionForTensor = getExpressionEvaluatorForTensor();
+    const evaluateExpressionForVariableDependencies = common.getExpressionEvaluatorForVariableDependencies();
+    const evaluateExpressionForTensor = common.getExpressionEvaluatorForTensor();
 
     // --- persisted state
     const state = useSessionStorage(FLOW_GRAPH_STORE_ID, {
-        nodes: [] as Node[],
-        edges: [] as Edge[]
+        nodes: [] as common.Node[],
+        edges: [] as common.Edge[]
     });
 
     const { nodes, edges } = toRefs(state.value);
@@ -108,27 +81,30 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         () =>
             ({
                 mcRuns: projectSettings.mcRuns
-            }) as ComputationContext
+            }) as common.ComputationContext
     );
 
-    const _nodesByIdMap = computed(() => getNodeByIdMap(nodes.value));
-    const _childrenByParentIdMap = computed(() => getChildrenByParentIdMap(nodes.value));
+    const _nodesByIdMap = computed(() => common.getNodeByIdMap(nodes.value));
+    const _childrenByParentIdMap = computed(() => common.getChildrenByParentIdMap(nodes.value));
     const _nodeIdByVariableMap = computed(
         () => new Map(nodes.value.map(n => [getComputedVariableName(n.id).value, n.id]))
     );
 
-    const getComputedNode = computedByKey((nodeId: NodeId) => getFromMapOrThrow(nodeId, _nodesByIdMap.value));
+    const getComputedNode = computedByKey((nodeId: common.NodeId) =>
+        common.getFromMapOrThrow(nodeId, _nodesByIdMap.value)
+    );
     const getComputedNodeIdFromVariableName = computedByKey((variableName: string) =>
-        getFromMapOrThrow(variableName, _nodeIdByVariableMap.value)
+        common.getFromMapOrThrow(variableName, _nodeIdByVariableMap.value)
     );
     const isVariableNameValid = (variableName: string) => _nodeIdByVariableMap.value.has(variableName);
 
     const getComputedNodePosition = computedByKey(
-        (nodeId: NodeId): Position =>
-            getNodePositionRecursion(
+        (nodeId: common.NodeId): common.Position =>
+            common.getNodePositionRecursion(
                 nodeId,
-                (nodeId: NodeId) => getComputedNode(nodeId).value,
-                (nodeId: NodeId, _getNode: (nodeId: NodeId) => Node) => getComputedNodePosition(nodeId).value
+                (nodeId: common.NodeId) => getComputedNode(nodeId).value,
+                (nodeId: common.NodeId, _getNode: (nodeId: common.NodeId) => common.Node) =>
+                    getComputedNodePosition(nodeId).value
             )
     );
 
@@ -155,7 +131,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
 
     const getComputedVueFlowEdges = () =>
         computed(() => {
-            const computationEdges = getComputationEdges(
+            const computationEdges = common.getComputationEdges(
                 nodes.value,
                 (nodeId: string) => {
                     const dependencies = getComputedVariableDependencies(nodeId).value;
@@ -169,7 +145,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
                 ...computationEdges.map(edge =>
                     getVueFlowEdge(edge, (nodeId: string) => getComputedNodePosition(nodeId).value)
                 ),
-                ...filterManualEdgesByComputationEdges(edges.value, computationEdges).map(edge =>
+                ...common.filterManualEdgesByComputationEdges(edges.value, computationEdges).map(edge =>
                     getVueFlowEdge(edge, (nodeId: string) => getComputedNodePosition(nodeId).value, {
                         strokeDasharray: 5
                     })
@@ -177,49 +153,71 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
             ];
         });
 
-    const getComputedAncestorNodes = computedByKey((nodeId: NodeId): Node[] =>
-        getAncestorNodesRecursion(
+    const getComputedAncestorNodes = computedByKey((nodeId: common.NodeId): common.Node[] =>
+        common.getAncestorNodesRecursion(
             nodeId,
-            (nodeId: NodeId) => getComputedNode(nodeId).value,
-            (nodeId: NodeId, _getNode: (nodeId: NodeId) => Node) => getComputedAncestorNodes(nodeId).value
+            (nodeId: common.NodeId) => getComputedNode(nodeId).value,
+            (nodeId: common.NodeId, _getNode: (nodeId: common.NodeId) => common.Node) =>
+                getComputedAncestorNodes(nodeId).value
         )
     );
 
-    const getComputedDescendantNodes = computedByKey((nodeId: NodeId): Node[] =>
-        getDescendantNodesRecursion(
+    const getComputedDescendantNodes = computedByKey((nodeId: common.NodeId): common.Node[] =>
+        common.getDescendantNodesRecursion(
             nodeId,
             _childrenByParentIdMap.value,
-            (nodeId: NodeId, _childrenByParentIdMap: Map<NodeId, Node[]>) => getComputedDescendantNodes(nodeId).value
+            (nodeId: common.NodeId, _childrenByParentIdMap: Map<common.NodeId, common.Node[]>) =>
+                getComputedDescendantNodes(nodeId).value
         )
     );
 
-    const getComputedVariableName = computedByKey((nodeId: NodeId): string =>
+    const getComputedVariableName = computedByKey((nodeId: common.NodeId): string =>
         generateVariableName(getComputedNode(nodeId).value.visualization.title)
     );
 
-    const getComputedVariableDependencies = computedByKey((nodeId: NodeId): ComputedResult<VariableDependencies> => {
-        const node = getComputedNode(nodeId).value;
-        if (node.type == OPERATION_NODE_TYPE || node.type == RESULT_NODE_TYPE) {
-            try {
-                return {
-                    type: "success",
-                    value: evaluateExpressionForVariableDependencies(node.options.expression)
-                };
-            } catch (e) {
-                return {
-                    type: "error",
-                    message: e instanceof Error ? `${e.message}` : `${e}`
-                };
+    const getComputedVariableDependencies = computedByKey(
+        (nodeId: common.NodeId): ComputedResult<common.VariableDependencies> => {
+            const node = getComputedNode(nodeId).value;
+            if (node.type == common.OPERATION_NODE_TYPE || node.type == common.RESULT_NODE_TYPE) {
+                try {
+                    return {
+                        type: "success",
+                        value: evaluateExpressionForVariableDependencies(node.options.expression)
+                    };
+                } catch (e) {
+                    return {
+                        type: "error",
+                        message: e instanceof Error ? `${e.message}` : `${e}`
+                    };
+                }
+            } else if (node.type == common.LOOP_OPERATION_NODE_TYPE) {
+                try {
+                    return {
+                        type: "success",
+                        value: [
+                            ...evaluateExpressionForVariableDependencies(node.options.initExpression),
+                            ...evaluateExpressionForVariableDependencies(node.options.iterExpression)
+                        ].filter(v => v !== "previous" && v !== "i")
+                    };
+                } catch (e) {
+                    return {
+                        type: "error",
+                        message: e instanceof Error ? `${e.message}` : `${e}`
+                    };
+                }
             }
+            return {
+                type: "success",
+                value: []
+            };
         }
-        return {
-            type: "success",
-            value: []
-        };
-    });
+    );
 
     const getComputedTensor = computedByKey(
-        (nodeId: NodeId, previousTensor: ComputedResult<Tensor> | undefined): ComputedResult<Tensor> => {
+        (
+            nodeId: common.NodeId,
+            previousTensor: ComputedResult<common.Tensor> | undefined
+        ): ComputedResult<common.Tensor> => {
             if (previousTensor && previousTensor.type == "success") {
                 previousTensor.value.dispose();
             }
@@ -239,7 +237,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
                 };
                 return {
                     type: "success",
-                    value: getTensorForNodeRecursion(
+                    value: common.getTensorForNodeRecursion(
                         nodeId,
                         getNode,
                         getVariableDependencies,
@@ -248,7 +246,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
                         getTensorForNode,
                         computedComputationContext.value
                     )
-                } as ComputedResult<Tensor>;
+                } as ComputedResult<common.Tensor>;
             } catch (e) {
                 return {
                     type: "error",
@@ -258,36 +256,40 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         }
     );
 
-    const getComputedTensorDescriptor = computedByKey((nodeId: NodeId): ComputedResult<TensorDescriptor> => {
-        const tensorResult = getComputedTensor(nodeId).value;
-        if (tensorResult.type == "error") {
+    const getComputedTensorDescriptor = computedByKey(
+        (nodeId: common.NodeId): ComputedResult<common.TensorDescriptor> => {
+            const tensorResult = getComputedTensor(nodeId).value;
+            if (tensorResult.type == "error") {
+                return {
+                    type: "error",
+                    message: tensorResult.message
+                };
+            }
             return {
-                type: "error",
-                message: tensorResult.message
+                type: "success",
+                value: common.tensorToDescriptor(tensorResult.value)
             };
         }
-        return {
-            type: "success",
-            value: tensorToDescriptor(tensorResult.value)
-        };
-    });
+    );
 
-    const getComputedDeterministicValue = computedByKey(async (nodeId: NodeId): Promise<ComputedResult<number>> => {
-        const tensorResult = getComputedTensor(nodeId).value;
-        if (tensorResult.type == "error") {
+    const getComputedDeterministicValue = computedByKey(
+        async (nodeId: common.NodeId): Promise<ComputedResult<number>> => {
+            const tensorResult = getComputedTensor(nodeId).value;
+            if (tensorResult.type == "error") {
+                return {
+                    type: "error",
+                    message: tensorResult.message
+                };
+            }
             return {
-                type: "error",
-                message: tensorResult.message
+                type: "success",
+                value: (await tensorResult.value.array()) as number
             };
         }
-        return {
-            type: "success",
-            value: (await tensorResult.value.array()) as number
-        };
-    });
+    );
 
     const getComputedProbabilisticHistogramData = computedByKey(
-        async (nodeId: NodeId): Promise<ComputedResult<HistogramData>> => {
+        async (nodeId: common.NodeId): Promise<ComputedResult<common.HistogramData>> => {
             const tensorDescriptor = getComputedTensorDescriptor(nodeId).value;
             const tensorResult = getComputedTensor(nodeId).value;
 
@@ -303,7 +305,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
                     message: tensorDescriptor.message
                 };
             }
-            if (tensorDescriptor.value.type !== PROBABILISTIC_TYPE) {
+            if (tensorDescriptor.value.type !== common.PROBABILISTIC_TYPE) {
                 return {
                     type: "error",
                     message: `Can only calculate histogram for probabilistic value`
@@ -311,7 +313,37 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
             }
             return {
                 type: "success",
-                value: await getHistogramBinsFromTensor(tensorResult.value, projectSettings.histogramBins)
+                value: await common.getHistogramBinsFromTensor(tensorResult.value, projectSettings.histogramBins)
+            };
+        }
+    );
+
+    const getComputedSeriesPlotData = computedByKey(
+        async (nodeId: common.NodeId): Promise<ComputedResult<common.SeriesPlotData>> => {
+            const tensorDescriptor = getComputedTensorDescriptor(nodeId).value;
+            const tensorResult = getComputedTensor(nodeId).value;
+
+            if (tensorResult.type == "error") {
+                return {
+                    type: "error",
+                    message: tensorResult.message
+                };
+            }
+            if (tensorDescriptor.type == "error") {
+                return {
+                    type: "error",
+                    message: tensorDescriptor.message
+                };
+            }
+            if (tensorDescriptor.value.type !== common.SERIES_TYPE) {
+                return {
+                    type: "error",
+                    message: `can only calculate series plot data for series value`
+                };
+            }
+            return {
+                type: "success",
+                value: await common.getSeriesPlotDataFromTensor(tensorResult.value)
             };
         }
     );
@@ -319,7 +351,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
     // --- actions
 
     const addEdgeFromVueFlowConnectionAction = (connection: VueFlowConnection) => {
-        const edgeId = getEdgeIdForNodes(connection.source, connection.target);
+        const edgeId = common.getEdgeIdForNodes(connection.source, connection.target);
         edges.value = edges.value.filter(e => e.id != edgeId);
         edges.value.push({
             id: edgeId,
@@ -332,23 +364,23 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         edges.value = edges.value.filter(e => e.id != edge_id);
     };
 
-    const updateNodePositionAction = (nodeId: NodeId, position: Position) => {
+    const updateNodePositionAction = (nodeId: common.NodeId, position: common.Position) => {
         const node = getComputedNode(nodeId).value;
         node.visualization.position = position;
     };
 
-    const updateNodeSizeAction = (nodeId: NodeId, size: Size) => {
+    const updateNodeSizeAction = (nodeId: common.NodeId, size: common.Size) => {
         const node = getComputedNode(nodeId).value;
         node.visualization.size = size;
     };
 
-    const addNewNodeAction = (nodeType: NodeType, options?: NewNodeOptions): NodeId => {
-        const newNode = getNewNode(nodeType, nodes.value, options);
+    const addNewNodeAction = (nodeType: common.NodeType, options?: common.NewNodeOptions): common.NodeId => {
+        const newNode = common.getNewNode(nodeType, nodes.value, options);
         nodes.value.push(newNode);
         return newNode.id;
     };
 
-    const removeNodeAction = (nodeId: NodeId) => {
+    const removeNodeAction = (nodeId: common.NodeId) => {
         const node = getComputedNode(nodeId).value;
         const removeNodeIds = [nodeId, ...getComputedDescendantNodes(node.id).value.map(n => n.id)];
         const removeEdgeIds = edges.value
@@ -358,9 +390,9 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         edges.value = edges.value.filter(e => !removeEdgeIds.includes(e.id));
     };
 
-    const setNodeExpressionAction = (nodeId: NodeId, expression: string) => {
+    const setNodeExpressionAction = (nodeId: common.NodeId, expression: string) => {
         const node = getComputedNode(nodeId).value;
-        if (node.type == OPERATION_NODE_TYPE || node.type == RESULT_NODE_TYPE) {
+        if (node.type == common.OPERATION_NODE_TYPE || node.type == common.RESULT_NODE_TYPE) {
             node.options.expression = expression;
         } else {
             throw new Error(`cannot set expression for node ${node.id} of type ${node.type}`);
@@ -382,6 +414,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         getComputedTensorDescriptor,
         getComputedDeterministicValue,
         getComputedProbabilisticHistogramData,
+        getComputedSeriesPlotData,
         getComputedAncestorNodes,
         getComputedDescendantNodes,
         getComputedVariableName,

@@ -13,8 +13,8 @@ export const getHistogramBinsFromTensor = async (tensor: Tensor, numBins: number
     const { minTensor, maxTensor, countsTensor } = tidy(() => {
         const n = tensor.size;
 
-        const loRank = Math.floor(lowerQ * n);
-        const hiRank = Math.ceil(upperQ * n);
+        const loRank = Math.ceil(lowerQ * n);
+        const hiRank = Math.floor(upperQ * n);
 
         const maxTensor = topk(keep(tensor), n - hiRank).values.min();
         const minTensor = topk(keep(tensor).neg(), loRank).values.min().neg();
