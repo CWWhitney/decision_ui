@@ -18,16 +18,6 @@ import { generateVariableName } from "@/editor/common/variables";
 
 export const FLOW_GRAPH_STORE_ID = "flow.graph";
 
-export type ComputedResult<T> =
-    | {
-          type: "success";
-          value: T;
-      }
-    | {
-          type: "error";
-          message: string;
-      };
-
 const computedByKey = <K, T>(get: (key: K, previous: T | undefined) => T) => {
     const cache = new Map<K, ComputedRef<T>>();
     return (key: K): ComputedRef<T> => {
@@ -177,7 +167,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
     );
 
     const getComputedVariableDependencies = computedByKey(
-        (nodeId: common.NodeId): ComputedResult<common.VariableDependencies> => {
+        (nodeId: common.NodeId): common.ComputedResult<common.VariableDependencies> => {
             const node = getComputedNode(nodeId).value;
             if (node.type == common.OPERATION_NODE_TYPE || node.type == common.RESULT_NODE_TYPE) {
                 try {
@@ -217,8 +207,8 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
     const getComputedTensor = computedByKey(
         (
             nodeId: common.NodeId,
-            previousTensor: ComputedResult<common.Tensor> | undefined
-        ): ComputedResult<common.Tensor> => {
+            previousTensor: common.ComputedResult<common.Tensor> | undefined
+        ): common.ComputedResult<common.Tensor> => {
             if (previousTensor && previousTensor.type == "success") {
                 previousTensor.value.dispose();
             }
@@ -247,7 +237,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
                         getTensorForNode,
                         computedComputationContext.value
                     )
-                } as ComputedResult<common.Tensor>;
+                } as common.ComputedResult<common.Tensor>;
             } catch (e) {
                 return {
                     type: "error",
@@ -258,7 +248,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
     );
 
     const getComputedTensorDescriptor = computedByKey(
-        (nodeId: common.NodeId): ComputedResult<common.TensorDescriptor> => {
+        (nodeId: common.NodeId): common.ComputedResult<common.TensorDescriptor> => {
             const tensorResult = getComputedTensor(nodeId).value;
             if (tensorResult.type == "error") {
                 return {
@@ -274,7 +264,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
     );
 
     const getComputedDeterministicValue = computedByKey(
-        async (nodeId: common.NodeId): Promise<ComputedResult<number>> => {
+        async (nodeId: common.NodeId): Promise<common.ComputedResult<number>> => {
             const tensorResult = getComputedTensor(nodeId).value;
             if (tensorResult.type == "error") {
                 return {
@@ -290,7 +280,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
     );
 
     const getComputedProbabilisticHistogramData = computedByKey(
-        async (nodeId: common.NodeId): Promise<ComputedResult<common.HistogramData>> => {
+        async (nodeId: common.NodeId): Promise<common.ComputedResult<common.HistogramData>> => {
             const tensorDescriptor = getComputedTensorDescriptor(nodeId).value;
             const tensorResult = getComputedTensor(nodeId).value;
 
@@ -320,7 +310,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
     );
 
     const getComputedSeriesPlotData = computedByKey(
-        async (nodeId: common.NodeId): Promise<ComputedResult<common.SeriesPlotData>> => {
+        async (nodeId: common.NodeId): Promise<common.ComputedResult<common.SeriesPlotData>> => {
             const tensorDescriptor = getComputedTensorDescriptor(nodeId).value;
             const tensorResult = getComputedTensor(nodeId).value;
 

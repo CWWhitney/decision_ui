@@ -1,4 +1,4 @@
-import grammar from "./expression.ohm-bundle";
+import grammar from "../grammar/expression.ohm-bundle";
 
 export type VariableDependencies = string[];
 

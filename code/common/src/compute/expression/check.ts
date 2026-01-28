@@ -1,7 +1,7 @@
-import grammar from "./expression.ohm-bundle.js";
+import { expressionGrammar } from "./grammar";
 
 export const getExpressionError = (expression: string): string | null => {
-    const match = grammar.match(expression);
+    const match = expressionGrammar.match(expression);
     if (match.failed()) {
         return match.shortMessage;
     }
