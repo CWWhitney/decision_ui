@@ -58,6 +58,33 @@ export const getDefaultNodeSize = (nodeType: NodeType): Size => {
     }
 };
 
+export type NodeStyleDefaultBorder = "default";
+export type NodeStyleSharpBorder = "sharp";
+export type NodeStyleRoundBorder = "round";
+export type NodeStyleEllipseBorder = "ellipse";
+
+export const NODE_STYLE_DEFAULT_BORDER = "default";
+export const NODE_STYLE_SHARP_BORDER = "sharp";
+export const NODE_STYLE_ROUND_BORDER = "round";
+export const NODE_STYLE_ELLIPSE_BORDER = "ellipse";
+
+export const NODE_STYLE_BORDER_VARIANTS = [
+    NODE_STYLE_DEFAULT_BORDER,
+    NODE_STYLE_SHARP_BORDER,
+    NODE_STYLE_ROUND_BORDER,
+    NODE_STYLE_ELLIPSE_BORDER
+];
+
+export type NodeStyleBorderVariant =
+    | NodeStyleDefaultBorder
+    | NodeStyleSharpBorder
+    | NodeStyleRoundBorder
+    | NodeStyleEllipseBorder;
+
+export interface NodeStyle {
+    border: NodeStyleBorderVariant;
+}
+
 export interface AbstractNode<T, O> {
     id: NodeId;
     type: T;
@@ -67,6 +94,7 @@ export interface AbstractNode<T, O> {
         title: string;
         position: Position;
         size: Size;
+        style: NodeStyle;
     };
 
     options: O;
@@ -227,7 +255,10 @@ export const getNewNode = (nodeType: NodeType, nodes: Node[], options?: NewNodeO
         visualization: {
             title: `${DEFAULT_NODE_TYPE_TITLES[nodeType]} ${nextNodeId}`,
             position: options?.position ?? { x: 0, y: 0 },
-            size: options?.size ?? getDefaultNodeSize(nodeType)
+            size: options?.size ?? getDefaultNodeSize(nodeType),
+            style: {
+                border: NODE_STYLE_DEFAULT_BORDER
+            }
         },
         options: getDefaultNodeOptions(nodeType)
     } as Node;

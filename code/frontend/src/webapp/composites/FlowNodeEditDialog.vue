@@ -12,6 +12,7 @@
     import FlowNodeEditFunctionTab from "./FlowNodeEditFunctionTab.vue";
     import FlowNodeEditDebugTab from "./FlowNodeEditDebugTab.vue";
     import FlowNodeEditDataTab from "./FlowNodeEditDataTab.vue";
+    import FlowNodeEditStyleTab from "./FlowNodeEditStyleTab.vue";
 
     const store = useDialogsNodeEditStore();
 </script>
@@ -45,7 +46,7 @@
                         <FlowNodeEditDataTab v-model="store.node" />
                     </v-tabs-window-item>
                     <v-tabs-window-item :value="NODE_EDIT_STYLE_TAB">
-                        <p>Style Tab</p>
+                        <FlowNodeEditStyleTab v-model="store.node" />
                     </v-tabs-window-item>
                     <v-tabs-window-item :value="NODE_EDIT_DEBUG_TAB">
                         <FlowNodeEditDebugTab v-model="store.node" />

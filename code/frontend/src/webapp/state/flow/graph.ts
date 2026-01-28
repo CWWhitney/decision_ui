@@ -123,7 +123,8 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
                         extent: "parent",
                         expandParent: true,
                         data: {
-                            label: node.visualization.title
+                            label: node.visualization.title,
+                            border: node.visualization.style.border
                         }
                     }) as VueFlowNode
             );

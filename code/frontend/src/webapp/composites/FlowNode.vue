@@ -7,6 +7,12 @@
         useDialogsNodeEditStore
     } from "@/state/dialogs/nodeEdit";
 
+    import {
+        NODE_STYLE_DEFAULT_BORDER,
+        NODE_STYLE_SHARP_BORDER,
+        NODE_STYLE_ROUND_BORDER
+    } from "@decision-support-ui/common";
+
     import { Position, Handle, useVueFlow } from "@vue-flow/core";
     import type { NodeProps } from "@vue-flow/core";
     import { NodeResizer } from "@vue-flow/node-resizer";
@@ -22,6 +28,20 @@
 
     const node = defineProps<NodeProps>();
     const showToolbar = computed(() => getSelectedNodes.value.length == 1 && getSelectedNodes.value[0]?.id == node.id);
+
+    const nodeStyle = (node: NodeProps) => {
+        return {
+            ...(node &&
+                node.data.border != NODE_STYLE_DEFAULT_BORDER && {
+                    borderRadius:
+                        node.data.border == NODE_STYLE_SHARP_BORDER
+                            ? "0px"
+                            : node.data.border == NODE_STYLE_ROUND_BORDER
+                              ? "0.5em"
+                              : "50%"
+                })
+        };
+    };
 </script>
 
 <template>
@@ -73,7 +93,7 @@
         </v-btn-group>
     </NodeToolbar>
 
-    <div class="content">{{ node.data.label }} <br /></div>
+    <div class="content" :style="nodeStyle(node)">{{ node.data.label }} <br /></div>
 
     <Handle id="top" type="source" :position="Position.Top" style="" />
     <Handle id="bottom" type="source" :position="Position.Bottom" />
