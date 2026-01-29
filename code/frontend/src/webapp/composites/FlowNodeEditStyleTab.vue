@@ -5,11 +5,13 @@
 </script>
 
 <template>
-    <v-combobox
-        v-model="node.visualization.style.border"
-        label="Border Variant"
-        :items="NODE_STYLE_BORDER_VARIANTS"
-    ></v-combobox>
+    <div>
+        <v-combobox
+            v-model="node.visualization.style.border"
+            label="Border Variant"
+            :items="NODE_STYLE_BORDER_VARIANTS"
+        ></v-combobox>
+    </div>
 </template>
 
 <style scoped lang="scss">

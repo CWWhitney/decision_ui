@@ -10,6 +10,7 @@ Arithmetic {
   MulExp
     = MulExp "*" ExpExp  -- times
     | MulExp "/" ExpExp  -- divide
+    | MulExp "%" ExpExp  -- modulo
     | ExpExp
 
   ExpExp
@@ -30,7 +31,21 @@ Arithmetic {
     = Exp ("," Exp)*
 
   funcName  (a function)
-    = "vv" | "npv" | "abs" | "ceiling" | "floor" | "sin" | "cos" | "tan" | "exp" | "log" | "log10" | "round" |  "trunc" | "sqrt"
+    = "chance_event"
+    | "vv"
+    | "npv"
+    | "abs"
+    | "ceiling"
+    | "floor"
+    | "sin"
+    | "cos"
+    | "tan"
+    | "exp"
+    | "log"
+    | "log10"
+    | "round"
+    |  "trunc"
+    | "sqrt"
 
   variable  (a variable)
     = variableStart variableContinue*

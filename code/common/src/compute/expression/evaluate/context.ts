@@ -1,6 +1,6 @@
-import { Tensor } from "@tensorflow/tfjs";
+import { TypedTensor } from "../../tensor";
 
 export interface ExpressionTensorContext {
     mcRuns: number;
-    tensorByVariable: { [variable: string]: Tensor };
+    tensorByVariable: { [variable: string]: TypedTensor };
 }

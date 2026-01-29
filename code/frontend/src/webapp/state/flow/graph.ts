@@ -55,7 +55,7 @@ const getVueFlowEdge = (
 export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
     const projectSettings = useProjectSettingsStore();
     const evaluateExpressionForVariableDependencies = common.getExpressionEvaluatorForVariableDependencies();
-    const evaluateExpressionForTensor = common.getExpressionEvaluatorForTensor();
+    const evaluateExpressionForTypedTensor = common.getExpressionEvaluatorForTypedTensor();
 
     // --- persisted state
     const state = useSessionStorage(FLOW_GRAPH_STORE_ID, {
@@ -206,13 +206,13 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         }
     );
 
-    const getComputedTensor = computedByKey(
+    const getComputedTypedTensor = computedByKey(
         (
             nodeId: common.NodeId,
-            previousTensor: common.ComputedResult<common.Tensor> | undefined
-        ): common.ComputedResult<common.Tensor> => {
+            previousTensor: common.ComputedResult<common.TypedTensor> | undefined
+        ): common.ComputedResult<common.TypedTensor> => {
             if (previousTensor && previousTensor.type == "success") {
-                previousTensor.value.dispose();
+                previousTensor.value.tensor.dispose();
             }
 
             try {
@@ -224,22 +224,22 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
                 };
                 const getNodeIdForVariable = (variable: string) => getComputedNodeIdFromVariableName(variable).value;
                 const getTensorForNode = (nodeId: string) => {
-                    const computedTensor = getComputedTensor(nodeId).value;
+                    const computedTensor = getComputedTypedTensor(nodeId).value;
                     if (computedTensor.type == "error") throw new Error(computedTensor.message);
                     return computedTensor.value;
                 };
                 return {
                     type: "success",
-                    value: common.getTensorForNodeRecursion(
+                    value: common.getTypedTensorForNodeRecursion(
                         nodeId,
                         getNode,
                         getVariableDependencies,
                         getNodeIdForVariable,
-                        evaluateExpressionForTensor,
+                        evaluateExpressionForTypedTensor,
                         getTensorForNode,
                         computedComputationContext.value
                     )
-                } as common.ComputedResult<common.Tensor>;
+                } as common.ComputedResult<common.TypedTensor>;
             } catch (e) {
                 console.error(`error calculating tensor for node '${nodeId}'`, e);
                 return {
@@ -250,25 +250,9 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         }
     );
 
-    const getComputedTensorDescriptor = computedByKey(
-        (nodeId: common.NodeId): common.ComputedResult<common.TensorDescriptor> => {
-            const tensorResult = getComputedTensor(nodeId).value;
-            if (tensorResult.type == "error") {
-                return {
-                    type: "error",
-                    message: tensorResult.message
-                };
-            }
-            return {
-                type: "success",
-                value: common.tensorToDescriptor(tensorResult.value)
-            };
-        }
-    );
-
     const getComputedDeterministicValue = computedByKey(
         async (nodeId: common.NodeId): Promise<common.ComputedResult<number>> => {
-            const tensorResult = getComputedTensor(nodeId).value;
+            const tensorResult = getComputedTypedTensor(nodeId).value;
             if (tensorResult.type == "error") {
                 return {
                     type: "error",
@@ -277,29 +261,23 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
             }
             return {
                 type: "success",
-                value: (await tensorResult.value.array()) as number
+                value: (await tensorResult.value.tensor.array()) as number
             };
         }
     );
 
     const getComputedProbabilisticHistogramData = computedByKey(
         async (nodeId: common.NodeId): Promise<common.ComputedResult<common.HistogramData>> => {
-            const tensorDescriptor = getComputedTensorDescriptor(nodeId).value;
-            const tensorResult = getComputedTensor(nodeId).value;
+            console.log(`getComputedProbabilisticHistogramData(${nodeId})`);
+            const ttResult = getComputedTypedTensor(nodeId).value;
 
-            if (tensorResult.type == "error") {
+            if (ttResult.type == "error") {
                 return {
                     type: "error",
-                    message: tensorResult.message
+                    message: ttResult.message
                 };
             }
-            if (tensorDescriptor.type == "error") {
-                return {
-                    type: "error",
-                    message: tensorDescriptor.message
-                };
-            }
-            if (tensorDescriptor.value.type !== common.PROBABILISTIC_TYPE) {
+            if (!ttResult.value.isProbabilistic) {
                 return {
                     type: "error",
                     message: `Can only calculate histogram for probabilistic value`
@@ -307,37 +285,63 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
             }
             return {
                 type: "success",
-                value: await common.getHistogramBinsFromTensor(tensorResult.value, projectSettings.histogramBins)
+                value: await common.getHistogramBinsFromTensor(ttResult.value.tensor, projectSettings.histogramBins)
             };
         }
     );
 
-    const getComputedSeriesPlotData = computedByKey(
-        async (nodeId: common.NodeId): Promise<common.ComputedResult<common.SeriesPlotData>> => {
-            const tensorDescriptor = getComputedTensorDescriptor(nodeId).value;
-            const tensorResult = getComputedTensor(nodeId).value;
-
-            if (tensorResult.type == "error") {
+    const getComputedProbabilisticSeriesPlotData = computedByKey(
+        async (nodeId: common.NodeId): Promise<common.ComputedResult<common.ProbabilisticSeriesPlotData>> => {
+            const ttResult = getComputedTypedTensor(nodeId).value;
+            if (ttResult.type == "error") {
                 return {
                     type: "error",
-                    message: tensorResult.message
+                    message: ttResult.message
                 };
             }
-            if (tensorDescriptor.type == "error") {
-                return {
-                    type: "error",
-                    message: tensorDescriptor.message
-                };
-            }
-            if (tensorDescriptor.value.type !== common.SERIES_TYPE) {
+            if (!ttResult.value.isSeries) {
                 return {
                     type: "error",
                     message: `can only calculate series plot data for series value`
                 };
             }
+            if (!ttResult.value.isProbabilistic) {
+                return {
+                    type: "error",
+                    message: `can only calculate probabilistic series plot data for probabilistic tensor`
+                };
+            }
             return {
                 type: "success",
-                value: await common.getSeriesPlotDataFromTensor(tensorResult.value)
+                value: await common.getProbabilisticSeriesPlotDataFromTensor(ttResult.value.tensor)
+            };
+        }
+    );
+
+    const getComputedDeterministicSeriesPlotData = computedByKey(
+        async (nodeId: common.NodeId): Promise<common.ComputedResult<common.DeterministicSeriesPlotData>> => {
+            const ttResult = getComputedTypedTensor(nodeId).value;
+            if (ttResult.type == "error") {
+                return {
+                    type: "error",
+                    message: ttResult.message
+                };
+            }
+            if (!ttResult.value.isSeries) {
+                return {
+                    type: "error",
+                    message: `can only calculate deterministic series plot data for series tensor`
+                };
+            }
+            if (ttResult.value.isProbabilistic) {
+                return {
+                    type: "error",
+                    message: `can only calculate deterministic series plot data for deterministc tensor`
+                };
+            }
+            return {
+                type: "success",
+                value: await common.getDeterministicSeriesPlotDataFromTensor(ttResult.value.tensor)
             };
         }
     );
@@ -404,11 +408,11 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         getComputedVueFlowNodes,
         getComputedVueFlowEdges,
         getComputedNode,
-        getComputedTensor,
-        getComputedTensorDescriptor,
+        getComputedTypedTensor,
         getComputedDeterministicValue,
         getComputedProbabilisticHistogramData,
-        getComputedSeriesPlotData,
+        getComputedProbabilisticSeriesPlotData,
+        getComputedDeterministicSeriesPlotData,
         getComputedAncestorNodes,
         getComputedDescendantNodes,
         getComputedVariableName,

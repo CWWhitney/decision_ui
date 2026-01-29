@@ -1,11 +1,17 @@
 import { moments, Tensor, tidy } from "@tensorflow/tfjs";
 
-export interface SeriesPlotData {
+export interface ProbabilisticSeriesPlotData {
     means: number[];
     stddevs: number[];
 }
 
-export const getSeriesPlotDataFromTensor = async (tensor: Tensor): Promise<SeriesPlotData> => {
+export interface DeterministicSeriesPlotData {
+    values: number[];
+}
+
+export const getProbabilisticSeriesPlotDataFromTensor = async (
+    tensor: Tensor
+): Promise<ProbabilisticSeriesPlotData> => {
     const { meansTensor, stddevsTensor } = tidy(() => {
         const { mean: meansTensor, variance: varianceTensor } = moments(tensor, 0);
         const stddevsTensor = varianceTensor.sqrt();
@@ -19,4 +25,11 @@ export const getSeriesPlotDataFromTensor = async (tensor: Tensor): Promise<Serie
     stddevsTensor.dispose();
 
     return { means, stddevs };
+};
+
+export const getDeterministicSeriesPlotDataFromTensor = async (
+    tensor: Tensor
+): Promise<DeterministicSeriesPlotData> => {
+    const values = (await tensor.array()) as number[];
+    return { values };
 };

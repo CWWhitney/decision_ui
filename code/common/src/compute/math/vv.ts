@@ -1,4 +1,5 @@
 import * as tf from "@tensorflow/tfjs";
+import { TypedTensor } from "../tensor";
 
 export const valueVarier = ({
     mcRuns,
@@ -12,19 +13,19 @@ export const valueVarier = ({
     upperLimit = null
 }: {
     mcRuns: number;
-    varMean: tf.Tensor;
-    varCv: tf.Tensor;
-    n: tf.Tensor;
-    distribution: string;
-    absoluteTrend: tf.Tensor | null;
-    relativeTrend: tf.Tensor | null;
-    lowerLimit: tf.Tensor | null;
-    upperLimit: tf.Tensor | null;
-}) => {
-    if (n.shape.length != 0) {
-        throw new Error("valueVarier parameter 'n' needs to be a number");
+    varMean: TypedTensor;
+    varCv: TypedTensor;
+    n: TypedTensor;
+    distribution?: string;
+    absoluteTrend?: TypedTensor | null;
+    relativeTrend?: TypedTensor | null;
+    lowerLimit?: TypedTensor | null;
+    upperLimit?: TypedTensor | null;
+}): TypedTensor => {
+    if (n.isProbabilistic || n.isSeries || n.tensor.shape.length != 0) {
+        throw new Error("valueVarier parameter 'n' needs to be a deterministic number");
     }
-    const nValue = n.arraySync() as number;
+    const nValue = n.tensor.arraySync() as number;
     if (Math.ceil(nValue) != nValue) {
         throw new Error("valueVarier parameter 'n' needs to be an integer");
     }
@@ -34,38 +35,40 @@ export const valueVarier = ({
     if (distribution != "normal") {
         throw new Error("valueVarier only supports 'normal' distrubtion");
     }
-    if (varMean.shape.length > 1) {
+    if (varMean.isSeries) {
         throw new Error("valueVarier varMean can only be a constant or sample");
     }
-    if (varCv.shape.length > 1) {
+    if (varCv.isSeries) {
         throw new Error("valueVarier varCv can only be a constant or sample");
     }
-    if (lowerLimit && lowerLimit.shape.length > 0) {
-        throw new Error("valueVarier lowerLimit can only be a constant");
+    if (lowerLimit && (lowerLimit.isProbabilistic || lowerLimit.isSeries || lowerLimit.tensor.shape.length != 0)) {
+        throw new Error("valueVarier lowerLimit can only be a deterministic number");
     }
-    if (upperLimit && upperLimit.shape.length > 0) {
-        throw new Error("valueVarier upperLimit can only be a constant");
+    if (upperLimit && (upperLimit.isProbabilistic || upperLimit.isSeries || upperLimit.tensor.shape.length != 0)) {
+        throw new Error("valueVarier upperLimit can only be a deterministic number");
     }
 
-    const meansSample = varMean.shape.length == 0 ? tf.tile(tf.expandDims(varMean, -1), [mcRuns]) : varMean;
-    const meansSeries = tf.tile(tf.expandDims(meansSample, -1), [1, nValue]);
+    const varMeanT = varMean.tensor;
+    const meansSampleT = varMeanT.shape.length == 0 ? tf.tile(tf.expandDims(varMeanT, -1), [mcRuns]) : varMeanT;
+    const meansSeriesT = tf.tile(tf.expandDims(meansSampleT, -1), [1, nValue]);
 
-    const cvSample = varCv.shape.length == 0 ? tf.tile(tf.expandDims(varCv, -1), [mcRuns]) : varCv;
-    const cvSeries = tf.tile(tf.expandDims(cvSample, -1), [1, nValue]);
+    const varCvT = varCv.tensor;
+    const cvSampleT = varCvT.shape.length == 0 ? tf.tile(tf.expandDims(varCvT, -1), [mcRuns]) : varCvT;
+    const cvSeriesT = tf.tile(tf.expandDims(cvSampleT, -1), [1, nValue]);
 
-    let annualMeansSeries: tf.Tensor = meansSeries;
+    let annualMeansSeries: tf.Tensor = meansSeriesT;
     if (absoluteTrend != null) {
         // absolute trend
-        annualMeansSeries = tf.add(annualMeansSeries, tf.mul(absoluteTrend, tf.range(0, nValue)));
+        annualMeansSeries = tf.add(annualMeansSeries, tf.mul(absoluteTrend.tensor, tf.range(0, nValue)));
     }
     if (relativeTrend != null) {
         // relative trend
         const exponent = tf.range(0, nValue);
-        const base = tf.add(1, tf.div(relativeTrend, 100.0));
+        const base = tf.add(1, tf.div(relativeTrend.tensor, 100.0));
         annualMeansSeries = tf.mul(annualMeansSeries, tf.pow(base, exponent));
     }
 
-    const annualVarsSeries = tf.abs(tf.mul(annualMeansSeries, tf.div(cvSeries, 100)));
+    const annualVarsSeries = tf.abs(tf.mul(annualMeansSeries, tf.div(cvSeriesT, 100)));
     const epsilon = tf.randomNormal([mcRuns, nValue], 0, 1);
 
     let vvSeries = tf.add(annualMeansSeries, tf.mul(annualVarsSeries, epsilon));
@@ -73,11 +76,15 @@ export const valueVarier = ({
     console.log(`vv stddev`, tf.sqrt(tf.mean(tf.square(tf.sub(vvSeries, tf.mean(vvSeries, 0, true))), 0)).arraySync());
 
     if (lowerLimit != null) {
-        vvSeries = tf.maximum(vvSeries, lowerLimit);
+        vvSeries = tf.maximum(vvSeries, lowerLimit.tensor);
     }
     if (upperLimit != null) {
-        vvSeries = tf.minimum(vvSeries, upperLimit);
+        vvSeries = tf.minimum(vvSeries, upperLimit.tensor);
     }
 
-    return vvSeries;
+    return {
+        tensor: vvSeries,
+        isProbabilistic: true,
+        isSeries: true
+    };
 };

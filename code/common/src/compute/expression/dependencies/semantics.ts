@@ -25,6 +25,9 @@ export const getDepedenciesSemantics = () => {
         MulExp_divide(left, operator, right) {
             return [...left.deps(), ...right.deps()];
         },
+        MulExp_modulo(left, operator, right) {
+            return [...left.deps(), ...right.deps()];
+        },
         ExpExp(e) {
             return e.deps();
         },

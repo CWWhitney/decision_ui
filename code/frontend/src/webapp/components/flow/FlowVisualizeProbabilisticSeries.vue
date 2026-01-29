@@ -1,9 +1,9 @@
 <script setup lang="ts">
     import type { Chart } from "chart.js";
     import { onBeforeUnmount, onMounted, onUpdated, ref, useTemplateRef } from "vue";
-    import { drawHistogramChart } from "../../charts/histogram/nodeEditDialog";
+    import { drawProbabilisticSeriesChart } from "../../charts/histogram/nodeEditDialog";
 
-    const { bins, counts, label } = defineProps<{ bins: number[]; counts: number[]; label: string }>();
+    const { means, stddevs, label } = defineProps<{ means: number[]; stddevs: number[]; label: string }>();
 
     const canvas = useTemplateRef<HTMLCanvasElement | null>("canvas");
     const graph = ref<Chart<"bar"> | Chart<any> | null>(null);
@@ -23,21 +23,21 @@
         return ctx;
     };
 
-    const drawProbabilisticChart = () => {
+    const drawSeriesChart = () => {
         const ctx = getCanvasContext();
         if (ctx == null) {
             // no canvas context
             return;
         }
-        graph.value = drawHistogramChart(graph.value, ctx, bins, counts, label);
+        graph.value = drawProbabilisticSeriesChart(graph.value, ctx, means, stddevs, label);
     };
 
     onMounted(() => {
-        drawProbabilisticChart();
+        drawSeriesChart();
     });
 
     onUpdated(() => {
-        drawProbabilisticChart();
+        drawSeriesChart();
     });
 
     onBeforeUnmount(() => {

@@ -1,68 +1,41 @@
 <script setup lang="ts">
     import { useFlowGraphStore } from "@/state/flow/graph";
-    import { DETERMINISTIC_TYPE, PROBABILISTIC_TYPE, SERIES_TYPE, type Node } from "@decision-support-ui/common";
-    import FlowVisualizeDeterministicValue from "../components/flow/FlowVisualizeDeterministicValue.vue";
-    import FlowVisualizeProbabilisticValue from "../components/flow/FlowVisualizeProbabilisticValue.vue";
-    import FlowVisualizeSeriesValue from "../components/flow/FlowVisualizeSeriesValue.vue";
-    import { computedAsync } from "@vueuse/core";
+    import { type Node } from "@decision-support-ui/common";
+    import FlowVisualizeTypedTensor from "@/components/flow/FlowVisualizeTypedTensor.vue";
 
     const node = defineModel<Node>({ required: true });
     const graphStore = useFlowGraphStore();
 
-    const computedTensorDescriptor = graphStore.getComputedTensorDescriptor(node.value.id);
+    const computedTypedTensor = graphStore.getComputedTypedTensor(node.value.id);
 
-    const computedDeterministicValue = computedAsync(async () => {
-        if (
-            computedTensorDescriptor.value.type == "success" &&
-            computedTensorDescriptor.value.value.type == DETERMINISTIC_TYPE
-        ) {
-            return await graphStore.getComputedDeterministicValue(node.value.id).value;
-        }
-    });
-
-    const computedProbabilisticHistogramData = computedAsync(async () => {
-        if (
-            computedTensorDescriptor.value.type == "success" &&
-            computedTensorDescriptor.value.value.type == PROBABILISTIC_TYPE
-        ) {
-            return await graphStore.getComputedProbabilisticHistogramData(node.value.id).value;
-        }
-    });
-
-    const computedSeriesPlotData = computedAsync(async () => {
-        if (
-            computedTensorDescriptor.value.type == "success" &&
-            computedTensorDescriptor.value.value.type == SERIES_TYPE
-        ) {
-            return await graphStore.getComputedSeriesPlotData(node.value.id).value;
-        }
-    });
+    const getDeterministicValue = () => graphStore.getComputedDeterministicValue(node.value.id).value;
+    const getHistogramData = () => graphStore.getComputedProbabilisticHistogramData(node.value.id).value;
+    const getProbabilisticSeriesPlotData = () => graphStore.getComputedProbabilisticSeriesPlotData(node.value.id).value;
+    const getDeterministicSeriesPlotData = () => graphStore.getComputedDeterministicSeriesPlotData(node.value.id).value;
 </script>
 
 <template>
-    <div v-if="computedTensorDescriptor.type == 'success'" class="container">
-        <div v-if="computedDeterministicValue && computedDeterministicValue.type == 'success'">
-            <FlowVisualizeDeterministicValue :value="computedDeterministicValue.value" />
-        </div>
-        <div v-if="computedProbabilisticHistogramData && computedProbabilisticHistogramData.type == 'success'">
-            <FlowVisualizeProbabilisticValue
-                :bins="computedProbabilisticHistogramData.value.bins"
-                :counts="computedProbabilisticHistogramData.value.counts"
-                :label="node.visualization.title"
-            />
-        </div>
-        <div v-if="computedSeriesPlotData && computedSeriesPlotData.type == 'success'">
-            <FlowVisualizeSeriesValue
-                :means="computedSeriesPlotData.value.means"
-                :stddevs="computedSeriesPlotData.value.stddevs"
-                :label="node.visualization.title"
-            />
-        </div>
+    <div v-if="computedTypedTensor.type == 'success'" class="container">
+        <FlowVisualizeTypedTensor
+            :node-title="node.visualization.title"
+            :is-probabilistic="computedTypedTensor.value.isProbabilistic"
+            :is-series="computedTypedTensor.value.isSeries"
+            :get-deterministic-value="getDeterministicValue"
+            :get-histogram-data="getHistogramData"
+            :get-probabilistic-series-plot-data="getProbabilisticSeriesPlotData"
+            :get-deterministic-series-plot-data="getDeterministicSeriesPlotData"
+        />
+    </div>
+    <div v-if="computedTypedTensor.type == 'error'">
+        <v-alert color="error" :text="computedTypedTensor.message" />
     </div>
 </template>
 
 <style scoped lang="scss">
     .container {
-        min-width: 30em;
+        display: flex;
+        flex-grow: 1;
+        flex-direction: column;
+        width: 100%;
     }
 </style>

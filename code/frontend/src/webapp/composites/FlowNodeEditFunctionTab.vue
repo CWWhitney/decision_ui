@@ -67,9 +67,28 @@
         }
         return null;
     });
+
+    const appendToExpression = (text: string) => {
+        nodeWithExpressionInputValue.value = `${nodeWithExpressionInputValue.value}${text}`;
+    };
+
+    const computedTypedTensor = graphStore.getComputedTypedTensor(node.value.id);
+
+    const nodeType = ref<string>();
 </script>
 
 <template>
+    <div>
+        <h4>Function Type</h4>
+        <div>
+            <v-btn-toggle v-model="nodeType" divided border variant="text" color="primary">
+                <v-btn prepend-icon="mdi-tilde" text="Estimate" />
+                <v-btn prepend-icon="mdi-plus-minus" text="Operation" />
+                <v-btn prepend-icon="mdi-repeat" text="Loop Operation" disabled />
+            </v-btn-toggle>
+        </div>
+    </div>
+    <h4>Options</h4>
     <div v-if="node.type == ESTIMATE_NODE_TYPE">
         <v-text-field
             v-model="graphStore.getComputedVariableName(node.id).value"
@@ -110,8 +129,97 @@
             label="Variable Name"
             disabled
         ></v-text-field>
-        <v-text-field v-model="nodeWithExpressionInputValue" label="Expression or Formula"></v-text-field>
+        <v-btn-group>
+            <v-tooltip location="bottom" text="add chance event function" open-delay="500">
+                <template #activator="{ props }">
+                    <v-btn
+                        v-bind="props"
+                        variant="outlined"
+                        size="x-small"
+                        text="ce"
+                        @click="
+                            appendToExpression(
+                                'chance_event(chance, value_if, value_if_not, n, cv_if, cv_if_not, one_draw)'
+                            )
+                        "
+                    ></v-btn>
+                </template>
+            </v-tooltip>
+            <v-tooltip location="bottom" text="add value varier function" open-delay="500">
+                <template #activator="{ props }">
+                    <v-btn
+                        v-bind="props"
+                        variant="outlined"
+                        size="x-small"
+                        text="vv"
+                        @click="
+                            appendToExpression(
+                                'vv(mean, cv, n, absolute_trend, relative_trend, lower_limit, upper_limit)'
+                            )
+                        "
+                    ></v-btn>
+                </template>
+            </v-tooltip>
+            <v-tooltip location="bottom" text="add net present value function" open-delay="500">
+                <template #activator="{ props }">
+                    <v-btn
+                        v-bind="props"
+                        variant="outlined"
+                        size="x-small"
+                        text="npv"
+                        @click="appendToExpression('npv(x, discount)')"
+                    ></v-btn>
+                </template>
+            </v-tooltip>
+            <v-divider vertical></v-divider>
+            <v-tooltip location="bottom" text="add absolute value function" open-delay="500">
+                <template #activator="{ props }">
+                    <v-btn
+                        v-bind="props"
+                        variant="outlined"
+                        size="x-small"
+                        text="abs"
+                        @click="appendToExpression('abs(x)')"
+                    ></v-btn>
+                </template>
+            </v-tooltip>
+            <v-tooltip location="bottom" text="add logarithm function" open-delay="500">
+                <template #activator="{ props }">
+                    <v-btn
+                        v-bind="props"
+                        variant="outlined"
+                        size="x-small"
+                        text="log"
+                        @click="appendToExpression('log(x)')"
+                    ></v-btn>
+                </template>
+            </v-tooltip>
+            <v-tooltip location="bottom" text="add exponential function" open-delay="500">
+                <template #activator="{ props }">
+                    <v-btn
+                        v-bind="props"
+                        variant="outlined"
+                        size="x-small"
+                        text="exp"
+                        @click="appendToExpression('exp(x)')"
+                    ></v-btn>
+                </template>
+            </v-tooltip>
+            <v-tooltip location="bottom" text="add round function" open-delay="500">
+                <template #activator="{ props }">
+                    <v-btn
+                        v-bind="props"
+                        variant="outlined"
+                        size="x-small"
+                        text="round"
+                        @click="appendToExpression('round(x)')"
+                    ></v-btn>
+                </template>
+            </v-tooltip>
+        </v-btn-group>
+        <v-text-field v-model="nodeWithExpressionInputValue" label="Expression or Formula" single-line></v-text-field>
         <v-alert v-if="!!expressionError" color="error" :text="expressionError" />
+        <v-alert v-if="computedTypedTensor.type == 'error'" color="error" :text="computedTypedTensor.message" />
     </div>
     <div v-if="node.type == LOOP_NODE_TYPE">
         <FlowLoopNodeFunctionTab v-model="node" />
@@ -145,5 +253,15 @@
     .lower-upper-inputs {
         display: flex;
         gap: 1em;
+    }
+
+    h4 {
+        font-weight: normal;
+        margin-bottom: 0.5em;
+        text-transform: uppercase;
+
+        &:not(:first-child) {
+            margin-top: 1em;
+        }
     }
 </style>

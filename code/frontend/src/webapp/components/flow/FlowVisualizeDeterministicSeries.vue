@@ -1,9 +1,9 @@
 <script setup lang="ts">
     import type { Chart } from "chart.js";
     import { onBeforeUnmount, onMounted, onUpdated, ref, useTemplateRef } from "vue";
-    import { drawNodeEditDialogSeriesPlot } from "../../charts/histogram/nodeEditDialog";
+    import { drawProbabilisticSeriesChart } from "../../charts/histogram/nodeEditDialog";
 
-    const { means, stddevs, label } = defineProps<{ means: number[]; stddevs: number[]; label: string }>();
+    const { values, label } = defineProps<{ values: number[]; label: string }>();
 
     const canvas = useTemplateRef<HTMLCanvasElement | null>("canvas");
     const graph = ref<Chart<"bar"> | Chart<any> | null>(null);
@@ -29,7 +29,7 @@
             // no canvas context
             return;
         }
-        graph.value = drawNodeEditDialogSeriesPlot(graph.value, ctx, means, stddevs, label);
+        graph.value = drawProbabilisticSeriesChart(graph.value, ctx, values, Array(values.length).fill(0), label);
     };
 
     onMounted(() => {
@@ -49,17 +49,22 @@
 
 <template>
     <div class="canvasContainer">
-        <canvas ref="canvas" />
+        <canvas ref="canvas" class="canvas" />
     </div>
 </template>
 
 <style scoped lang="scss">
     .canvasContainer {
-        aspect-ratio: 1.41;
         flex-grow: 1;
-        overflow: hidden;
-
+        height: 100%;
         width: 100%;
+        overflow: hidden;
         position: relative;
+        min-width: 30em;
+        min-height: 20em;
+    }
+
+    .canvas {
+        position: absolute;
     }
 </style>

@@ -10,17 +10,27 @@
     const graphStore = useFlowGraphStore();
 
     const variableDependencies = computed(() => graphStore.getComputedVariableDependencies(node.value.id).value);
-    const computedTensorDescriptor = computedAsync(
-        async () => await graphStore.getComputedTensorDescriptor(node.value.id).value
-    );
+    const computedTypedTensor = computedAsync(async () => await graphStore.getComputedTypedTensor(node.value.id).value);
 </script>
 
 <template>
     <p v-if="variableDependencies.type == 'success'">
         Variable Dependencies: {{ JSON.stringify(variableDependencies.value) }}
     </p>
-    <p>Computed Tensor Descriptor:</p>
-    <pre>{{ JSON.stringify(computedTensorDescriptor, null, 2) }}</pre>
+    <div v-if="computedTypedTensor && computedTypedTensor.type == 'success'">
+        <p>Computed Tensor:</p>
+        <pre>{{
+            JSON.stringify(
+                {
+                    shape: computedTypedTensor.value.tensor.shape,
+                    isProbabilistic: computedTypedTensor.value.isProbabilistic,
+                    isSeries: computedTypedTensor.value.isSeries
+                },
+                null,
+                2
+            )
+        }}</pre>
+    </div>
     <p>Tensorflow Memory:</p>
     <pre>{{ JSON.stringify(memory(), null, 2) }}</pre>
 </template>

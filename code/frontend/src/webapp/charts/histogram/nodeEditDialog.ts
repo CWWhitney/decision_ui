@@ -8,7 +8,7 @@ const BAR_COLOR = "rgb(63, 149, 203)";
 const STDDEV_COLOR = "rgb(153, 189, 211)";
 const POINT_COLOR = "rgb(63, 149, 203)";
 
-export const drawNodeEditDialogHistogram = (
+export const drawHistogramChart = (
     chart: Chart<"bar"> | null,
     ctx: CanvasRenderingContext2D,
     bins: number[],
@@ -18,9 +18,6 @@ export const drawNodeEditDialogHistogram = (
     const max_ticks = 5;
 
     if (chart) chart.destroy();
-
-    console.log(`bins are: ${bins}`);
-    console.log(`values are: ${values}`);
 
     return new Chart<"bar">(ctx, {
         type: "bar",
@@ -45,20 +42,20 @@ export const drawNodeEditDialogHistogram = (
     });
 };
 
-export const drawNodeEditDialogSeriesPlot = (
+export const drawProbabilisticSeriesChart = (
     chart: Chart<"bar"> | null,
     ctx: CanvasRenderingContext2D,
     means: number[],
     stddevs: number[],
     label: string
 ): Chart<"bar" | "scatter"> => {
-    const max_ticks = 7;
+    const max_ticks = 5;
 
     if (chart) chart.destroy();
 
     const indexes = Array.from(Array(means.length).keys()).map(i => `${i + 1}`);
 
-    return new Chart<"bar">(ctx, {
+    return new Chart<"bar" | "scatter">(ctx, {
         type: "bar",
         data: {
             labels: indexes,

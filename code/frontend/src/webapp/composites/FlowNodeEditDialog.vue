@@ -112,7 +112,18 @@
 
         .v-window {
             width: 100%;
+            min-width: 20em;
             overflow: auto;
+
+            .v-window__container {
+                min-height: 100%;
+            }
+
+            .v-window-item {
+                display: flex;
+                flex-direction: column;
+                flex-grow: 1;
+            }
         }
     }
 </style>
