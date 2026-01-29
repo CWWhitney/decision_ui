@@ -48,14 +48,15 @@ export const getTensorForNodeWithExpression = (
     getVariableDependencies: (nodeId: string) => VariableDependencies,
     getNodeIdForVariable: (variable: string) => NodeId,
     evaluateExpressionForTensor: (expression: string, expressionContext: ExpressionTensorContext) => Tensor,
-    getTensorForNode: (nodeId: string) => Tensor
+    getTensorForNode: (nodeId: string) => Tensor,
+    computationContext: ComputationContext
 ): Tensor => {
     if (!(node.type == OPERATION_NODE_TYPE || node.type == RESULT_NODE_TYPE)) {
         throw new Error(`cannot calculate operation node tensor for node of type '${node.type}'`);
     }
 
     // determine all required variable values as tensors
-    const expressionContext: ExpressionTensorContext = { tensorByVariable: {} };
+    const expressionContext: ExpressionTensorContext = { tensorByVariable: {}, mcRuns: computationContext.mcRuns };
     for (const variable of getVariableDependencies(node.id)) {
         expressionContext.tensorByVariable[variable] = getTensorForNode(getNodeIdForVariable(variable));
     }
@@ -69,7 +70,8 @@ export const getTensorForLoopOperationNode = (
     getVariableDependencies: (nodeId: string) => VariableDependencies,
     getNodeIdForVariable: (variable: string) => NodeId,
     evaluateExpressionForTensor: (expression: string, expressionContext: ExpressionTensorContext) => Tensor,
-    getTensorForNode: (nodeId: string) => Tensor
+    getTensorForNode: (nodeId: string) => Tensor,
+    computationContext: ComputationContext
 ): Tensor => {
     if (node.type != LOOP_OPERATION_NODE_TYPE) {
         throw new Error(`cannot calculate loop operation node tensor for node of type '${node.type}'`);
@@ -85,7 +87,7 @@ export const getTensorForLoopOperationNode = (
     }
 
     // determine all required variable values as tensors
-    const expressionContext: ExpressionTensorContext = { tensorByVariable: {} };
+    const expressionContext: ExpressionTensorContext = { tensorByVariable: {}, mcRuns: computationContext.mcRuns };
     for (const variable of getVariableDependencies(node.id)) {
         expressionContext.tensorByVariable[variable] = getTensorForNode(getNodeIdForVariable(variable));
     }
@@ -96,6 +98,7 @@ export const getTensorForLoopOperationNode = (
         tensorList.push(initTensor);
         for (let i = 1; i < parentNode.options.iterations; i++) {
             const iterTensor = evaluateExpressionForTensor(node.options.iterExpression, {
+                ...expressionContext,
                 tensorByVariable: {
                     ...expressionContext.tensorByVariable,
                     i: scalar(i),
@@ -127,7 +130,8 @@ export const getTensorForNodeRecursion = (
             getVariableDependencies,
             getNodeIdForVariable,
             evaluateExpressionForTensor,
-            getTensorForNode
+            getTensorForNode,
+            computationContext
         );
     } else if (node.type == LOOP_OPERATION_NODE_TYPE) {
         return getTensorForLoopOperationNode(
@@ -136,7 +140,8 @@ export const getTensorForNodeRecursion = (
             getVariableDependencies,
             getNodeIdForVariable,
             evaluateExpressionForTensor,
-            getTensorForNode
+            getTensorForNode,
+            computationContext
         );
     }
     throw new Error(`unknown node type ${node.type}`);

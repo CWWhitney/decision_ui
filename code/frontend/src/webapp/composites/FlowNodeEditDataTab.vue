@@ -48,12 +48,14 @@
             <FlowVisualizeProbabilisticValue
                 :bins="computedProbabilisticHistogramData.value.bins"
                 :counts="computedProbabilisticHistogramData.value.counts"
+                :label="node.visualization.title"
             />
         </div>
         <div v-if="computedSeriesPlotData && computedSeriesPlotData.type == 'success'">
             <FlowVisualizeSeriesValue
                 :means="computedSeriesPlotData.value.means"
                 :stddevs="computedSeriesPlotData.value.stddevs"
+                :label="node.visualization.title"
             />
         </div>
     </div>
@@ -61,6 +63,6 @@
 
 <style scoped lang="scss">
     .container {
-        min-width: 25em;
+        min-width: 30em;
     }
 </style>

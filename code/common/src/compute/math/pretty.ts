@@ -1,3 +1,7 @@
+export const roundToSignificant = (value: number, precision = 3) => {
+    return Number(value.toPrecision(precision));
+};
+
 export const numberToPrettyString = (value: number, epsilon = 0.001, precision = 3) => {
     if (value == null) return "undefined";
     value = value as number;

@@ -12,11 +12,15 @@ export const drawNodeEditDialogHistogram = (
     chart: Chart<"bar"> | null,
     ctx: CanvasRenderingContext2D,
     bins: number[],
-    values: number[]
+    values: number[],
+    label: string
 ): Chart<"bar"> => {
-    const max_ticks = 7;
+    const max_ticks = 5;
 
     if (chart) chart.destroy();
+
+    console.log(`bins are: ${bins}`);
+    console.log(`values are: ${values}`);
 
     return new Chart<"bar">(ctx, {
         type: "bar",
@@ -33,7 +37,7 @@ export const drawNodeEditDialogHistogram = (
         },
         options: {
             ...getDefaultHistogramOptions(),
-            ...getDefaultHistogramScales(max_ticks, TEXT_COLOR, GRID_COLOR, true),
+            ...getDefaultHistogramScales(label, "occurrences", max_ticks, TEXT_COLOR, GRID_COLOR, true),
             plugins: {
                 legend: { display: false }
             }
@@ -45,7 +49,8 @@ export const drawNodeEditDialogSeriesPlot = (
     chart: Chart<"bar"> | null,
     ctx: CanvasRenderingContext2D,
     means: number[],
-    stddevs: number[]
+    stddevs: number[],
+    label: string
 ): Chart<"bar" | "scatter"> => {
     const max_ticks = 7;
 
@@ -77,7 +82,7 @@ export const drawNodeEditDialogSeriesPlot = (
         options: {
             ...getDefaultHistogramOptions(),
             ...(getDefaultScatterOptions() as any),
-            ...getDefaultHistogramScales(max_ticks, TEXT_COLOR, GRID_COLOR, false),
+            ...getDefaultHistogramScales("time", label, max_ticks, TEXT_COLOR, GRID_COLOR, false),
             plugins: {
                 legend: { display: false }
             }

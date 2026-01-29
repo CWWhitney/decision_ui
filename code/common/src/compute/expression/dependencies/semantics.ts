@@ -37,13 +37,16 @@ export const getDepedenciesSemantics = () => {
         PriExp_paren(open, exp, _close) {
             return exp.deps();
         },
-        PriExp_pos(operator, right) {
-            return [...right.deps()];
-        },
         PriExp_neg(operator, right) {
             return [...right.deps()];
         },
-        ident(_l, _ns) {
+        FuncExp(_n, _l, argList, _r) {
+            return [...argList.deps()];
+        },
+        FuncArgs(first, _c, rest) {
+            return [...first.deps(), ...rest.children.reduce((p, c) => [...p, ...c.deps()], [])];
+        },
+        variable(_l, _ns) {
             return [this.sourceString];
         },
         number_fract(_l, _d, _r) {

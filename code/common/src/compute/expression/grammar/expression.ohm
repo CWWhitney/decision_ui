@@ -18,19 +18,28 @@ Arithmetic {
 
   PriExp
     = "(" Exp ")"  -- paren
-    | "+" PriExp   -- pos
     | "-" PriExp   -- neg
-    | ident
+    | FuncExp
+    | variable
     | number
 
-  ident  (an identifier)
-    = identStart identContinue*
+  FuncExp
+    = funcName "(" FuncArgs ")"
 
-  identStart
+  FuncArgs
+    = Exp ("," Exp)*
+
+  funcName  (a function)
+    = "vv" | "npv" | "abs" | "ceiling" | "floor" | "sin" | "cos" | "tan" | "exp" | "log" | "log10" | "round" |  "trunc" | "sqrt"
+
+  variable  (a variable)
+    = variableStart variableContinue*
+
+  variableStart
     = letter
 
-  identContinue
-    = identStart | digit | "_"
+  variableContinue
+    = variableStart | digit | "_"
 
   number  (a number)
     = digit* "." digit+  -- fract

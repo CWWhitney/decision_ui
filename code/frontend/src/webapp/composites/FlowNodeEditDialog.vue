@@ -13,16 +13,44 @@
     import FlowNodeEditDebugTab from "./FlowNodeEditDebugTab.vue";
     import FlowNodeEditDataTab from "./FlowNodeEditDataTab.vue";
     import FlowNodeEditStyleTab from "./FlowNodeEditStyleTab.vue";
+    import { ref } from "vue";
 
     const store = useDialogsNodeEditStore();
+
+    const maximized = ref(false);
+
+    const toggleMaximize = () => {
+        maximized.value = !maximized.value;
+    };
 </script>
 
 <template>
-    <v-dialog v-if="store.node" v-model="store.isOpen" class="dialog" @click:outside="store.closeDialog()">
+    <v-dialog
+        v-if="store.node"
+        v-model="store.isOpen"
+        :width="maximized ? '90%' : 'auto'"
+        :height="maximized ? '90%' : 'auto'"
+        :class="`nodeEditDialog ${maximized ? 'maximized' : ''}`"
+        @click:outside="store.closeDialog()"
+    >
         <v-card>
             <v-toolbar>
                 <v-toolbar-title>{{ store.node.visualization.title }}</v-toolbar-title>
                 <v-toolbar-items>
+                    <v-tooltip
+                        location="bottom"
+                        :text="maximized ? 'reduce window size' : 'maximize window size'"
+                        open-delay="500"
+                    >
+                        <template #activator="{ props }">
+                            <v-btn
+                                v-bind="props"
+                                :icon="maximized ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'"
+                                @click="toggleMaximize"
+                            />
+                        </template>
+                    </v-tooltip>
+
                     <v-btn icon="mdi-close" @click="store.closeDialog()"></v-btn>
                 </v-toolbar-items>
             </v-toolbar>
@@ -61,10 +89,18 @@
     </v-dialog>
 </template>
 
-<style scoped lang="scss">
-    .dialog {
+<style lang="scss">
+    .nodeEditDialog {
         .v-toolbar {
             background: transparent;
+        }
+
+        .v-card {
+            padding: 0.5em;
+        }
+
+        .v-card-text {
+            overflow: hidden;
         }
 
         .tabCard {
@@ -77,18 +113,6 @@
         .v-window {
             width: 100%;
             overflow: auto;
-        }
-
-        .v-card {
-            min-width: 20em;
-            max-width: 90%;
-            margin: 0 auto;
-            padding: 0.5em;
-            width: auto;
-        }
-
-        .v-card-text {
-            overflow: hidden;
         }
     }
 </style>

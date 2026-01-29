@@ -39,6 +39,8 @@ export const CHART_COLORS = [
 Chart.register(BarController, ScatterController, LinearScale, BarElement, PointElement, Colors, Legend, CategoryScale);
 
 export const getDefaultHistogramScales = (
+    xLabel: string,
+    yLabel: string,
     max_ticks: number,
     textColor: string,
     gridColor: string,
@@ -49,6 +51,14 @@ export const getDefaultHistogramScales = (
             x: {
                 type: "linear",
                 beginAtZero: false,
+                title: {
+                    display: true,
+                    text: xLabel,
+                    font: {
+                        size: 14
+                    },
+                    color: textColor
+                },
                 bounds: "data",
                 ticks: {
                     maxRotation: 90,
@@ -56,7 +66,7 @@ export const getDefaultHistogramScales = (
                     autoSkip: false,
                     maxTicksLimit: max_ticks,
                     color: textColor,
-                    callback: value => +(value as number).toFixed(5)
+                    callback: value => `${Number(Number(value).toPrecision(3))}`
                 },
                 grid: {
                     color: gridColor,
@@ -65,6 +75,14 @@ export const getDefaultHistogramScales = (
             },
             y: {
                 type: "linear",
+                title: {
+                    display: true,
+                    text: yLabel,
+                    font: {
+                        size: 14
+                    },
+                    color: textColor
+                },
                 beginAtZero,
                 ticks: {
                     color: textColor,
@@ -93,7 +111,7 @@ export const getDefaultHistogramLegend = (textColor: string): DeepPartial<Legend
 export const getDefaultHistogramOptions = (): ChartOptions<"bar"> => {
     return {
         responsive: true,
-        resizeDelay: 0,
+        resizeDelay: 1,
         animation: false,
         maintainAspectRatio: false,
         hover: { mode: "nearest" }

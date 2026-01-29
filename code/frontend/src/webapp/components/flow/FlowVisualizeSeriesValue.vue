@@ -3,7 +3,7 @@
     import { onBeforeUnmount, onMounted, onUpdated, ref, useTemplateRef } from "vue";
     import { drawNodeEditDialogSeriesPlot } from "../../charts/histogram/nodeEditDialog";
 
-    const { means, stddevs } = defineProps<{ means: number[]; stddevs: number[] }>();
+    const { means, stddevs, label } = defineProps<{ means: number[]; stddevs: number[]; label: string }>();
 
     const canvas = useTemplateRef<HTMLCanvasElement | null>("canvas");
     const graph = ref<Chart<"bar"> | Chart<any> | null>(null);
@@ -29,7 +29,7 @@
             // no canvas context
             return;
         }
-        graph.value = drawNodeEditDialogSeriesPlot(graph.value, ctx, means, stddevs);
+        graph.value = drawNodeEditDialogSeriesPlot(graph.value, ctx, means, stddevs, label);
     };
 
     onMounted(() => {
