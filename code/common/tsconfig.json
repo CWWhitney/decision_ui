@@ -6,7 +6,6 @@
         "outDir": "build",
         "declaration": true,
         "rootDir": ".",
-        "sourceRoot": "src",
         "allowJs": true,
         "newLine": "LF",
         "noImplicitAny": true,
