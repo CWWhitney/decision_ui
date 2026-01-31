@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { ESTIMATE_NODE_TYPE, type Node } from "@decision-support-ui/common";
+    import { ESTIMATE_FUNCTION_TYPE, type Node } from "@decision-support-ui/common";
 
     const node = defineModel<Node>({ required: true });
 </script>
@@ -7,8 +7,8 @@
 <template>
     <div>
         <v-text-field v-model="node.visualization.title" label="Title" required></v-text-field>
-        <div v-if="node.type == ESTIMATE_NODE_TYPE">
-            <v-text-field v-model="node.options.comment" label="Comment for Estimate in CSV"></v-text-field>
+        <div v-if="node.function.type == ESTIMATE_FUNCTION_TYPE">
+            <v-text-field v-model="node.function.comment" label="Comment for Estimate in CSV"></v-text-field>
         </div>
     </div>
 </template>

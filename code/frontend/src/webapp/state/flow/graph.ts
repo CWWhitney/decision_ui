@@ -14,7 +14,6 @@ import { useSessionStorage } from "@vueuse/core";
 
 import * as common from "@decision-support-ui/common";
 import { useProjectSettingsStore } from "../projects/settings";
-import { generateVariableName } from "@/editor/common/variables";
 
 export const FLOW_GRAPH_STORE_ID = "flow.graph";
 
@@ -108,7 +107,10 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
                         id: node.id,
                         position: node.visualization.position,
                         type: "custom",
-                        class: node.type,
+                        class:
+                            `${node.type}-type ` +
+                            `${node.function.type}-function-type ` +
+                            `${node.visualization.style.type}-style-type`,
                         width: node.visualization.size.width,
                         height: node.visualization.size.height,
                         parentNode: node.parentNodeId,
@@ -116,7 +118,10 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
                         expandParent: true,
                         data: {
                             label: node.visualization.title,
-                            border: node.visualization.style.border
+                            nodeType: node.type,
+                            ...(node.visualization.style.type == common.CUSTOM_STYLE_TYPE && {
+                                border: node.visualization.style.border
+                            })
                         }
                     }) as VueFlowNode
             );
@@ -165,17 +170,20 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
     );
 
     const getComputedVariableName = computedByKey((nodeId: common.NodeId): string =>
-        generateVariableName(getComputedNode(nodeId).value.visualization.title)
+        common.generateVariableName(getComputedNode(nodeId).value.visualization.title)
     );
 
     const getComputedVariableDependencies = computedByKey(
         (nodeId: common.NodeId): common.ComputedResult<common.VariableDependencies> => {
             const node = getComputedNode(nodeId).value;
-            if (node.type == common.OPERATION_NODE_TYPE || node.type == common.RESULT_NODE_TYPE) {
+            if (
+                node.function.type == common.OPERATION_FUNCTION_TYPE ||
+                node.function.type == common.RESULT_FUNCTION_TYPE
+            ) {
                 try {
                     return {
                         type: "success",
-                        value: evaluateExpressionForVariableDependencies(node.options.expression)
+                        value: evaluateExpressionForVariableDependencies(node.function.expression)
                     };
                 } catch (e) {
                     return {
@@ -183,13 +191,13 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
                         message: e instanceof Error ? `${e.message}` : `${e}`
                     };
                 }
-            } else if (node.type == common.LOOP_OPERATION_NODE_TYPE) {
+            } else if (node.function.type == common.LOOP_FUNCTION_TYPE) {
                 try {
                     return {
                         type: "success",
                         value: [
-                            ...evaluateExpressionForVariableDependencies(node.options.initExpression),
-                            ...evaluateExpressionForVariableDependencies(node.options.iterExpression)
+                            ...evaluateExpressionForVariableDependencies(node.function.initExpression),
+                            ...evaluateExpressionForVariableDependencies(node.function.iterExpression)
                         ].filter(v => v !== "previous" && v !== "i")
                     };
                 } catch (e) {
@@ -372,8 +380,14 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         node.visualization.size = size;
     };
 
-    const addNewNodeAction = (nodeType: common.NodeType, options?: common.NewNodeOptions): common.NodeId => {
-        const newNode = common.getNewNode(nodeType, nodes.value, options);
+    const addNewNodeAction = (
+        title: string,
+        nodeType: common.NodeType,
+        functionType: common.NodeFunctionType,
+        styleType: common.NodeStyleType,
+        options?: common.NewNodeOptions
+    ): common.NodeId => {
+        const newNode = common.getNewNode(title, nodeType, functionType, styleType, nodes.value, options);
         nodes.value.push(newNode);
         return newNode.id;
     };
@@ -386,15 +400,6 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
             .map(e => e.id);
         nodes.value = nodes.value.filter(n => !removeNodeIds.includes(n.id));
         edges.value = edges.value.filter(e => !removeEdgeIds.includes(e.id));
-    };
-
-    const setNodeExpressionAction = (nodeId: common.NodeId, expression: string) => {
-        const node = getComputedNode(nodeId).value;
-        if (node.type == common.OPERATION_NODE_TYPE || node.type == common.RESULT_NODE_TYPE) {
-            node.options.expression = expression;
-        } else {
-            throw new Error(`cannot set expression for node ${node.id} of type ${node.type}`);
-        }
     };
 
     const reset = () => {
@@ -423,7 +428,6 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         updateNodeSizeAction,
         addNewNodeAction,
         removeNodeAction,
-        setNodeExpressionAction,
         reset
     };
 });

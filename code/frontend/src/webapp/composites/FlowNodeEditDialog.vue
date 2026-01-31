@@ -14,6 +14,7 @@
     import FlowNodeEditDataTab from "./FlowNodeEditDataTab.vue";
     import FlowNodeEditStyleTab from "./FlowNodeEditStyleTab.vue";
     import { ref } from "vue";
+    import { VARIABLE_NODE_TYPE } from "@decision-support-ui/common";
 
     const store = useDialogsNodeEditStore();
 
@@ -58,10 +59,25 @@
             <v-card-text class="tabCard">
                 <v-tabs v-model="store.tab" color="primary" direction="vertical">
                     <v-tab prepend-icon="mdi-information-outline" text="General" :value="NODE_EDIT_GENERAL_TAB"></v-tab>
-                    <v-tab prepend-icon="mdi-function" text="Function" :value="NODE_EDIT_FUNCTION_TAB"></v-tab>
-                    <v-tab prepend-icon="mdi-chart-histogram" text="Data" :value="NODE_EDIT_DATA_TAB"></v-tab>
+                    <v-tab
+                        v-if="store.node.type == VARIABLE_NODE_TYPE"
+                        prepend-icon="mdi-function"
+                        text="Function"
+                        :value="NODE_EDIT_FUNCTION_TAB"
+                    ></v-tab>
+                    <v-tab
+                        v-if="store.node.type == VARIABLE_NODE_TYPE"
+                        prepend-icon="mdi-chart-histogram"
+                        text="Data"
+                        :value="NODE_EDIT_DATA_TAB"
+                    ></v-tab>
                     <v-tab prepend-icon="mdi-palette-outline" text="Style" :value="NODE_EDIT_STYLE_TAB"></v-tab>
-                    <v-tab prepend-icon="mdi-bug-outline" text="Debug" :value="NODE_EDIT_DEBUG_TAB"></v-tab>
+                    <v-tab
+                        v-if="store.node.type == VARIABLE_NODE_TYPE"
+                        prepend-icon="mdi-bug-outline"
+                        text="Debug"
+                        :value="NODE_EDIT_DEBUG_TAB"
+                    ></v-tab>
                 </v-tabs>
                 <v-tabs-window v-model="store.tab">
                     <v-tabs-window-item :value="NODE_EDIT_GENERAL_TAB">

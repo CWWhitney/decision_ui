@@ -2,15 +2,21 @@ import * as tf from "@tensorflow/tfjs";
 
 import { VariableDependencies } from "../dependencies/semantics";
 import {
-    ESTIMATE_NODE_TYPE,
-    LOOP_NODE_TYPE,
-    LOOP_OPERATION_NODE_TYPE,
+    ESTIMATE_FUNCTION_TYPE,
+    LOOP_FUNCTION_TYPE,
     Node,
     NodeId,
-    OPERATION_NODE_TYPE,
-    RESULT_NODE_TYPE
+    OPERATION_FUNCTION_TYPE,
+    RESULT_FUNCTION_TYPE
 } from "../../../graph";
-import { getNormalDistributionParameter, validateLowerUpperBounds } from "../../math";
+import {
+    DETERMINISTIC_DISTRIBUTION_TYPE,
+    getNormalDistributionParameter,
+    NORMAL_DISTRIBUTION_TYPE,
+    POSNORM_DISTRIBUTION_TYPE,
+    TNORM01_DISTRIBUTION_TYPE,
+    validateLowerUpperBounds
+} from "../../math";
 import { ComputationContext } from "../../context";
 import {
     get01TruncatedNormalDistributionSample,
@@ -23,41 +29,39 @@ import { ExpressionTensorContext } from "./context";
 import { getTypedTensorFromConstant, TypedTensor } from "../../tensor";
 
 export const getTypedTensorForEstimateNode = (node: Node, context: ComputationContext): TypedTensor => {
-    if (node.type != ESTIMATE_NODE_TYPE) {
+    if (node.function.type != ESTIMATE_FUNCTION_TYPE) {
         throw new Error(`cannot calculate estimate node tensor for node of type '${node.type}'`);
     }
 
-    if (node.options.distribution == "deterministic") {
-        return getTypedTensorFromConstant(tf.scalar(node.options.lower));
-    } else if (node.options.distribution == "norm") {
-        validateLowerUpperBounds(node.options.lower, node.options.upper);
-        const { mean, stddev } = getNormalDistributionParameter(node.options.lower, node.options.upper);
+    const { distribution, lower, upper } = node.function;
+
+    if (distribution == DETERMINISTIC_DISTRIBUTION_TYPE) {
+        return getTypedTensorFromConstant(tf.scalar(lower));
+    } else if (distribution == NORMAL_DISTRIBUTION_TYPE) {
+        validateLowerUpperBounds(lower, upper);
+        const { mean, stddev } = getNormalDistributionParameter(lower, upper);
         return {
             tensor: tf.randomNormal([context.mcRuns], mean, stddev),
             isProbabilistic: true,
             isSeries: false
         };
-    } else if (node.options.distribution == "posnorm") {
-        validatePositiveNormalDistributionParameters(node.options.lower, node.options.upper);
+    } else if (distribution == POSNORM_DISTRIBUTION_TYPE) {
+        validatePositiveNormalDistributionParameters(lower, upper);
         return {
-            tensor: tf.tensor1d(
-                getPositiveNormalDistributionSample(node.options.lower, node.options.upper, context.mcRuns)
-            ),
+            tensor: tf.tensor1d(getPositiveNormalDistributionSample(lower, upper, context.mcRuns)),
             isProbabilistic: true,
             isSeries: false
         };
-    } else if (node.options.distribution == "tnorm_0_1") {
-        validate01TruncatedNormalDistributionParameters(node.options.lower, node.options.upper);
+    } else if (distribution == TNORM01_DISTRIBUTION_TYPE) {
+        validate01TruncatedNormalDistributionParameters(lower, upper);
         return {
-            tensor: tf.tensor1d(
-                get01TruncatedNormalDistributionSample(node.options.lower, node.options.upper, context.mcRuns)
-            ),
+            tensor: tf.tensor1d(get01TruncatedNormalDistributionSample(lower, upper, context.mcRuns)),
             isProbabilistic: true,
             isSeries: false
         };
     }
 
-    throw new Error(`distribution '${node.options.distribution}' tensor calculation not implemented`);
+    throw new Error(`distribution '${distribution}' tensor calculation not implemented`);
 };
 
 export const getTypedTensorForNodeWithExpression = (
@@ -68,9 +72,11 @@ export const getTypedTensorForNodeWithExpression = (
     getTypedTensorForNode: (nodeId: string) => TypedTensor,
     computationContext: ComputationContext
 ): TypedTensor => {
-    if (!(node.type == OPERATION_NODE_TYPE || node.type == RESULT_NODE_TYPE)) {
+    if (!(node.function.type == OPERATION_FUNCTION_TYPE || node.function.type == RESULT_FUNCTION_TYPE)) {
         throw new Error(`cannot calculate operation node tensor for node of type '${node.type}'`);
     }
+
+    const { expression } = node.function;
 
     // determine all required variable values as tensors
     const expressionContext: ExpressionTensorContext = { tensorByVariable: {}, mcRuns: computationContext.mcRuns };
@@ -78,7 +84,7 @@ export const getTypedTensorForNodeWithExpression = (
         expressionContext.tensorByVariable[variable] = getTypedTensorForNode(getNodeIdForVariable(variable));
     }
 
-    return tf.tidy(() => evaluateExpressionForTensor(node.options.expression, expressionContext));
+    return tf.tidy(() => evaluateExpressionForTensor(expression, expressionContext));
 };
 
 export const getTypedTensorForLoopOperationNode = (
@@ -90,18 +96,11 @@ export const getTypedTensorForLoopOperationNode = (
     getTypedTensorForNode: (nodeId: string) => TypedTensor,
     computationContext: ComputationContext
 ): TypedTensor => {
-    if (node.type != LOOP_OPERATION_NODE_TYPE) {
+    if (node.function.type != LOOP_FUNCTION_TYPE) {
         throw new Error(`cannot calculate loop operation node tensor for node of type '${node.type}'`);
     }
 
-    if (!node.parentNodeId) {
-        throw new Error(`cannot calculate loop operation node without a parent node`);
-    }
-
-    const parentNode = getNode(node.parentNodeId);
-    if (parentNode.type != LOOP_NODE_TYPE) {
-        throw new Error(`cannot calculate loop operation node if parent node is not of type '${LOOP_NODE_TYPE}}`);
-    }
+    const { iterations, initExpression, iterExpression } = node.function;
 
     // determine all required variable values as tensors
     const expressionContext: ExpressionTensorContext = { tensorByVariable: {}, mcRuns: computationContext.mcRuns };
@@ -111,10 +110,10 @@ export const getTypedTensorForLoopOperationNode = (
 
     return tf.tidy(() => {
         const tensorList = [] as TypedTensor[];
-        const initTensor = evaluateExpressionForTensor(node.options.initExpression, expressionContext);
+        const initTensor = evaluateExpressionForTensor(initExpression, expressionContext);
         tensorList.push(initTensor);
-        for (let i = 1; i < parentNode.options.iterations; i++) {
-            const iterTensor = evaluateExpressionForTensor(node.options.iterExpression, {
+        for (let i = 1; i < iterations; i++) {
+            const iterTensor = evaluateExpressionForTensor(iterExpression, {
                 ...expressionContext,
                 tensorByVariable: {
                     ...expressionContext.tensorByVariable,
@@ -145,9 +144,9 @@ export const getTypedTensorForNodeRecursion = (
     computationContext: ComputationContext
 ): TypedTensor => {
     const node = getNode(nodeId);
-    if (node.type == ESTIMATE_NODE_TYPE) {
+    if (node.function.type == ESTIMATE_FUNCTION_TYPE) {
         return getTypedTensorForEstimateNode(node, computationContext);
-    } else if (node.type == OPERATION_NODE_TYPE || node.type == RESULT_NODE_TYPE) {
+    } else if (node.function.type == OPERATION_FUNCTION_TYPE || node.function.type == RESULT_FUNCTION_TYPE) {
         return getTypedTensorForNodeWithExpression(
             node,
             getVariableDependencies,
@@ -156,7 +155,7 @@ export const getTypedTensorForNodeRecursion = (
             getTypedTensorForNode,
             computationContext
         );
-    } else if (node.type == LOOP_OPERATION_NODE_TYPE) {
+    } else if (node.function.type == LOOP_FUNCTION_TYPE) {
         return getTypedTensorForLoopOperationNode(
             node,
             getNode,

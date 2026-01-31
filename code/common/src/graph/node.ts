@@ -1,62 +1,96 @@
 import { Position, Size } from "../draw";
-import { DistributionFunctionType } from "../compute/math";
+import { DistributionFunctionType, NORMAL_DISTRIBUTION_TYPE } from "../compute/math";
+import { generateVariableName } from "../compute/variables";
 
-export const ESTIMATE_NODE_TYPE = "estimate";
-export const OPERATION_NODE_TYPE = "operation";
-export const LOOP_NODE_TYPE = "loop";
-export const LOOP_OPERATION_NODE_TYPE = "loop_operation";
-export const RESULT_NODE_TYPE = "result";
-export const COLLECTION_NODE_TYPE = "collection";
-
-export type EstimateNodeType = "estimate";
-export type OperationNodeType = "operation";
-export type LoopNodeType = "loop";
-export type LoopOperationNodeType = "loop_operation";
-export type ResultNodeType = "result";
-export type CollectionNodeType = "collection";
+// node id
 
 export type NodeId = string;
 
-export type NodeType =
-    | EstimateNodeType
-    | OperationNodeType
-    | LoopNodeType
-    | LoopOperationNodeType
-    | ResultNodeType
-    | CollectionNodeType;
+// node type
 
-export const AVAILABLE_NODE_TYPES: NodeType[] = [
-    ESTIMATE_NODE_TYPE,
-    OPERATION_NODE_TYPE,
-    LOOP_NODE_TYPE,
-    LOOP_OPERATION_NODE_TYPE,
-    RESULT_NODE_TYPE,
-    COLLECTION_NODE_TYPE
+export const VARIABLE_NODE_TYPE = "variable";
+export const COLLECTION_NODE_TYPE = "collection";
+
+export type VariableNodeType = "variable";
+export type CollectionNodeType = "collection";
+
+export type NodeType = VariableNodeType | CollectionNodeType;
+
+export const AVAILABLE_NODE_TYPES: NodeType[] = [VARIABLE_NODE_TYPE, COLLECTION_NODE_TYPE];
+
+// node function type
+
+export const ESTIMATE_FUNCTION_TYPE = "estimate";
+export const OPERATION_FUNCTION_TYPE = "operation";
+export const LOOP_FUNCTION_TYPE = "loop";
+export const RESULT_FUNCTION_TYPE = "result";
+export const EMPTY_FUNCTION_TYPE = "empty";
+
+export type EstimateFunctionType = "estimate";
+export type OperationFunctionType = "operation";
+export type LoopFunctionType = "loop";
+export type ResultFunctionType = "result";
+export type EmptyFunctionType = "empty";
+
+export type NodeFunctionType =
+    | EstimateFunctionType
+    | OperationFunctionType
+    | LoopFunctionType
+    | ResultFunctionType
+    | EmptyFunctionType;
+
+export const AVAILABLE_NODE_FUNCTION_TYPES: NodeFunctionType[] = [
+    ESTIMATE_FUNCTION_TYPE,
+    OPERATION_FUNCTION_TYPE,
+    LOOP_FUNCTION_TYPE,
+    RESULT_FUNCTION_TYPE
 ];
 
-export const DEFAULT_NODE_TYPE_TITLES: { [key in NodeType]: string } = {
-    [ESTIMATE_NODE_TYPE]: "Estimate",
-    [OPERATION_NODE_TYPE]: "Operation",
-    [LOOP_NODE_TYPE]: "Loop",
-    [LOOP_OPERATION_NODE_TYPE]: "Loop Operation",
-    [RESULT_NODE_TYPE]: "Result",
-    [COLLECTION_NODE_TYPE]: "Collection"
-};
+// node style preset
 
-export const getDefaultNodeSize = (nodeType: NodeType): Size => {
-    switch (nodeType) {
-        case ESTIMATE_NODE_TYPE:
-        case OPERATION_NODE_TYPE:
-        case LOOP_OPERATION_NODE_TYPE:
-        case RESULT_NODE_TYPE:
-            return { width: 200, height: 50 };
-        case LOOP_NODE_TYPE:
-        case COLLECTION_NODE_TYPE:
-            return { width: 500, height: 400 };
-        default:
-            throw new Error(`unknown node type '${nodeType}'`);
-    }
-};
+export const COST_STYLE_TYPE = "cost";
+export const BENEFIT_STYLE_TYPE = "benefit";
+export const RISK_STYLE_TYPE = "risk";
+export const GENERIC_STYLE_TYPE = "generic";
+export const RESULT_STYLE_TYPE = "result";
+export const COLLECTION_STYLE_TYPE = "collection";
+export const CUSTOM_STYLE_TYPE = "custom";
+
+export type CostStyleType = "cost";
+export type BenefitStyleType = "benefit";
+export type RiskStyleType = "risk";
+export type GenericStyleType = "generic";
+export type ResultStyleType = "result";
+export type CollectionStyleType = "collection";
+export type CustomStyleType = "custom";
+
+export type VariableNodeStyleType =
+    | CostStyleType
+    | BenefitStyleType
+    | RiskStyleType
+    | GenericStyleType
+    | ResultStyleType
+    | CustomStyleType;
+
+export type CollectionNodeStyleType = CollectionStyleType | CustomStyleType;
+
+export type NodeStyleType = VariableNodeStyleType | CollectionNodeStyleType;
+
+export const AVAILABLE_VARIABLE_NODE_STYLE_TYPES: VariableNodeStyleType[] = [
+    COST_STYLE_TYPE,
+    BENEFIT_STYLE_TYPE,
+    RISK_STYLE_TYPE,
+    RESULT_STYLE_TYPE,
+    GENERIC_STYLE_TYPE,
+    CUSTOM_STYLE_TYPE
+];
+
+export const AVAILABLE_COLLECTION_NODE_STYLE_TYPES: CollectionNodeStyleType[] = [
+    COLLECTION_STYLE_TYPE,
+    CUSTOM_STYLE_TYPE
+];
+
+// node border style
 
 export type NodeStyleDefaultBorder = "default";
 export type NodeStyleSharpBorder = "sharp";
@@ -81,100 +115,178 @@ export type NodeStyleBorderVariant =
     | NodeStyleRoundBorder
     | NodeStyleEllipseBorder;
 
-export interface NodeStyle {
-    border: NodeStyleBorderVariant;
-}
+// node function state
 
-export interface AbstractNode<T, O> {
-    id: NodeId;
+export interface AbstractNodeFunctionState<T extends NodeFunctionType> {
     type: T;
-    parentNodeId: NodeId | null;
-
-    visualization: {
-        title: string;
-        position: Position;
-        size: Size;
-        style: NodeStyle;
-    };
-
-    options: O;
 }
 
-export interface EstimateNodeOptions {
+export interface AbstractVariableNodeFunctionState<T extends NodeFunctionType> extends AbstractNodeFunctionState<T> {
+    variable: string;
+}
+
+export interface EstimateNodeFunctionState extends AbstractVariableNodeFunctionState<EstimateFunctionType> {
     distribution: DistributionFunctionType;
     lower: number;
     upper: number;
     comment: string;
 }
 
-export interface OperationNodeOptions {
+export interface OperationNodeFunctionState extends AbstractVariableNodeFunctionState<OperationFunctionType> {
     expression: string;
 }
 
-export interface LoopNodeOptions {
+export interface LoopNodeFunctionState extends AbstractVariableNodeFunctionState<LoopFunctionType> {
     iterations: number;
-}
-
-export interface LoopOperationNodeOptions {
     initExpression: string;
     iterExpression: string;
 }
 
-export interface ResultNodeOptions {
+export interface ResultNodeFunctionState extends AbstractVariableNodeFunctionState<ResultFunctionType> {
     expression: string;
 }
 
-export type ResultNode = AbstractNode<ResultNodeType, ResultNodeOptions>;
+export type EmptyNodeFunctionState = AbstractNodeFunctionState<EmptyFunctionType>;
 
-export type CollectionNode = AbstractNode<CollectionNodeType, null>;
-export type LoopNode = AbstractNode<LoopNodeType, LoopNodeOptions>;
-export type LoopOperationNode = AbstractNode<LoopOperationNodeType, LoopOperationNodeOptions>;
-export type OperationNode = AbstractNode<OperationNodeType, OperationNodeOptions>;
-export type EstimateNode = AbstractNode<EstimateNodeType, EstimateNodeOptions>;
+export type VariableNodeFunctionState =
+    | EstimateNodeFunctionState
+    | OperationNodeFunctionState
+    | LoopNodeFunctionState
+    | ResultNodeFunctionState;
 
-export type NodeOptionsTypeMap = {
-    [ESTIMATE_NODE_TYPE]: EstimateNodeOptions;
-    [OPERATION_NODE_TYPE]: OperationNodeOptions;
-    [LOOP_NODE_TYPE]: LoopNodeOptions;
-    [LOOP_OPERATION_NODE_TYPE]: LoopOperationNodeOptions;
-    [RESULT_NODE_TYPE]: ResultNodeOptions;
-    [COLLECTION_NODE_TYPE]: null;
-};
+export type NodeFunctionState = VariableNodeFunctionState | EmptyNodeFunctionState;
 
-export const getDefaultNodeOptions = (nodeType: NodeType) => {
+// node style state
+
+export interface AbstractNodeStyleState<T extends NodeStyleType> {
+    type: T;
+}
+
+export interface CustomNodeStyleState extends AbstractNodeStyleState<CustomStyleType> {
+    border: NodeStyleBorderVariant;
+}
+
+export type VariableNodePresetStyleState = AbstractNodeStyleState<
+    CostStyleType | RiskStyleType | BenefitStyleType | ResultStyleType | GenericStyleType
+>;
+
+export type CollectionNodePresetStyleState = AbstractNodeStyleState<CollectionStyleType>;
+
+export type VariableNodeStyleState = VariableNodePresetStyleState | CustomNodeStyleState;
+export type CollectionNodeStyleState = CollectionNodePresetStyleState | CustomNodeStyleState;
+
+export type NodeStyleState = VariableNodeStyleState | CollectionNodeStyleState;
+
+// node state
+
+export interface AbstractNode<F extends NodeFunctionState, S extends NodeStyleState> {
+    id: NodeId;
+    type: NodeType;
+    parentNodeId: NodeId | null;
+
+    function: F;
+
+    visualization: {
+        title: string;
+        position: Position;
+        size: Size;
+        style: S;
+    };
+}
+
+export type VariableNode = AbstractNode<VariableNodeFunctionState, VariableNodeStyleState>;
+export type CollectionNode = AbstractNode<EmptyNodeFunctionState, CollectionNodeStyleState>;
+
+export type Node = VariableNode | CollectionNode;
+
+// default state helper
+
+export const getDefaultNodeSize = (nodeType: NodeType): Size => {
     switch (nodeType) {
-        case ESTIMATE_NODE_TYPE:
-            return {
-                distribution: "deterministic",
-                lower: 1,
-                upper: 1,
-                comment: ""
-            } as EstimateNodeOptions;
-        case OPERATION_NODE_TYPE:
-            return {
-                expression: ""
-            };
-        case LOOP_NODE_TYPE:
-            return {
-                iterations: 10
-            } as LoopNodeOptions;
-        case LOOP_OPERATION_NODE_TYPE:
-            return {
-                initExpression: "",
-                iterExpression: "previous"
-            } as LoopOperationNodeOptions;
-        case RESULT_NODE_TYPE:
-            return {
-                expression: ""
-            } as ResultNodeOptions;
+        case VARIABLE_NODE_TYPE:
+            return { width: 200, height: 50 };
         case COLLECTION_NODE_TYPE:
-            return null;
+            return { width: 500, height: 400 };
         default:
-            throw new Error(`unkown node type '${nodeType}'`);
+            throw new Error(`unknown node type '${nodeType}'`);
     }
 };
 
-export type Node = ResultNode | OperationNode | LoopNode | LoopOperationNode | EstimateNode | CollectionNode;
+export const getDefaultFunctionState = (variable: string, functionType: NodeFunctionType): NodeFunctionState => {
+    switch (functionType) {
+        case ESTIMATE_FUNCTION_TYPE:
+            return {
+                type: ESTIMATE_FUNCTION_TYPE,
+                variable,
+                distribution: NORMAL_DISTRIBUTION_TYPE,
+                lower: -1,
+                upper: 1,
+                comment: ""
+            } as EstimateNodeFunctionState;
+        case OPERATION_FUNCTION_TYPE:
+            return {
+                type: OPERATION_FUNCTION_TYPE,
+                variable,
+                expression: ""
+            };
+        case LOOP_FUNCTION_TYPE:
+            return {
+                type: LOOP_FUNCTION_TYPE,
+                variable,
+                iterations: 10,
+                initExpression: "",
+                iterExpression: ""
+            } as LoopNodeFunctionState;
+        case RESULT_FUNCTION_TYPE:
+            return {
+                type: RESULT_FUNCTION_TYPE,
+                variable,
+                expression: ""
+            } as ResultNodeFunctionState;
+        case EMPTY_FUNCTION_TYPE:
+            return {
+                type: EMPTY_FUNCTION_TYPE
+            } as EmptyNodeFunctionState;
+        default:
+            throw new Error(`unkown node function type '${functionType}'`);
+    }
+};
+
+export const getDefaultNodeStyleState = (styleType: NodeStyleType) => {
+    switch (styleType) {
+        case COST_STYLE_TYPE:
+            return {
+                type: COST_STYLE_TYPE
+            } as AbstractNodeStyleState<CostStyleType>;
+        case RISK_STYLE_TYPE:
+            return {
+                type: RISK_STYLE_TYPE
+            } as AbstractNodeStyleState<RiskStyleType>;
+        case BENEFIT_STYLE_TYPE:
+            return {
+                type: BENEFIT_STYLE_TYPE
+            } as AbstractNodeStyleState<BenefitStyleType>;
+        case RESULT_STYLE_TYPE:
+            return {
+                type: RESULT_STYLE_TYPE
+            } as AbstractNodeStyleState<ResultStyleType>;
+        case GENERIC_STYLE_TYPE:
+            return {
+                type: GENERIC_STYLE_TYPE
+            } as AbstractNodeStyleState<GenericStyleType>;
+        case COLLECTION_STYLE_TYPE:
+            return {
+                type: COLLECTION_STYLE_TYPE
+            } as CollectionNodePresetStyleState;
+        case CUSTOM_STYLE_TYPE:
+            return {
+                type: CUSTOM_STYLE_TYPE,
+                border: NODE_STYLE_DEFAULT_BORDER
+            } as CustomNodeStyleState;
+        default:
+            throw new Error(`unkown node style type '${styleType}'`);
+    }
+};
 
 export type NodeByIdMap = Map<NodeId, Node>;
 export type NodeChildrenByParentIdMap = Map<NodeId, Node[]>;
@@ -246,21 +358,28 @@ export interface NewNodeOptions {
     size?: Size;
 }
 
-export const getNewNode = (nodeType: NodeType, nodes: Node[], options?: NewNodeOptions): Node => {
+export const getNewNode = (
+    title: string,
+    nodeType: NodeType,
+    functionType: NodeFunctionType,
+    styleType: NodeStyleType,
+    nodes: Node[],
+    options?: NewNodeOptions
+): Node => {
     const nextNodeId = getNextNodeId(nodes);
+    const nodeTitle = `${title} ${nextNodeId}`;
+    const variable = generateVariableName(nodeTitle);
     return {
         id: nextNodeId,
         type: nodeType,
         parentNodeId: options?.parentNodeId ?? null,
+        function: getDefaultFunctionState(variable, functionType),
         visualization: {
-            title: `${DEFAULT_NODE_TYPE_TITLES[nodeType]} ${nextNodeId}`,
+            title: nodeTitle,
             position: options?.position ?? { x: 0, y: 0 },
             size: options?.size ?? getDefaultNodeSize(nodeType),
-            style: {
-                border: NODE_STYLE_DEFAULT_BORDER
-            }
-        },
-        options: getDefaultNodeOptions(nodeType)
+            style: getDefaultNodeStyleState(styleType)
+        }
     } as Node;
 };
 

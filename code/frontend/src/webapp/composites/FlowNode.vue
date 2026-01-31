@@ -10,7 +10,8 @@
     import {
         NODE_STYLE_DEFAULT_BORDER,
         NODE_STYLE_SHARP_BORDER,
-        NODE_STYLE_ROUND_BORDER
+        NODE_STYLE_ROUND_BORDER,
+        VARIABLE_NODE_TYPE
     } from "@decision-support-ui/common";
 
     import { Position, Handle, useVueFlow } from "@vue-flow/core";
@@ -32,6 +33,7 @@
     const nodeStyle = (node: NodeProps) => {
         return {
             ...(node &&
+                node.data.border &&
                 node.data.border != NODE_STYLE_DEFAULT_BORDER && {
                     borderRadius:
                         node.data.border == NODE_STYLE_SHARP_BORDER
@@ -58,7 +60,12 @@
                     ></v-btn>
                 </template>
             </v-tooltip>
-            <v-tooltip location="top" text="function definition" open-delay="500">
+            <v-tooltip
+                v-if="node.data.nodeType == VARIABLE_NODE_TYPE"
+                location="top"
+                text="function definition"
+                open-delay="500"
+            >
                 <template #activator="{ props }">
                     <v-btn
                         v-bind="props"
@@ -67,7 +74,12 @@
                     ></v-btn>
                 </template>
             </v-tooltip>
-            <v-tooltip location="top" text="data visualization" open-delay="500">
+            <v-tooltip
+                v-if="node.data.nodeType == VARIABLE_NODE_TYPE"
+                location="top"
+                text="data visualization"
+                open-delay="500"
+            >
                 <template #activator="{ props }">
                     <v-btn
                         v-bind="props"
@@ -125,33 +137,62 @@
             overflow: hidden;
         }
 
-        &.estimate .content {
+        &.cost-style-type .content {
+            background-color: rgba(246, 137, 115, 0.8);
+            border: 1.5px solid #8e432e;
+        }
+
+        &.benefit-style-type .content {
             background-color: rgba(135, 238, 238, 0.8);
             border: 1.5px solid #2e8e8e;
         }
 
-        &.operation .content,
-        &.loop_operation .content {
-            background-color: rgba(250, 250, 250, 0.8);
-            border: 1.5px solid #333;
-            border-radius: 0.5em;
+        &.risk-style-type .content {
+            background-color: rgba(241, 232, 110, 0.8);
+            border: 1.5px solid #a29755;
         }
 
-        &.loop .content {
-            background-color: rgba(212, 212, 212, 0.8);
-            border: 1.5px solid #5e5e5e;
-            border-radius: 0.5em;
+        &.generic-style-type .content {
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 1.5px solid #888888;
         }
 
-        &.result .content {
+        &.result-style-type .content {
             background-color: rgba(235, 168, 235, 0.8);
             border: 1.5px solid #ac31ac;
         }
 
-        &.collection .content {
+        &.collection-style-type .content {
             background-color: rgba(209, 209, 209, 0.2);
             border-radius: 0.5em;
             border: 1.5px dashed #828282;
+        }
+
+        &.estimate-function-type .content {
+            border-radius: 0;
+        }
+
+        &.operation-function-type .content {
+            border-radius: 0.5em;
+        }
+
+        &.loop-function-type .content {
+            border-radius: 0.5em;
+        }
+
+        &.result-function-type .content {
+            border-radius: 0;
+        }
+
+        &.preview {
+            display: flex;
+            justify-content: center;
+            position: relative;
+            margin: 1em 0;
+
+            .content {
+                width: auto;
+            }
         }
 
         .vue-flow__handle {

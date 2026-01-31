@@ -10,16 +10,23 @@
         useFlowStyleStore
     } from "@/state/flow/style";
     import {
+        BENEFIT_STYLE_TYPE,
         COLLECTION_NODE_TYPE,
-        DEFAULT_NODE_TYPE_TITLES,
-        ESTIMATE_NODE_TYPE,
+        COLLECTION_STYLE_TYPE,
+        COST_STYLE_TYPE,
+        EMPTY_FUNCTION_TYPE,
+        ESTIMATE_FUNCTION_TYPE,
+        GENERIC_STYLE_TYPE,
+        RESULT_FUNCTION_TYPE,
         getDefaultNodeSize,
-        LOOP_NODE_TYPE,
-        LOOP_OPERATION_NODE_TYPE,
-        OPERATION_NODE_TYPE,
-        RESULT_NODE_TYPE,
+        OPERATION_FUNCTION_TYPE,
+        RISK_STYLE_TYPE,
+        VARIABLE_NODE_TYPE,
         type Node,
-        type NodeType
+        type NodeFunctionType,
+        type NodeStyleType,
+        type NodeType,
+        RESULT_STYLE_TYPE
     } from "@decision-support-ui/common";
     import { useVueFlow, type Rect, type XYPosition } from "@vue-flow/core";
 
@@ -37,13 +44,49 @@
     const graphStore = useFlowGraphStore();
     const styleStore = useFlowStyleStore();
 
-    const NODE_TYPES = [
-        ESTIMATE_NODE_TYPE,
-        OPERATION_NODE_TYPE,
-        LOOP_NODE_TYPE,
-        RESULT_NODE_TYPE,
-        COLLECTION_NODE_TYPE
-    ] as NodeType[];
+    const TOOLBAR_NODES: {
+        title: string;
+        nodeType: NodeType;
+        functionType: NodeFunctionType;
+        styleType: NodeStyleType;
+    }[] = [
+        {
+            title: "Cost",
+            nodeType: VARIABLE_NODE_TYPE,
+            functionType: ESTIMATE_FUNCTION_TYPE,
+            styleType: COST_STYLE_TYPE
+        },
+        {
+            title: "Benefit",
+            nodeType: VARIABLE_NODE_TYPE,
+            functionType: ESTIMATE_FUNCTION_TYPE,
+            styleType: BENEFIT_STYLE_TYPE
+        },
+        {
+            title: "Risk",
+            nodeType: VARIABLE_NODE_TYPE,
+            functionType: ESTIMATE_FUNCTION_TYPE,
+            styleType: RISK_STYLE_TYPE
+        },
+        {
+            title: "Generic",
+            nodeType: VARIABLE_NODE_TYPE,
+            functionType: OPERATION_FUNCTION_TYPE,
+            styleType: GENERIC_STYLE_TYPE
+        },
+        {
+            title: "Result",
+            nodeType: VARIABLE_NODE_TYPE,
+            functionType: RESULT_FUNCTION_TYPE,
+            styleType: RESULT_STYLE_TYPE
+        },
+        {
+            title: "Collection",
+            nodeType: COLLECTION_NODE_TYPE,
+            functionType: EMPTY_FUNCTION_TYPE,
+            styleType: COLLECTION_STYLE_TYPE
+        }
+    ];
 
     const determineParentNode = (position: XYPosition) => {
         // determine which node could be the best parent node based on cursor position
@@ -63,7 +106,13 @@
         return candidateParentNodes.length > 0 ? candidateParentNodes[0] : null;
     };
 
-    const onNodeDragEnd = (event: DragEvent, nodeType: NodeType) => {
+    const onNodeDragEnd = (
+        event: DragEvent,
+        title: string,
+        nodeType: NodeType,
+        functionType: NodeFunctionType,
+        styleType: NodeStyleType
+    ) => {
         const topleft = screenToFlowCoordinate({
             x: event.clientX,
             y: event.clientY
@@ -81,10 +130,7 @@
             y: topleft.y - newNodeSize.height / 2 - ancestorOffset.y
         };
 
-        const newNodeType =
-            parentNode?.type == LOOP_NODE_TYPE && nodeType == OPERATION_NODE_TYPE ? LOOP_OPERATION_NODE_TYPE : nodeType;
-
-        graphStore.addNewNodeAction(newNodeType, {
+        graphStore.addNewNodeAction(title, nodeType, functionType, styleType, {
             position: newNodePosition,
             size: newNodeSize,
             parentNodeId: parentNode?.id
@@ -93,8 +139,13 @@
         removeSelectedNodes(getSelectedNodes.value);
     };
 
-    const onNodeClick = (nodeType: NodeType) => {
-        graphStore.addNewNodeAction(nodeType);
+    const onNodeClick = (
+        title: string,
+        nodeType: NodeType,
+        functionType: NodeFunctionType,
+        styleType: NodeStyleType
+    ) => {
+        graphStore.addNewNodeAction(title, nodeType, functionType, styleType);
     };
 
     const onLockGraphClick = () => {
@@ -161,23 +212,15 @@
         </div>
         <div class="toolbar_group">
             <div
-                v-for="nodeType in NODE_TYPES"
-                :key="nodeType"
-                :class="`vue-flow__node ${nodeType}`"
+                v-for="node in TOOLBAR_NODES"
+                :key="node.title"
+                :class="`vue-flow__node ${node.nodeType}-type ${node.functionType}-function-type ${node.styleType}-style-type`"
                 :draggable="true"
-                @click="() => onNodeClick(nodeType)"
-                @dragend="event => onNodeDragEnd(event, nodeType)"
+                @click="() => onNodeClick(node.title, node.nodeType, node.functionType, node.styleType)"
+                @dragend="event => onNodeDragEnd(event, node.title, node.nodeType, node.functionType, node.styleType)"
             >
-                <div class="content">{{ DEFAULT_NODE_TYPE_TITLES[nodeType] }}</div>
+                <div class="content">{{ node.title }}</div>
             </div>
-            <!--<v-btn
-        icon="mdi-dots-vertical"
-        variant="outlined"
-        size="small"
-        disabled
-        rounded="0"
-        style="border-width: 1.5px"
-      ></v-btn>-->
         </div>
         <div class="toolbar_group">
             <v-tooltip location="bottom" text="change edge style" open-delay="500">
