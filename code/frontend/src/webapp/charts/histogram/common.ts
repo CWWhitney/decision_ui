@@ -8,7 +8,8 @@ import {
     Legend,
     CategoryScale,
     ScatterController,
-    PointElement
+    PointElement,
+    Tooltip
 } from "chart.js";
 
 /* eslint @typescript-eslint/no-unsafe-function-type: 0 */
@@ -36,11 +37,23 @@ export const CHART_COLORS = [
     "rgba(201, 203, 207, 0.7)" // grey
 ];
 
-Chart.register(BarController, ScatterController, LinearScale, BarElement, PointElement, Colors, Legend, CategoryScale);
+Chart.register(
+    BarController,
+    ScatterController,
+    LinearScale,
+    BarElement,
+    PointElement,
+    Colors,
+    Legend,
+    CategoryScale,
+    Tooltip
+);
 
 export const getDefaultHistogramScales = (
     xLabel: string,
     yLabel: string,
+    maxValue: number,
+    minValue: number,
     max_ticks: number,
     textColor: string,
     gridColor: string,
@@ -59,11 +72,13 @@ export const getDefaultHistogramScales = (
                     },
                     color: textColor
                 },
-                bounds: "data",
+                bounds: "ticks",
+                max: maxValue,
+                min: minValue,
                 ticks: {
                     maxRotation: 90,
                     minRotation: 0,
-                    autoSkip: false,
+                    autoSkip: true,
                     maxTicksLimit: max_ticks,
                     color: textColor,
                     callback: value => `${Number(Number(value).toPrecision(3))}`
@@ -111,7 +126,7 @@ export const getDefaultHistogramLegend = (textColor: string): DeepPartial<Legend
 export const getDefaultHistogramOptions = (): ChartOptions<"bar"> => {
     return {
         responsive: true,
-        resizeDelay: 1,
+        resizeDelay: 0,
         animation: false,
         maintainAspectRatio: false,
         hover: { mode: "nearest" }
@@ -122,7 +137,7 @@ export const getDefaultScatterOptions = (): ChartOptions<"scatter"> => {
     return {
         elements: {
             point: {
-                radius: 4
+                radius: 5
             }
         }
     };

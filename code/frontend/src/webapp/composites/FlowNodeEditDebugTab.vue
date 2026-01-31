@@ -25,7 +25,7 @@
                 {
                     shape: JSON.stringify(computedTypedTensor.value.tensor.shape),
                     dtype: computedTypedTensor.value.tensor.dtype,
-                    tensor: computedTypedTensor.value.tensor.toString().replace("Tensor\n    ", ""),
+                    // tensor: computedTypedTensor.value.tensor.toString().replace("Tensor\n    ", ""),
                     isProbabilistic: computedTypedTensor.value.isProbabilistic,
                     isSeries: computedTypedTensor.value.isSeries
                 },

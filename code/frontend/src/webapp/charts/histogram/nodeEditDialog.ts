@@ -1,6 +1,7 @@
 import { Chart, type ChartDataset } from "chart.js";
 
 import { getDefaultHistogramOptions, getDefaultHistogramScales, getDefaultScatterOptions } from "./common";
+import { numberToPrettyString } from "@decision-support-ui/common";
 
 const TEXT_COLOR = "rgba(0, 0, 0, 1)";
 const GRID_COLOR = "rgba(255, 255, 255, 0.2)";
@@ -15,9 +16,11 @@ export const drawHistogramChart = (
     values: number[],
     label: string
 ): Chart<"bar"> => {
-    const max_ticks = 5;
+    const max_ticks = 7;
 
     if (chart) chart.destroy();
+
+    console.log(`draw histogram with bins=${JSON.stringify(bins)} and counts=${JSON.stringify(values)}`);
 
     return new Chart<"bar">(ctx, {
         type: "bar",
@@ -27,16 +30,35 @@ export const drawHistogramChart = (
                 {
                     data: values,
                     categoryPercentage: 1.0,
-                    barPercentage: 1.05,
+                    barPercentage: 1.0,
                     backgroundColor: BAR_COLOR
                 } as ChartDataset<"bar", any>
             ]
         },
         options: {
             ...getDefaultHistogramOptions(),
-            ...getDefaultHistogramScales(label, "occurrences", max_ticks, TEXT_COLOR, GRID_COLOR, true),
+            ...getDefaultHistogramScales(
+                label,
+                "occurrences",
+                Math.max(...bins),
+                Math.min(...bins),
+                max_ticks,
+                TEXT_COLOR,
+                GRID_COLOR,
+                true
+            ),
             plugins: {
-                legend: { display: false }
+                legend: { display: false },
+                tooltip: {
+                    enabled: true,
+                    mode: "nearest",
+                    callbacks: {
+                        title: function (i) {
+                            return `bin = [${numberToPrettyString(bins[i[0]!.dataIndex])}, ${numberToPrettyString(bins[i[0]!.dataIndex + 1])}]`;
+                        },
+                        label: i => `occurrences = ${numberToPrettyString(values[i.dataIndex])}`
+                    }
+                }
             }
         }
     });
@@ -49,7 +71,7 @@ export const drawProbabilisticSeriesChart = (
     stddevs: number[],
     label: string
 ): Chart<"bar" | "scatter"> => {
-    const max_ticks = 5;
+    const max_ticks = 7;
 
     if (chart) chart.destroy();
 
@@ -62,8 +84,7 @@ export const drawProbabilisticSeriesChart = (
             datasets: [
                 {
                     data: means.map((m, i) => [m - stddevs[i]!, m + stddevs[i]!] as [number, number]),
-                    categoryPercentage: 1.0,
-                    maxBarThickness: 3,
+                    maxBarThickness: 4,
                     barPercentage: 1.0,
                     backgroundColor: STDDEV_COLOR,
                     order: 1
@@ -79,9 +100,21 @@ export const drawProbabilisticSeriesChart = (
         options: {
             ...getDefaultHistogramOptions(),
             ...(getDefaultScatterOptions() as any),
-            ...getDefaultHistogramScales("time", label, max_ticks, TEXT_COLOR, GRID_COLOR, false),
+            ...getDefaultHistogramScales("time", label, means.length, 1, max_ticks, TEXT_COLOR, GRID_COLOR, false),
             plugins: {
-                legend: { display: false }
+                legend: { display: false },
+                tooltip: {
+                    enabled: true,
+                    mode: "nearest",
+                    callbacks: {
+                        title: function (i) {
+                            return `time = ${i[0]!.dataIndex + 1}`;
+                        },
+                        label: i =>
+                            `mean = ${numberToPrettyString(means[i.dataIndex])}, ` +
+                            `stddev = ${numberToPrettyString(stddevs[i.dataIndex])}`
+                    }
+                }
             }
         }
     });
