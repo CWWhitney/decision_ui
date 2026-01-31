@@ -25,7 +25,7 @@ Arithmetic {
     | number
 
   FuncExp
-    = funcName "(" FuncArgs ")"
+    = #(funcName "(") FuncArgs ")"
 
   FuncArgs
     = Exp ("," Exp)*
