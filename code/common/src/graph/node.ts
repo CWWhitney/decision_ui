@@ -90,30 +90,33 @@ export const AVAILABLE_COLLECTION_NODE_STYLE_TYPES: CollectionNodeStyleType[] = 
     CUSTOM_STYLE_TYPE
 ];
 
-// node border style
+// node shape style
 
-export type NodeStyleDefaultBorder = "default";
-export type NodeStyleSharpBorder = "sharp";
-export type NodeStyleRoundBorder = "round";
-export type NodeStyleEllipseBorder = "ellipse";
+export type NodeStyleBoxShape = "box";
+export type NodeStyleRoundedBoxShape = "rounded-box";
+export type NodeStyleEllipseShape = "ellipse";
 
-export const NODE_STYLE_DEFAULT_BORDER = "default";
-export const NODE_STYLE_SHARP_BORDER = "sharp";
-export const NODE_STYLE_ROUND_BORDER = "round";
-export const NODE_STYLE_ELLIPSE_BORDER = "ellipse";
+export const NODE_STYLE_BOX_SHAPE = "box";
+export const NODE_STYLE_ROUNDED_BOX_SHAPE = "rounded-box";
+export const NODE_STYLE_ELLIPSE_SHAPE = "ellipse";
 
-export const NODE_STYLE_BORDER_VARIANTS = [
-    NODE_STYLE_DEFAULT_BORDER,
-    NODE_STYLE_SHARP_BORDER,
-    NODE_STYLE_ROUND_BORDER,
-    NODE_STYLE_ELLIPSE_BORDER
-];
+export const NODE_STYLE_SHAPE_VARIANTS = [NODE_STYLE_BOX_SHAPE, NODE_STYLE_ROUNDED_BOX_SHAPE, NODE_STYLE_ELLIPSE_SHAPE];
 
-export type NodeStyleBorderVariant =
-    | NodeStyleDefaultBorder
-    | NodeStyleSharpBorder
-    | NodeStyleRoundBorder
-    | NodeStyleEllipseBorder;
+export type NodeStyleShapeVariant = NodeStyleBoxShape | NodeStyleRoundedBoxShape | NodeStyleEllipseShape;
+
+// node style border variants
+
+export type NodeStyleBorderSolid = "solid";
+export type NodeStyleBorderDashed = "dashed";
+export type NodeStyleBorderDotted = "dotted";
+
+export const NODE_STYLE_BORDER_SOLID = "solid";
+export const NODE_STYLE_BORDER_DASHED = "dashed";
+export const NODE_STYLE_BORDER_DOTTED = "dotted";
+
+export const NODE_STYLE_BORDER_VARIANTS = [NODE_STYLE_BORDER_SOLID, NODE_STYLE_BORDER_DASHED, NODE_STYLE_BORDER_DOTTED];
+
+export type NodeStyleBorderVariant = NodeStyleBorderSolid | NodeStyleBorderDashed | NodeStyleBorderDotted;
 
 // node function state
 
@@ -163,6 +166,9 @@ export interface AbstractNodeStyleState<T extends NodeStyleType> {
 }
 
 export interface CustomNodeStyleState extends AbstractNodeStyleState<CustomStyleType> {
+    shape: NodeStyleShapeVariant;
+    backgroundColor: string;
+    borderWidth: number;
     border: NodeStyleBorderVariant;
 }
 
@@ -281,7 +287,10 @@ export const getDefaultNodeStyleState = (styleType: NodeStyleType) => {
         case CUSTOM_STYLE_TYPE:
             return {
                 type: CUSTOM_STYLE_TYPE,
-                border: NODE_STYLE_DEFAULT_BORDER
+                backgroundColor: "#fff",
+                borderWidth: 1.5,
+                shape: NODE_STYLE_BOX_SHAPE,
+                border: NODE_STYLE_BORDER_SOLID
             } as CustomNodeStyleState;
         default:
             throw new Error(`unkown node style type '${styleType}'`);

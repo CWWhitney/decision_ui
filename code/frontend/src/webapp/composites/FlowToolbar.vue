@@ -30,6 +30,8 @@
     } from "@decision-support-ui/common";
     import { useVueFlow, type Rect, type XYPosition } from "@vue-flow/core";
 
+    import FlowNodeBox from "../components/flow/FlowNodeBox.vue";
+
     const {
         fitView,
         screenToFlowCoordinate,
@@ -211,16 +213,21 @@
             </v-tooltip>
         </div>
         <div class="toolbar_group">
-            <div
+            <FlowNodeBox
                 v-for="node in TOOLBAR_NODES"
                 :key="node.title"
-                :class="`vue-flow__node ${node.nodeType}-type ${node.functionType}-function-type ${node.styleType}-style-type`"
+                :node-type="node.nodeType"
+                :function-type="node.functionType"
+                :style-type="node.styleType"
                 :draggable="true"
+                width="auto"
                 @click="() => onNodeClick(node.title, node.nodeType, node.functionType, node.styleType)"
-                @dragend="event => onNodeDragEnd(event, node.title, node.nodeType, node.functionType, node.styleType)"
+                @dragend="
+                    (event: DragEvent) =>
+                        onNodeDragEnd(event, node.title, node.nodeType, node.functionType, node.styleType)
+                "
+                >{{ node.title }}</FlowNodeBox
             >
-                <div class="content">{{ node.title }}</div>
-            </div>
         </div>
         <div class="toolbar_group">
             <v-tooltip location="bottom" text="change edge style" open-delay="500">
@@ -283,14 +290,8 @@
             background: #fff;
         }
 
-        .vue-flow__node {
-            position: relative;
+        .flow-node-box {
             min-width: 6em;
-
-            .content {
-                padding: 0.4em 0.75em;
-                box-shadow: none;
-            }
         }
     }
 </style>

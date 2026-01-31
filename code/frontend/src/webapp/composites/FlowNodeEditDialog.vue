@@ -12,7 +12,7 @@
     import FlowNodeEditFunctionTab from "./FlowNodeEditFunctionTab.vue";
     import FlowNodeEditDebugTab from "./FlowNodeEditDebugTab.vue";
     import FlowNodeEditDataTab from "./FlowNodeEditDataTab.vue";
-    import FlowNodeEditStyleTab from "./FlowNodeEditStyleTab.vue";
+    import FlowNodeEditStyleTab from "../components/flow/FlowNodeEditStyleTab.vue";
     import { ref } from "vue";
     import { VARIABLE_NODE_TYPE } from "@decision-support-ui/common";
 
@@ -139,6 +139,17 @@
                 display: flex;
                 flex-direction: column;
                 flex-grow: 1;
+            }
+        }
+
+        h4 {
+            font-size: 10pt;
+            font-weight: 500;
+            margin: 1.5em 0 1em 0;
+            text-transform: uppercase;
+
+            &:first-child {
+                margin-top: 0;
             }
         }
     }

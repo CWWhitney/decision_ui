@@ -45,11 +45,11 @@
 </script>
 
 <template>
-    <div v-if="node.function.type != EMPTY_FUNCTION_TYPE">
-        <h4>Variable</h4>
-        <v-text-field v-model="node.function.variable" label="Variable Name"></v-text-field>
-    </div>
     <div>
+        <template v-if="node.function.type != EMPTY_FUNCTION_TYPE">
+            <h4>Variable</h4>
+            <v-text-field v-model="node.function.variable" label="Variable Name" hide-details></v-text-field>
+        </template>
         <h4>Type</h4>
         <div>
             <v-btn-toggle v-model="functionType" divided border variant="text" color="primary">
@@ -59,38 +59,38 @@
                 <v-btn prepend-icon="mdi-chart-histogram" text="Result" :value="RESULT_FUNCTION_TYPE" />
             </v-btn-toggle>
         </div>
-    </div>
-    <h4>Options</h4>
-    <div v-if="node.function.type == ESTIMATE_FUNCTION_TYPE">
-        <FlowEstimateFunctionTab
-            v-model="
-                node as AbstractNode<EstimateNodeFunctionState, any> //
-            "
-        />
-    </div>
-    <div v-if="node.function.type == OPERATION_FUNCTION_TYPE">
-        <FlowOperationFunctionTab
-            v-model="
-                node as AbstractNode<OperationNodeFunctionState, any> //
-            "
-        />
-    </div>
-    <div v-if="node.function.type == LOOP_FUNCTION_TYPE">
-        <FlowLoopNodeFunctionTab
-            v-model="
-                node as AbstractNode<LoopNodeFunctionState, any> //
-            "
-        />
-    </div>
-    <div v-if="node.function.type == RESULT_FUNCTION_TYPE">
-        <FlowOperationFunctionTab
-            v-model="
-                node as AbstractNode<ResultNodeFunctionState, any> //
-            "
-        />
-    </div>
-    <div>
-        <v-alert v-if="!!computationError" type="error" :text="computationError" />
+        <h4>Options</h4>
+        <div v-if="node.function.type == ESTIMATE_FUNCTION_TYPE">
+            <FlowEstimateFunctionTab
+                v-model="
+                    node as AbstractNode<EstimateNodeFunctionState, any> //
+                "
+            />
+        </div>
+        <div v-if="node.function.type == OPERATION_FUNCTION_TYPE">
+            <FlowOperationFunctionTab
+                v-model="
+                    node as AbstractNode<OperationNodeFunctionState, any> //
+                "
+            />
+        </div>
+        <div v-if="node.function.type == LOOP_FUNCTION_TYPE">
+            <FlowLoopNodeFunctionTab
+                v-model="
+                    node as AbstractNode<LoopNodeFunctionState, any> //
+                "
+            />
+        </div>
+        <div v-if="node.function.type == RESULT_FUNCTION_TYPE">
+            <FlowOperationFunctionTab
+                v-model="
+                    node as AbstractNode<ResultNodeFunctionState, any> //
+                "
+            />
+        </div>
+        <div>
+            <v-alert v-if="!!computationError" type="error" :text="`Computation Error: ${computationError}`" />
+        </div>
     </div>
 </template>
 
@@ -101,16 +101,5 @@
 
     .v-number-input {
         min-width: 15em;
-    }
-
-    h4 {
-        font-size: 10pt;
-        font-weight: 500;
-        margin-bottom: 0.5em;
-        text-transform: uppercase;
-
-        &:not(:first-child) {
-            margin-top: 1em;
-        }
     }
 </style>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+    import FlowNodeBox from "@/components/flow/FlowNodeBox.vue";
     import {
         NODE_EDIT_DATA_TAB,
         NODE_EDIT_FUNCTION_TAB,
@@ -6,13 +7,9 @@
         NODE_EDIT_STYLE_TAB,
         useDialogsNodeEditStore
     } from "@/state/dialogs/nodeEdit";
+    import { useFlowGraphStore } from "@/state/flow/graph";
 
-    import {
-        NODE_STYLE_DEFAULT_BORDER,
-        NODE_STYLE_SHARP_BORDER,
-        NODE_STYLE_ROUND_BORDER,
-        VARIABLE_NODE_TYPE
-    } from "@decision-support-ui/common";
+    import { CUSTOM_STYLE_TYPE, VARIABLE_NODE_TYPE } from "@decision-support-ui/common";
 
     import { Position, Handle, useVueFlow } from "@vue-flow/core";
     import type { NodeProps } from "@vue-flow/core";
@@ -22,32 +19,22 @@
 
     const { getSelectedNodes, removeNodes } = useVueFlow();
     const nodeEditStore = useDialogsNodeEditStore();
+    const graphStore = useFlowGraphStore();
 
     defineEmits<{
         (e: "updateNodeInternals"): void;
     }>();
 
-    const node = defineProps<NodeProps>();
-    const showToolbar = computed(() => getSelectedNodes.value.length == 1 && getSelectedNodes.value[0]?.id == node.id);
+    const flowNodeProps = defineProps<NodeProps>();
 
-    const nodeStyle = (node: NodeProps) => {
-        return {
-            ...(node &&
-                node.data.border &&
-                node.data.border != NODE_STYLE_DEFAULT_BORDER && {
-                    borderRadius:
-                        node.data.border == NODE_STYLE_SHARP_BORDER
-                            ? "0px"
-                            : node.data.border == NODE_STYLE_ROUND_BORDER
-                              ? "0.5em"
-                              : "50%"
-                })
-        };
-    };
+    const node = computed(() => graphStore.getComputedNode(flowNodeProps.id).value);
+    const showToolbar = computed(
+        () => getSelectedNodes.value.length == 1 && getSelectedNodes.value[0]?.id == flowNodeProps.id
+    );
 </script>
 
 <template>
-    <NodeResizer :min-width="150" :min-height="50" :is-visible="node.selected" />
+    <NodeResizer :min-width="150" :min-height="50" :is-visible="flowNodeProps.selected" />
 
     <NodeToolbar :is-visible="showToolbar" :position="Position.Top" class="nodrag nopan">
         <v-btn-group divided>
@@ -56,12 +43,12 @@
                     <v-btn
                         v-bind="props"
                         icon="mdi-information-outline"
-                        @click="nodeEditStore.openDialog(node.id, NODE_EDIT_GENERAL_TAB)"
+                        @click="nodeEditStore.openDialog(flowNodeProps.id, NODE_EDIT_GENERAL_TAB)"
                     ></v-btn>
                 </template>
             </v-tooltip>
             <v-tooltip
-                v-if="node.data.nodeType == VARIABLE_NODE_TYPE"
+                v-if="flowNodeProps.data.nodeType == VARIABLE_NODE_TYPE"
                 location="top"
                 text="function definition"
                 open-delay="500"
@@ -70,12 +57,12 @@
                     <v-btn
                         v-bind="props"
                         icon="mdi-function"
-                        @click="nodeEditStore.openDialog(node.id, NODE_EDIT_FUNCTION_TAB)"
+                        @click="nodeEditStore.openDialog(flowNodeProps.id, NODE_EDIT_FUNCTION_TAB)"
                     ></v-btn>
                 </template>
             </v-tooltip>
             <v-tooltip
-                v-if="node.data.nodeType == VARIABLE_NODE_TYPE"
+                v-if="flowNodeProps.data.nodeType == VARIABLE_NODE_TYPE"
                 location="top"
                 text="data visualization"
                 open-delay="500"
@@ -84,7 +71,7 @@
                     <v-btn
                         v-bind="props"
                         icon="mdi-chart-histogram"
-                        @click="nodeEditStore.openDialog(node.id, NODE_EDIT_DATA_TAB)"
+                        @click="nodeEditStore.openDialog(flowNodeProps.id, NODE_EDIT_DATA_TAB)"
                     ></v-btn>
                 </template>
             </v-tooltip>
@@ -93,19 +80,26 @@
                     <v-btn
                         v-bind="props"
                         icon="mdi-palette-outline"
-                        @click="nodeEditStore.openDialog(node.id, NODE_EDIT_STYLE_TAB)"
+                        @click="nodeEditStore.openDialog(flowNodeProps.id, NODE_EDIT_STYLE_TAB)"
                     ></v-btn>
                 </template>
             </v-tooltip>
             <v-tooltip location="top" text="remove node" open-delay="500">
                 <template #activator="{ props }">
-                    <v-btn v-bind="props" icon="mdi-trash-can-outline" @click="removeNodes(node.id)"></v-btn>
+                    <v-btn v-bind="props" icon="mdi-trash-can-outline" @click="removeNodes(flowNodeProps.id)"></v-btn>
                 </template>
             </v-tooltip>
         </v-btn-group>
     </NodeToolbar>
 
-    <div class="content" :style="nodeStyle(node)">{{ node.data.label }} <br /></div>
+    <FlowNodeBox
+        :node-type="node.type"
+        :function-type="node.function.type"
+        :style-type="node.visualization.style.type"
+        :custom-style="node.visualization.style.type == CUSTOM_STYLE_TYPE ? node.visualization.style : null"
+    >
+        {{ node.visualization.title }}
+    </FlowNodeBox>
 
     <Handle id="top" type="source" :position="Position.Top" style="" />
     <Handle id="bottom" type="source" :position="Position.Bottom" />
@@ -127,74 +121,6 @@
     }
 
     .vue-flow__node {
-        .content {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 0.75em;
-            overflow: hidden;
-        }
-
-        &.cost-style-type .content {
-            background-color: rgba(246, 137, 115, 0.8);
-            border: 1.5px solid #8e432e;
-        }
-
-        &.benefit-style-type .content {
-            background-color: rgba(135, 238, 238, 0.8);
-            border: 1.5px solid #2e8e8e;
-        }
-
-        &.risk-style-type .content {
-            background-color: rgba(241, 232, 110, 0.8);
-            border: 1.5px solid #a29755;
-        }
-
-        &.generic-style-type .content {
-            background-color: rgba(255, 255, 255, 0.8);
-            border: 1.5px solid #888888;
-        }
-
-        &.result-style-type .content {
-            background-color: rgba(235, 168, 235, 0.8);
-            border: 1.5px solid #ac31ac;
-        }
-
-        &.collection-style-type .content {
-            background-color: rgba(209, 209, 209, 0.2);
-            border-radius: 0.5em;
-            border: 1.5px dashed #828282;
-        }
-
-        &.estimate-function-type .content {
-            border-radius: 0;
-        }
-
-        &.operation-function-type .content {
-            border-radius: 0.5em;
-        }
-
-        &.loop-function-type .content {
-            border-radius: 0.5em;
-        }
-
-        &.result-function-type .content {
-            border-radius: 0;
-        }
-
-        &.preview {
-            display: flex;
-            justify-content: center;
-            position: relative;
-            margin: 1em 0;
-
-            .content {
-                width: auto;
-            }
-        }
-
         .vue-flow__handle {
             border-radius: 0;
             opacity: 0;

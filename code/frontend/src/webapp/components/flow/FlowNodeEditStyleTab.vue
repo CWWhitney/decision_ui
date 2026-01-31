@@ -1,4 +1,8 @@
 <script setup lang="ts">
+    import { VColorInput } from "vuetify/labs/VColorInput";
+
+    import FlowNodeBox from "./FlowNodeBox.vue";
+
     import {
         BENEFIT_STYLE_TYPE,
         COLLECTION_NODE_TYPE,
@@ -9,6 +13,7 @@
         getDefaultNodeStyleState,
         type Node,
         NODE_STYLE_BORDER_VARIANTS,
+        NODE_STYLE_SHAPE_VARIANTS,
         type NodeStyleType,
         RESULT_STYLE_TYPE,
         RISK_STYLE_TYPE,
@@ -31,13 +36,19 @@
 <template>
     <div>
         <h4>Preview</h4>
-        <div
-            :class="`vue-flow__node preview ${node.type}-type ${node.function.type}-function-type ${node.visualization.style.type}-style-type`"
-        >
-            <div class="content">{{ node.visualization.title }}</div>
+        <div class="preview">
+            <FlowNodeBox
+                width="auto"
+                height="auto"
+                :node-type="node.type"
+                :function-type="node.function.type"
+                :style-type="node.visualization.style.type"
+                :custom-style="node.visualization.style.type == CUSTOM_STYLE_TYPE ? node.visualization.style : null"
+            >
+                {{ node.visualization.title }}
+            </FlowNodeBox>
         </div>
-    </div>
-    <div>
+
         <h4>Preset</h4>
         <div>
             <v-btn-toggle v-model="styleType" divided border variant="text" color="primary">
@@ -50,19 +61,56 @@
                 <v-btn text="Custom" :value="CUSTOM_STYLE_TYPE" />
             </v-btn-toggle>
         </div>
-    </div>
-    <div v-if="node.visualization.style.type == CUSTOM_STYLE_TYPE">
-        <h4>Options</h4>
-        <v-combobox
-            v-model="node.visualization.style.border"
-            label="Border Variant"
-            :items="NODE_STYLE_BORDER_VARIANTS"
-        ></v-combobox>
+
+        <template v-if="node.visualization.style.type == CUSTOM_STYLE_TYPE">
+            <h4>Options</h4>
+            <v-combobox
+                v-model="node.visualization.style.shape"
+                label="Shape"
+                :items="NODE_STYLE_SHAPE_VARIANTS"
+            ></v-combobox>
+
+            <VColorInput
+                v-model="node.visualization.style.backgroundColor"
+                hide-pip
+                label="Background Color"
+            ></VColorInput>
+
+            <v-combobox
+                v-model="node.visualization.style.border"
+                label="Border"
+                :items="NODE_STYLE_BORDER_VARIANTS"
+            ></v-combobox>
+
+            <v-slider
+                v-model="node.visualization.style.borderWidth"
+                min="0.5"
+                max="5"
+                step="0.5"
+                label="Border Width"
+                thumb-label
+                show-ticks
+            ></v-slider>
+        </template>
     </div>
 </template>
 
 <style scoped lang="scss">
+    h4 {
+        font-weight: 400;
+    }
+
     .v-text-field {
         min-width: 25em;
+    }
+
+    .preview {
+        display: flex;
+        justify-content: center;
+        margin: 1;
+    }
+
+    .v-slider {
+        margin-right: 2em;
     }
 </style>
