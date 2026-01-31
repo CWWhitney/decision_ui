@@ -7,41 +7,68 @@ export const getDepedenciesSemantics = () => {
         Exp(e) {
             return e.deps();
         },
+        OrExp_or(l, _op, r) {
+            return [...l.deps(), ...r.deps()];
+        },
+        OrExp(e) {
+            return e.deps();
+        },
+        AndExp_and(l, _op, r) {
+            return [...l.deps(), ...r.deps()];
+        },
+        AndExp(e) {
+            return e.deps();
+        },
+        NegExp_not(_op, e) {
+            return e.deps();
+        },
+        NegExp(e) {
+            return e.deps();
+        },
+        RelExp_rel(l, _op, r) {
+            return [...l.deps(), ...r.deps()];
+        },
+        RelExp(e) {
+            return e.deps();
+        },
+        AddExp_plus(l, _op, r) {
+            return [...l.deps(), ...r.deps()];
+        },
+        AddExp_minus(l, _op, r) {
+            return [...l.deps(), ...r.deps()];
+        },
         AddExp(e) {
             return e.deps();
         },
-        AddExp_plus(left, operator, right) {
-            return [...left.deps(), ...right.deps()];
+        MulExp_times(l, _op, r) {
+            return [...l.deps(), ...r.deps()];
         },
-        AddExp_minus(left, operator, right) {
-            return [...left.deps(), ...right.deps()];
+        MulExp_divide(l, _op, r) {
+            return [...l.deps(), ...r.deps()];
+        },
+        MulExp_modulo(l, _op, r) {
+            return [...l.deps(), ...r.deps()];
         },
         MulExp(e) {
             return e.deps();
         },
-        MulExp_times(left, operator, right) {
-            return [...left.deps(), ...right.deps()];
+        UnaryExp_neg(_op, e) {
+            return e.deps();
         },
-        MulExp_divide(left, operator, right) {
-            return [...left.deps(), ...right.deps()];
+        UnaryExp(e) {
+            return e.deps();
         },
-        MulExp_modulo(left, operator, right) {
-            return [...left.deps(), ...right.deps()];
+        ExpExp_power(b, _op, e) {
+            return [...b.deps(), ...e.deps()];
         },
         ExpExp(e) {
             return e.deps();
         },
-        ExpExp_power(base, operator, exponent) {
-            return [...base.deps(), ...exponent.deps()];
-        },
-        PriExp(e) {
+        PriExp_paren(_lp, e, _rp) {
             return e.deps();
         },
-        PriExp_paren(open, exp, _close) {
-            return exp.deps();
-        },
-        PriExp_neg(operator, right) {
-            return [...right.deps()];
+        IfExp(_if, _lp, c, _rp, trueExp, _else, falseExp) {
+            return [...c.deps(), ...trueExp.deps(), ...falseExp.deps()];
         },
         FuncExp(_n, _l, argList, _r) {
             return [...argList.deps()];

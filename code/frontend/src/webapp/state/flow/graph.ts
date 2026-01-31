@@ -249,7 +249,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
                     )
                 } as common.ComputedResult<common.TypedTensor>;
             } catch (e) {
-                console.error(`error calculating tensor for node '${nodeId}'`, e);
+                // console.error(`error calculating tensor for node '${nodeId}'`, e);
                 return {
                     type: "error",
                     message: e instanceof Error ? `${e.message}` : `${e}`

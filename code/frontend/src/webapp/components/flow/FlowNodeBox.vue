@@ -135,6 +135,10 @@
         border: 1.5px dashed #828282;
     }
 
+    .collection-type .content {
+        align-items: flex-start;
+    }
+
     .estimate-function-type .background {
         border-radius: 0;
     }

@@ -39,6 +39,55 @@ export const createTensorEvaluationSemantics = () => {
             return e.eval(this.args.context);
         },
 
+        OrExp_or(l, _op, r) {
+            return wrapBinaryTensorOperator(tf.logicalOr)(l.eval(this.args.context), r.eval(this.args.context));
+        },
+
+        OrExp(e) {
+            return e.eval(this.args.context);
+        },
+
+        AndExp_and(l, _op, r) {
+            return wrapBinaryTensorOperator(tf.logicalAnd)(l.eval(this.args.context), r.eval(this.args.context));
+        },
+
+        AndExp(e) {
+            return e.eval(this.args.context);
+        },
+
+        NegExp_not(_op, x) {
+            return wrapUnaryTensorOperator(tf.logicalNot)(x.eval(this.args.context));
+        },
+
+        NegExp(e) {
+            return e.eval(this.args.context);
+        },
+
+        RelExp_rel(l, c, r) {
+            switch (c.sourceString) {
+                case "<":
+                    return wrapBinaryTensorOperator(tf.less)(l.eval(this.args.context), r.eval(this.args.context));
+                case ">":
+                    return wrapBinaryTensorOperator(tf.greater)(l.eval(this.args.context), r.eval(this.args.context));
+                case "<=":
+                    return wrapBinaryTensorOperator(tf.lessEqual)(l.eval(this.args.context), r.eval(this.args.context));
+                case ">=":
+                    return wrapBinaryTensorOperator(tf.greaterEqual)(
+                        l.eval(this.args.context),
+                        r.eval(this.args.context)
+                    );
+                case "==":
+                    return wrapBinaryTensorOperator(tf.equal)(l.eval(this.args.context), r.eval(this.args.context));
+                case "!=":
+                    return wrapBinaryTensorOperator(tf.notEqual)(l.eval(this.args.context), r.eval(this.args.context));
+            }
+            throw new Error(`unknown comparison operator '${c.sourceString}'`);
+        },
+
+        RelExp(e) {
+            return e.eval(this.args.context);
+        },
+
         AddExp_plus(a, _op, b) {
             return wrapBinaryTensorOperator(tf.add)(a.eval(this.args.context), b.eval(this.args.context));
         },
@@ -67,6 +116,14 @@ export const createTensorEvaluationSemantics = () => {
             return e.eval(this.args.context);
         },
 
+        UnaryExp_neg(_op, x) {
+            return wrapUnaryTensorOperator(tf.neg)(x.eval(this.args.context));
+        },
+
+        UnaryExp(e) {
+            return e.eval(this.args.context);
+        },
+
         ExpExp_power(a, _op, b) {
             return wrapBinaryTensorOperator(tf.pow)(a.eval(this.args.context), b.eval(this.args.context));
         },
@@ -79,8 +136,50 @@ export const createTensorEvaluationSemantics = () => {
             return e.eval(this.args.context);
         },
 
-        PriExp_neg(_op, e) {
-            return tf.neg(e.eval(this.args.context));
+        IfExp(_if, _lp, condition, _rp, expTrue, _else, expFalse) {
+            const conditionTT = condition.eval(this.args.context) as TypedTensor;
+            const trueTT = expTrue.eval(this.args.context) as TypedTensor;
+            const falseTT = expFalse.eval(this.args.context) as TypedTensor;
+
+            if (conditionTT.tensor.dtype !== "bool") {
+                throw new Error(`condition value is not of boolean type, but ${conditionTT.tensor.dtype}`);
+            }
+
+            if (
+                conditionTT.isProbabilistic != trueTT.isProbabilistic ||
+                conditionTT.isProbabilistic != falseTT.isProbabilistic
+            ) {
+                throw new Error(
+                    `condition value, true value and false value need to be all probabilistic or all not probabilistic`
+                );
+            }
+
+            if (conditionTT.isSeries != trueTT.isSeries || conditionTT.isSeries != falseTT.isSeries) {
+                throw new Error(
+                    `condition value, true value and false value need to be all a series or all not a series`
+                );
+            }
+
+            if (
+                !tf.util.arraysEqual(conditionTT.tensor.shape, trueTT.tensor.shape) ||
+                !tf.util.arraysEqual(conditionTT.tensor.shape, falseTT.tensor.shape)
+            ) {
+                throw new Error(
+                    `condition value shape, true value shape and false value shape need to match, ` +
+                        `but are ${JSON.stringify(conditionTT.tensor.shape)} (condition), ` +
+                        `${JSON.stringify(trueTT.tensor.shape)} (true value) and ` +
+                        `${JSON.stringify(falseTT.tensor.shape)} (false value)`
+                );
+            }
+
+            return {
+                tensor: tf.add(
+                    tf.mul(conditionTT.tensor, trueTT.tensor),
+                    tf.mul(tf.sub(1, conditionTT.tensor), falseTT.tensor)
+                ),
+                isProbabilistic: conditionTT.isProbabilistic,
+                isSeries: conditionTT.isSeries
+            } as TypedTensor;
         },
 
         FuncExp(nameNode, _l, argListNode, _r) {

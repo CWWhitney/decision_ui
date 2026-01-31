@@ -1,36 +1,44 @@
-import { keep, onesLike, scalar, Tensor1D, topk, unsortedSegmentSum, type Tensor, tidy } from "@tensorflow/tfjs";
+import * as tf from "@tensorflow/tfjs";
 
 export interface HistogramData {
     bins: number[];
     counts: number[];
 }
 
-export const getHistogramBinsFromTensor = async (tensor: Tensor, numBins: number, lowerQ = 0.001, upperQ = 0.999) => {
+export const getHistogramBinsFromTensor = async (
+    tensor: tf.Tensor,
+    numBins: number,
+    lowerQ = 0.001,
+    upperQ = 0.999
+) => {
     if (tensor.shape.length !== 1) {
         throw new Error("can only calculate histogram for probabilistic sample (Tensor1D)");
     }
 
-    const { minTensor, maxTensor, countsTensor } = tidy(() => {
+    const { minTensor, maxTensor, countsTensor } = tf.tidy(() => {
         const n = tensor.size;
+
+        // convert potential boolean tensor to numeric tensor
+        const numericTensor = tf.keep(tensor).toFloat();
 
         const loRank = Math.ceil(lowerQ * n);
         const hiRank = Math.floor(upperQ * n);
 
-        const maxTensor = topk(keep(tensor), n - hiRank).values.min();
-        const minTensor = topk(keep(tensor).neg(), loRank).values.min().neg();
+        const maxTensor = tf.topk(numericTensor, n - hiRank).values.min();
+        const minTensor = tf.topk(numericTensor.neg(), loRank).values.min().neg();
 
-        const range = maxTensor.sub(minTensor).maximum(scalar(1e-12));
+        const range = maxTensor.sub(minTensor).maximum(tf.scalar(1e-12));
         const binWidth = range.div(numBins);
 
-        const indices = keep(tensor)
+        const indices = numericTensor
             .sub(minTensor)
             .div(binWidth)
             .floor()
             .toInt()
-            .clipByValue(0, numBins - 1) as Tensor1D;
+            .clipByValue(0, numBins - 1) as tf.Tensor1D;
 
-        const ones = onesLike(indices);
-        const countsTensor = unsortedSegmentSum(ones, indices, numBins);
+        const ones = tf.onesLike(indices);
+        const countsTensor = tf.unsortedSegmentSum(ones, indices, numBins);
         return {
             minTensor,
             maxTensor,

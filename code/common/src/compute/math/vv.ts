@@ -72,8 +72,6 @@ export const valueVarier = ({
     const epsilon = tf.randomNormal([mcRuns, nValue], 0, 1);
 
     let vvSeries = tf.add(annualMeansSeries, tf.mul(annualVarsSeries, epsilon));
-    console.log(`vv means`, tf.mean(vvSeries, 0).arraySync());
-    console.log(`vv stddev`, tf.sqrt(tf.mean(tf.square(tf.sub(vvSeries, tf.mean(vvSeries, 0, true))), 0)).arraySync());
 
     if (lowerLimit != null) {
         vvSeries = tf.maximum(vvSeries, lowerLimit.tensor);

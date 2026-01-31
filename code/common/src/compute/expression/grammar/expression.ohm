@@ -1,6 +1,22 @@
 Arithmetic {
   Exp
-    = AddExp
+    = OrExp
+
+  OrExp
+    = OrExp "|" AndExp    -- or
+    | AndExp
+
+  AndExp
+    = AndExp "&" NegExp   -- and
+    | NegExp
+
+  NegExp
+    = "!" NegExp          -- not
+    | RelExp
+
+  RelExp
+    = AddExp relOperation AddExp -- rel
+    | AddExp
 
   AddExp
     = AddExp "+" MulExp  -- plus
@@ -8,27 +24,37 @@ Arithmetic {
     | MulExp
 
   MulExp
-    = MulExp "*" ExpExp  -- times
-    | MulExp "/" ExpExp  -- divide
-    | MulExp "%" ExpExp  -- modulo
+    = MulExp "*" UnaryExp  -- times
+    | MulExp "/" UnaryExp  -- divide
+    | MulExp "%" UnaryExp  -- modulo
+    | UnaryExp
+
+  UnaryExp
+    = "-" UnaryExp         -- neg
     | ExpExp
 
   ExpExp
-    = PriExp "^" ExpExp  -- power
+    = PriExp "^" ExpExp    -- power
     | PriExp
 
   PriExp
     = "(" Exp ")"  -- paren
-    | "-" PriExp   -- neg
+    | IfExp
     | FuncExp
     | variable
     | number
+
+  IfExp
+    = "if" "(" Exp ")" Exp "else" Exp
 
   FuncExp
     = #(funcName "(") FuncArgs ")"
 
   FuncArgs
     = Exp ("," Exp)*
+
+  relOperation  (a comparison)
+    = ">" | "<" | ">=" | "<=" | "==" | "!="
 
   funcName  (a function)
     = "chance_event"
@@ -44,7 +70,7 @@ Arithmetic {
     | "log"
     | "log10"
     | "round"
-    |  "trunc"
+    | "trunc"
     | "sqrt"
 
   variable  (a variable)

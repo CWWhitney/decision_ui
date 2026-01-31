@@ -14,15 +14,18 @@
 </script>
 
 <template>
-    <p v-if="variableDependencies.type == 'success'">
-        Variable Dependencies: {{ JSON.stringify(variableDependencies.value) }}
+    <p v-if="variableDependencies && variableDependencies.type == 'success'">
+        Variable Dependencies: <br />
+        {{ JSON.stringify(variableDependencies.value, null, 2) }}
     </p>
     <div v-if="computedTypedTensor && computedTypedTensor.type == 'success'">
         <p>Computed Tensor:</p>
         <pre>{{
             JSON.stringify(
                 {
-                    shape: computedTypedTensor.value.tensor.shape,
+                    shape: JSON.stringify(computedTypedTensor.value.tensor.shape),
+                    dtype: computedTypedTensor.value.tensor.dtype,
+                    tensor: computedTypedTensor.value.tensor.toString().replace("Tensor\n    ", ""),
                     isProbabilistic: computedTypedTensor.value.isProbabilistic,
                     isSeries: computedTypedTensor.value.isSeries
                 },
