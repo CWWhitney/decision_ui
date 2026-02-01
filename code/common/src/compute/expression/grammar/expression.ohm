@@ -56,6 +56,7 @@ Arithmetic {
 
   IndexedVariable
     = #(variable "[i]")
+    | #(variable "[i-1]")
 
   relOperation  (a comparison)
     = ">=" | "<=" | ">" | "<" | "==" | "!="

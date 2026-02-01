@@ -4,7 +4,7 @@ import { ref } from "vue";
 export const FLOW_STYLE_STORE_ID = "project.settings";
 
 export const DEFAULT_MC_RUNS = 10000;
-export const DEFAULT_HISTOGRAM_BINS = 30;
+export const DEFAULT_HISTOGRAM_BINS = 40;
 
 export const useProjectSettingsStore = defineStore(FLOW_STYLE_STORE_ID, () => {
     const mcRuns = ref(DEFAULT_MC_RUNS as number);

@@ -254,9 +254,10 @@ export const createTensorEvaluationSemantics = () => {
             return [first.eval(this.args.context), ...rest.children.map(c => c.eval(this.args.context))];
         },
 
-        IndexedVariable(variable, _op) {
+        IndexedVariable(variable, sliceOp) {
             const context = this.args.context as ExpressionTensorContext;
             const seriesTT = variable.eval(this.args.context) as TypedTensor;
+            const slice = sliceOp.sourceString;
 
             if (!context.index) {
                 throw Error("cannot apply index to value outside of loop context");
@@ -275,11 +276,17 @@ export const createTensorEvaluationSemantics = () => {
                 );
             }
 
+            const iteration = slice == "[i]" ? context.index.iteration : context.index.iteration - 1;
+
+            if (iteration < 0) {
+                throw Error(`cannot apply index [i-1] within the initial expression`);
+            }
+
             if (seriesTT.isProbabilistic) {
                 return {
                     ...seriesTT,
                     tensor: tf.squeeze(
-                        tf.slice2d(seriesTT.tensor as tf.Tensor2D, [0, context.index.iteration], [context.mcRuns, 1]),
+                        tf.slice2d(seriesTT.tensor as tf.Tensor2D, [0, iteration], [context.mcRuns, 1]),
                         [1]
                     ),
                     isSeries: false
@@ -288,7 +295,7 @@ export const createTensorEvaluationSemantics = () => {
 
             return {
                 ...seriesTT,
-                tensor: tf.squeeze(tf.slice1d(seriesTT.tensor as tf.Tensor1D, context.index.iteration, 1), [0]),
+                tensor: tf.squeeze(tf.slice1d(seriesTT.tensor as tf.Tensor1D, iteration, 1), [0]),
                 isSeries: false
             };
         },
