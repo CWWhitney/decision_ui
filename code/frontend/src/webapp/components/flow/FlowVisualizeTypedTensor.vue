@@ -1,76 +1,153 @@
 <script setup lang="ts">
     import * as common from "@decision-support-ui/common";
+    import * as tf from "@tensorflow/tfjs";
     import { computedAsync } from "@vueuse/core";
 
     import FlowVisualizeDeterministicValue from "./FlowVisualizeDeterministicValue.vue";
     import FlowVisualizeProbabilisticSeries from "./FlowVisualizeProbabilisticSeries.vue";
     import FlowVisualizeProbabilisticValue from "./FlowVisualizeProbabilisticValue.vue";
     import FlowVisualizeDeterministicSeries from "./FlowVisualizeDeterministicSeries.vue";
+    import { ref } from "vue";
 
-    const {
-        nodeTitle,
-        isProbabilistic,
-        isSeries,
-        getDeterministicValue,
-        getHistogramData,
-        getProbabilisticSeriesPlotData,
-        getDeterministicSeriesPlotData
-    } = defineProps<{
+    const { nodeTitle, tt, bins } = defineProps<{
         nodeTitle: string;
-        isProbabilistic: boolean;
-        isSeries: boolean;
-        getDeterministicValue: () => Promise<common.ComputedResult<number>>;
-        getHistogramData: () => Promise<common.ComputedResult<common.HistogramData>>;
-        getDeterministicSeriesPlotData: () => Promise<common.ComputedResult<common.DeterministicSeriesPlotData>>;
-        getProbabilisticSeriesPlotData: () => Promise<common.ComputedResult<common.ProbabilisticSeriesPlotData>>;
+        tt: common.TypedTensor;
+        bins: number;
     }>();
 
+    const probabilisticSeriesMode = ref<"full" | "sample" | "timestep">("full");
+    const sampleId = ref<number>(0);
+    const timestepId = ref<number>(0);
+
     const deterministicValue = computedAsync(async () => {
-        if (!isProbabilistic && !isSeries) {
-            return await getDeterministicValue();
+        if (!tt.isProbabilistic && !tt.isSeries) {
+            return (await tt.tensor.array()) as number;
         }
+        return null;
     });
 
     const histogramData = computedAsync(async () => {
-        if (isProbabilistic && !isSeries) {
-            return await getHistogramData();
+        if (tt.isProbabilistic && !tt.isSeries) {
+            return await common.getHistogramBinsFromTensor(tt.tensor, bins);
         }
-    });
-
-    const probabilisticSeriesPlotData = computedAsync(async () => {
-        if (isSeries && isProbabilistic) {
-            return await getProbabilisticSeriesPlotData();
-        }
+        return null;
     });
 
     const deterministicSeriesPlotData = computedAsync(async () => {
-        if (isSeries && !isProbabilistic) {
-            return await getDeterministicSeriesPlotData();
+        if (tt.isSeries && !tt.isProbabilistic) {
+            return await common.getDeterministicSeriesPlotDataFromTensor(tt.tensor);
         }
+        return null;
+    });
+
+    const probabilisticSeriesPlotData = computedAsync(async () => {
+        if (tt.isSeries && tt.isProbabilistic && probabilisticSeriesMode.value == "full") {
+            return await common.getProbabilisticSeriesPlotDataFromTensor(tt.tensor);
+        }
+        return null;
+    });
+
+    const probabilisticSeriesSingleSamplePlotData = computedAsync(async () => {
+        if (tt.isSeries && tt.isProbabilistic && probabilisticSeriesMode.value == "sample") {
+            const slicedTensor = tf.tidy(() => {
+                return tf.squeeze(
+                    tf.slice2d(tf.keep(tt.tensor) as tf.Tensor2D, [sampleId.value, 0], [1, tt.tensor.shape[1]!]),
+                    [0]
+                );
+            });
+            const plotData = await common.getDeterministicSeriesPlotDataFromTensor(slicedTensor);
+            slicedTensor.dispose();
+            return plotData;
+        }
+        return null;
+    });
+
+    const probabilisticSeriesSingleTimestepHistogramData = computedAsync(async () => {
+        if (tt.isSeries && tt.isProbabilistic && probabilisticSeriesMode.value == "timestep") {
+            const slicedTensor = tf.tidy(() => {
+                return tf.squeeze(
+                    tf.slice2d(tf.keep(tt.tensor) as tf.Tensor2D, [0, timestepId.value], [tt.tensor.shape[0], 1]),
+                    [1]
+                );
+            });
+            const histogramData = await common.getHistogramBinsFromTensor(slicedTensor, bins);
+            slicedTensor.dispose();
+            return histogramData;
+        }
+        return null;
     });
 </script>
 
 <template>
-    <template v-if="deterministicValue && deterministicValue.type == 'success'">
-        <FlowVisualizeDeterministicValue :value="deterministicValue.value" />
+    <template v-if="deterministicValue != null">
+        <FlowVisualizeDeterministicValue :value="deterministicValue" />
     </template>
-    <template v-if="histogramData && histogramData.type == 'success'">
-        <FlowVisualizeProbabilisticValue
-            :bins="histogramData.value.bins"
-            :counts="histogramData.value.counts"
-            :label="nodeTitle"
-        />
+    <template v-if="histogramData != null">
+        <FlowVisualizeProbabilisticValue :bins="histogramData.bins" :counts="histogramData.counts" :label="nodeTitle" />
     </template>
-    <template v-if="probabilisticSeriesPlotData && probabilisticSeriesPlotData.type == 'success'">
+    <template v-if="deterministicSeriesPlotData != null">
+        <FlowVisualizeDeterministicSeries :values="deterministicSeriesPlotData.values" :label="nodeTitle" />
+    </template>
+    <template v-if="tt.isSeries && tt.isProbabilistic">
         <FlowVisualizeProbabilisticSeries
-            :means="probabilisticSeriesPlotData.value.means"
-            :stddevs="probabilisticSeriesPlotData.value.stddevs"
+            v-if="probabilisticSeriesPlotData != null"
+            :means="probabilisticSeriesPlotData.means"
+            :stddevs="probabilisticSeriesPlotData.stddevs"
             :label="nodeTitle"
         />
-    </template>
-    <template v-if="deterministicSeriesPlotData && deterministicSeriesPlotData.type == 'success'">
-        <FlowVisualizeDeterministicSeries :values="deterministicSeriesPlotData.value.values" :label="nodeTitle" />
+        <FlowVisualizeDeterministicSeries
+            v-if="probabilisticSeriesSingleSamplePlotData != null"
+            :values="probabilisticSeriesSingleSamplePlotData.values"
+            :label="nodeTitle"
+        />
+        <FlowVisualizeProbabilisticValue
+            v-if="probabilisticSeriesSingleTimestepHistogramData != null"
+            :bins="probabilisticSeriesSingleTimestepHistogramData.bins"
+            :counts="probabilisticSeriesSingleTimestepHistogramData.counts"
+            :label="nodeTitle"
+        />
+        <div class="options">
+            <div class="toggle">
+                <v-btn-toggle v-model="probabilisticSeriesMode" divided border variant="text" color="primary">
+                    <v-btn prepend-icon="mdi-tilde" text="Full" value="full" />
+                    <v-btn prepend-icon="mdi-plus-minus" text="Single Sample" value="sample" />
+                    <v-btn prepend-icon="mdi-repeat" text="Single Time Step" value="timestep" />
+                </v-btn-toggle>
+            </div>
+            <v-slider
+                v-if="probabilisticSeriesSingleSamplePlotData != null"
+                v-model="sampleId"
+                min="0"
+                :max="tt.tensor.shape[0]! - 1"
+                step="1"
+                label="Sample"
+            ></v-slider>
+            <v-slider
+                v-if="probabilisticSeriesSingleTimestepHistogramData != null"
+                v-model="timestepId"
+                min="0"
+                :max="tt.tensor.shape[1]! - 1"
+                step="1"
+                label="Timestep"
+            ></v-slider>
+        </div>
     </template>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+    .options {
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+        margin-top: 1em;
+
+        .toggle {
+            display: flex;
+            justify-content: center;
+        }
+
+        .v-slider {
+            margin-right: 1.5em;
+        }
+    }
+</style>
