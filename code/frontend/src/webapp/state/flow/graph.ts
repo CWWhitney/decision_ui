@@ -80,11 +80,11 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
     );
 
     const getComputedNode = computedByKey((nodeId: common.NodeId) => {
-        console.log(`getComputedNode(${nodeId})`);
+        // console.log(`getComputedNode(${nodeId})`);
         return common.getFromMapOrThrow(nodeId, _nodesByIdMap.value);
     });
     const getComputedNodeIdFromVariableName = computedByKey((variableName: string) => {
-        console.log(`getComputedNodeIdFromVariableName(${variableName})`);
+        // console.log(`getComputedNodeIdFromVariableName(${variableName})`);
         return common.getFromMapOrThrow(variableName, _nodeIdByVariableMap.value);
     });
     const isVariableNameValid = (variableName: string) => _nodeIdByVariableMap.value.has(variableName);
@@ -249,7 +249,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
                     )
                 } as common.ComputedResult<common.TypedTensor>;
             } catch (e) {
-                // console.error(`error calculating tensor for node '${nodeId}'`, e);
+                console.error(`error calculating tensor for node '${nodeId}'`, e);
                 return {
                     type: "error",
                     message: e instanceof Error ? `${e.message}` : `${e}`

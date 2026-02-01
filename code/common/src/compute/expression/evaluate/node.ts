@@ -27,6 +27,7 @@ import {
 
 import { ExpressionTensorContext } from "./context";
 import { getTypedTensorFromConstant, TypedTensor } from "../../tensor";
+import { toProbabilistic } from "../../math/broadcast";
 
 export const getTypedTensorForEstimateNode = (node: Node, context: ComputationContext): TypedTensor => {
     if (node.function.type != ESTIMATE_FUNCTION_TYPE) {
@@ -79,7 +80,11 @@ export const getTypedTensorForNodeWithExpression = (
     const { expression } = node.function;
 
     // determine all required variable values as tensors
-    const expressionContext: ExpressionTensorContext = { tensorByVariable: {}, mcRuns: computationContext.mcRuns };
+    const expressionContext: ExpressionTensorContext = {
+        tensorByVariable: {},
+        mcRuns: computationContext.mcRuns,
+        index: null
+    };
     for (const variable of getVariableDependencies(node.id)) {
         expressionContext.tensorByVariable[variable] = getTypedTensorForNode(getNodeIdForVariable(variable));
     }
@@ -103,18 +108,30 @@ export const getTypedTensorForLoopOperationNode = (
     const { iterations, initExpression, iterExpression } = node.function;
 
     // determine all required variable values as tensors
-    const expressionContext: ExpressionTensorContext = { tensorByVariable: {}, mcRuns: computationContext.mcRuns };
+    const expressionContext: ExpressionTensorContext = {
+        tensorByVariable: {},
+        mcRuns: computationContext.mcRuns,
+        index: {
+            iteration: 0,
+            length: iterations
+        }
+    };
     for (const variable of getVariableDependencies(node.id)) {
         expressionContext.tensorByVariable[variable] = getTypedTensorForNode(getNodeIdForVariable(variable));
     }
 
     return tf.tidy(() => {
-        const tensorList = [] as TypedTensor[];
+        let tensorList = [] as TypedTensor[];
         const initTensor = evaluateExpressionForTensor(initExpression, expressionContext);
+
         tensorList.push(initTensor);
         for (let i = 1; i < iterations; i++) {
             const iterTensor = evaluateExpressionForTensor(iterExpression, {
                 ...expressionContext,
+                index: {
+                    ...expressionContext.index,
+                    iteration: i
+                },
                 tensorByVariable: {
                     ...expressionContext.tensorByVariable,
                     i: getTypedTensorFromConstant(tf.scalar(i)),
@@ -123,12 +140,19 @@ export const getTypedTensorForLoopOperationNode = (
             });
             tensorList.push(iterTensor);
         }
+
+        // check if any tensor is probabilistic and broadcast all others if so
+        const isAnyProbabilistic = tensorList.reduce((p, t) => p || t.isProbabilistic, false);
+        if (isAnyProbabilistic) {
+            tensorList = tensorList.map(t => toProbabilistic(t, computationContext.mcRuns));
+        }
+
         return {
             tensor: tf.stack(
                 tensorList.map(t => t.tensor),
                 -1
             ),
-            isProbabilistic: tensorList.reduce((p, t) => p || t.isProbabilistic, false),
+            isProbabilistic: isAnyProbabilistic,
             isSeries: true
         };
     });

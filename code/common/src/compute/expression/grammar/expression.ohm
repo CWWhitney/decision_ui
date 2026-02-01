@@ -41,6 +41,7 @@ Arithmetic {
     = "(" Exp ")"  -- paren
     | IfExp
     | FuncExp
+    | IndexedVariable
     | variable
     | number
 
@@ -53,8 +54,11 @@ Arithmetic {
   FuncArgs
     = Exp ("," Exp)*
 
+  IndexedVariable
+    = #(variable "[i]")
+
   relOperation  (a comparison)
-    = ">" | "<" | ">=" | "<=" | "==" | "!="
+    = ">=" | "<=" | ">" | "<" | "==" | "!="
 
   funcName  (a function)
     = "chance_event"

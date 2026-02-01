@@ -1,6 +1,7 @@
 import * as tf from "@tensorflow/tfjs";
 import { valueVarier } from "./vv";
 import { getTypedTensorFromConstant, TypedTensor } from "../tensor";
+import { toProbabilistic, toSeries } from "./broadcast";
 
 export const chanceEvent = ({
     mcRuns,
@@ -22,7 +23,9 @@ export const chanceEvent = ({
     oneDraw?: TypedTensor;
 }) => {
     // default values
-    const chanceT = chance.tensor;
+    chance = toProbabilistic(chance, mcRuns);
+
+    let chanceT = chance.tensor;
     let valueIfT = valueIf ? valueIf.tensor : tf.scalar(1);
     let valueIfNotT = valueIfNot ? valueIfNot.tensor : tf.scalar(0);
     const nT = n ? n.tensor : tf.scalar(1);
@@ -49,6 +52,7 @@ export const chanceEvent = ({
 
     valueIfT = nValue > 1 ? valueVarier({ mcRuns, varMean: valueIf, varCv: cvIf, n }).tensor : valueIfT;
     valueIfNotT = nValue > 1 ? valueVarier({ mcRuns, varMean: valueIfNot, varCv: cvIfNot, n }).tensor : valueIfNotT;
+    chanceT = nValue > 1 ? toSeries(chance, nValue).tensor : chanceT;
 
     const onesShape = [mcRuns, ...Array(Math.max(0, valueIfT.shape.length - 1)).fill(1)];
     const outputShape = valueIfT.shape.length == 0 ? [mcRuns] : valueIfT.shape;

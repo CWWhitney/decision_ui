@@ -160,6 +160,16 @@
             optionsStore.setLocked(true);
         }
     };
+
+    const download = () => {
+        const text = JSON.stringify({ nodes: graphStore.nodes, edges: graphStore.edges }, null, 2);
+        const blob = new Blob([text], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "graph.json";
+        a.click();
+    };
 </script>
 
 <template>
@@ -265,6 +275,7 @@
                 </template>
             </v-tooltip>
 
+            <v-btn icon="mdi-download-outline" size="small" variant="outlined" @click="download"></v-btn>
             <v-btn prepend-icon="mdi-bug-outline" variant="outlined" text="reset" @click="useStore().reset"
                 >Reset</v-btn
             >

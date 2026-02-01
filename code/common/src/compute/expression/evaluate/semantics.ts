@@ -5,7 +5,7 @@ import { ExpressionTensorContext } from "./context";
 import { netPresentValue } from "../../math/npv";
 import { valueVarier } from "../../math/vv";
 import { chanceEvent } from "../../math/chance_event";
-import { getTypedTensorFromConstant, TypedTensor } from "../../tensor";
+import { getSeriesLengthFromTypedTensor, getTypedTensorFromConstant, TypedTensor } from "../../tensor";
 
 const wrapUnaryTensorOperator = (operator: (t: tf.Tensor) => tf.Tensor) => (t: TypedTensor) => ({
     ...t,
@@ -252,6 +252,45 @@ export const createTensorEvaluationSemantics = () => {
 
         FuncArgs(first, _c, rest) {
             return [first.eval(this.args.context), ...rest.children.map(c => c.eval(this.args.context))];
+        },
+
+        IndexedVariable(variable, _op) {
+            const context = this.args.context as ExpressionTensorContext;
+            const seriesTT = variable.eval(this.args.context) as TypedTensor;
+
+            if (!context.index) {
+                throw Error("cannot apply index to value outside of loop context");
+            }
+
+            if (!seriesTT.isSeries) {
+                throw Error("cannot apply index to value which is not a series");
+            }
+
+            const seriesLength = getSeriesLengthFromTypedTensor(seriesTT);
+
+            if (context.index.length != seriesLength) {
+                throw Error(
+                    `cannot apply index to series of different length (${seriesLength}) ` +
+                        `than current loop context ${context.index.length}`
+                );
+            }
+
+            if (seriesTT.isProbabilistic) {
+                return {
+                    ...seriesTT,
+                    tensor: tf.squeeze(
+                        tf.slice2d(seriesTT.tensor as tf.Tensor2D, [0, context.index.iteration], [context.mcRuns, 1]),
+                        [1]
+                    ),
+                    isSeries: false
+                };
+            }
+
+            return {
+                ...seriesTT,
+                tensor: tf.squeeze(tf.slice1d(seriesTT.tensor as tf.Tensor1D, context.index.iteration, 1), [0]),
+                isSeries: false
+            };
         },
 
         variable(_l, _ns) {
