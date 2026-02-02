@@ -185,9 +185,9 @@ export type NodeStyleState = VariableNodeStyleState | CollectionNodeStyleState;
 
 // node state
 
-export interface AbstractNode<F extends NodeFunctionState, S extends NodeStyleState> {
+export interface AbstractNode<T, F extends NodeFunctionState, S extends NodeStyleState> {
     id: NodeId;
-    type: NodeType;
+    type: T;
     parentNodeId: NodeId | null;
 
     function: F;
@@ -200,8 +200,8 @@ export interface AbstractNode<F extends NodeFunctionState, S extends NodeStyleSt
     };
 }
 
-export type VariableNode = AbstractNode<VariableNodeFunctionState, VariableNodeStyleState>;
-export type CollectionNode = AbstractNode<EmptyNodeFunctionState, CollectionNodeStyleState>;
+export type VariableNode = AbstractNode<VariableNodeType, VariableNodeFunctionState, VariableNodeStyleState>;
+export type CollectionNode = AbstractNode<CollectionNodeType, EmptyNodeFunctionState, CollectionNodeStyleState>;
 
 export type Node = VariableNode | CollectionNode;
 

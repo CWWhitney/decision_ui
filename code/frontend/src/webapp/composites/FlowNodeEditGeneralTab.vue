@@ -1,12 +1,27 @@
 <script setup lang="ts">
-    import { ESTIMATE_FUNCTION_TYPE, type Node } from "@decision-support-ui/common";
+    import DebouncedTextInput from "@/components/flow/DebouncedTextInput.vue";
+    import {
+        ESTIMATE_FUNCTION_TYPE,
+        generateVariableName,
+        VARIABLE_NODE_TYPE,
+        type Node
+    } from "@decision-support-ui/common";
 
     const node = defineModel<Node>({ required: true });
+
+    const onTitleChange = (title: string, previous: string) => {
+        if (node.value.type == VARIABLE_NODE_TYPE) {
+            if (generateVariableName(previous) == node.value.function.variable) {
+                // auto-change variable in case it matches the default naming scheme
+                node.value.function.variable = generateVariableName(title);
+            }
+        }
+    };
 </script>
 
 <template>
     <div>
-        <v-text-field v-model="node.visualization.title" label="Title" required></v-text-field>
+        <DebouncedTextInput v-model="node.visualization.title" label="Title" required @change="onTitleChange" />
         <div v-if="node.function.type == ESTIMATE_FUNCTION_TYPE">
             <v-text-field v-model="node.function.comment" label="Comment for Estimate in CSV"></v-text-field>
         </div>

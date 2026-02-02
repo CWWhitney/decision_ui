@@ -3,6 +3,7 @@
     import {
         EMPTY_FUNCTION_TYPE,
         ESTIMATE_FUNCTION_TYPE,
+        generateVariableName,
         getDefaultFunctionState,
         LOOP_FUNCTION_TYPE,
         OPERATION_FUNCTION_TYPE,
@@ -13,13 +14,15 @@
         type Node,
         type NodeFunctionType,
         type OperationNodeFunctionState,
-        type ResultNodeFunctionState
+        type ResultNodeFunctionState,
+        type VariableNodeType
     } from "@decision-support-ui/common";
     import { computed } from "vue";
 
     import FlowLoopNodeFunctionTab from "../components/flow/FlowLoopFunctionTab.vue";
     import FlowEstimateFunctionTab from "@/components/flow/FlowEstimateFunctionTab.vue";
     import FlowOperationFunctionTab from "@/components/flow/FlowOperationFunctionTab.vue";
+    import DebouncedTextInput from "@/components/flow/DebouncedTextInput.vue";
 
     const node = defineModel<Node>({ required: true });
     const graphStore = useFlowGraphStore();
@@ -48,7 +51,12 @@
     <div>
         <template v-if="node.function.type != EMPTY_FUNCTION_TYPE">
             <h4>Variable</h4>
-            <v-text-field v-model="node.function.variable" label="Variable Name" hide-details></v-text-field>
+            <DebouncedTextInput
+                v-model="node.function.variable"
+                label="Variable Name"
+                hide-details
+                :transform="generateVariableName"
+            />
         </template>
         <h4>Type</h4>
         <div>
@@ -63,28 +71,28 @@
         <div v-if="node.function.type == ESTIMATE_FUNCTION_TYPE">
             <FlowEstimateFunctionTab
                 v-model="
-                    node as AbstractNode<EstimateNodeFunctionState, any> //
+                    node as AbstractNode<VariableNodeType, EstimateNodeFunctionState, any> //
                 "
             />
         </div>
         <div v-if="node.function.type == OPERATION_FUNCTION_TYPE">
             <FlowOperationFunctionTab
                 v-model="
-                    node as AbstractNode<OperationNodeFunctionState, any> //
+                    node as AbstractNode<VariableNodeType, OperationNodeFunctionState, any> //
                 "
             />
         </div>
         <div v-if="node.function.type == LOOP_FUNCTION_TYPE">
             <FlowLoopNodeFunctionTab
                 v-model="
-                    node as AbstractNode<LoopNodeFunctionState, any> //
+                    node as AbstractNode<VariableNodeType, LoopNodeFunctionState, any> //
                 "
             />
         </div>
         <div v-if="node.function.type == RESULT_FUNCTION_TYPE">
             <FlowOperationFunctionTab
                 v-model="
-                    node as AbstractNode<ResultNodeFunctionState, any> //
+                    node as AbstractNode<VariableNodeType, ResultNodeFunctionState, any> //
                 "
             />
         </div>

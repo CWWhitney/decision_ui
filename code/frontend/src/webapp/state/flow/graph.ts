@@ -76,7 +76,8 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
     const _nodesByIdMap = computed(() => common.getNodeByIdMap(nodes.value));
     const _childrenByParentIdMap = computed(() => common.getChildrenByParentIdMap(nodes.value));
     const _nodeIdByVariableMap = computed(
-        () => new Map(nodes.value.map(n => [getComputedVariableName(n.id).value, n.id]))
+        () =>
+            new Map(nodes.value.filter(n => n.type == common.VARIABLE_NODE_TYPE).map(n => [n.function.variable, n.id]))
     );
 
     const getComputedNode = computedByKey((nodeId: common.NodeId) => {
@@ -167,10 +168,6 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
             (nodeId: common.NodeId, _childrenByParentIdMap: Map<common.NodeId, common.Node[]>) =>
                 getComputedDescendantNodes(nodeId).value
         )
-    );
-
-    const getComputedVariableName = computedByKey((nodeId: common.NodeId): string =>
-        common.generateVariableName(getComputedNode(nodeId).value.visualization.title)
     );
 
     const getComputedVariableDependencies = computedByKey(
@@ -420,7 +417,6 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         getComputedDeterministicSeriesPlotData,
         getComputedAncestorNodes,
         getComputedDescendantNodes,
-        getComputedVariableName,
         getComputedVariableDependencies,
         addEdgeFromVueFlowConnectionAction,
         removeEdgeAction,
