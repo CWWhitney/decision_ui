@@ -109,9 +109,9 @@
         <div class="options">
             <div class="toggle">
                 <v-btn-toggle v-model="probabilisticSeriesMode" divided border variant="text" color="primary">
-                    <v-btn prepend-icon="mdi-tilde" text="Full" value="full" />
-                    <v-btn prepend-icon="mdi-plus-minus" text="Single Sample" value="sample" />
-                    <v-btn prepend-icon="mdi-repeat" text="Single Time Step" value="timestep" />
+                    <v-btn text="All Data" value="full" />
+                    <v-btn prepend-icon="mdi-scatter-plot" text="Single Sample" value="sample" />
+                    <v-btn prepend-icon="mdi-clock-outline" text="Single Time Step" value="timestep" />
                 </v-btn-toggle>
             </div>
             <v-slider
