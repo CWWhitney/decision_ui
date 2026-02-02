@@ -49,7 +49,7 @@ export const useComputationSettingsStore = defineStore(COMPUTATION_SETTINGS_STOR
 
     const reset = () => {
         mcRuns.value = DEFAULT_MC_RUNS;
-        histogramBins.value = DEFAULT_MC_RUNS;
+        histogramBins.value = DEFAULT_HISTOGRAM_BINS;
     };
 
     return { mcRuns, histogramBins, reset };
