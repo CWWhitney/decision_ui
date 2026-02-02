@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { useEditorSettingsStore } from "@/state/editor/settings";
+    import { useEditorSettingsStore } from "@/state/settings";
     import { BezierEdge, MarkerType, SmoothStepEdge, StraightEdge, type EdgeProps } from "@vue-flow/core";
     import * as common from "@decision-support-ui/common";
 

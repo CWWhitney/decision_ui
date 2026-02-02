@@ -13,7 +13,8 @@ import { defineStore } from "pinia";
 import { useSessionStorage } from "@vueuse/core";
 
 import * as common from "@decision-support-ui/common";
-import { useComputationSettingsStore } from "../computation/settings";
+
+import { useComputationSettingsStore } from "./settings";
 
 export const FLOW_GRAPH_STORE_ID = "flow.graph";
 

@@ -8,11 +8,11 @@
     import FlowNodeEditDialog from "./FlowNodeEditDialog.vue";
     import FlowToolbar from "./FlowToolbar.vue";
 
-    import { useFlowGraphStore } from "@/state/flow/graph";
-    import { useDialogsNodeEditStore } from "@/state/dialogs/nodeEdit";
+    import { useFlowGraphStore } from "@/state/graph";
+    import { useDialogsNodeEditStore } from "@/state/dialogs";
     import { ref, watch } from "vue";
     import FlowShortcuts from "./FlowShortcuts.vue";
-    import { useEditorSettingsStore } from "@/state/editor/settings";
+    import { useEditorSettingsStore } from "@/state/settings";
 
     const graphStore = useFlowGraphStore();
     const editorSettings = useEditorSettingsStore();

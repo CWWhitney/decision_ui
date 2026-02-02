@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import { memory } from "@tensorflow/tfjs";
 
-    import { useFlowGraphStore } from "@/state/flow/graph";
+    import { useFlowGraphStore } from "@/state/graph";
     import { type Node } from "@decision-support-ui/common";
     import { computedAsync } from "@vueuse/core";
     import { computed } from "vue";

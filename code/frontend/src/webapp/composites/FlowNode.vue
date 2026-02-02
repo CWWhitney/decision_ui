@@ -6,8 +6,8 @@
         NODE_EDIT_GENERAL_TAB,
         NODE_EDIT_STYLE_TAB,
         useDialogsNodeEditStore
-    } from "@/state/dialogs/nodeEdit";
-    import { useFlowGraphStore } from "@/state/flow/graph";
+    } from "@/state/dialogs";
+    import { useFlowGraphStore } from "@/state/graph";
 
     import { CUSTOM_STYLE_TYPE, VARIABLE_NODE_TYPE } from "@decision-support-ui/common";
 

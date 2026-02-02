@@ -1,6 +1,5 @@
-import { useComputationSettingsStore } from "./computation/settings";
-import { useEditorSettingsStore } from "./editor/settings";
-import { useFlowGraphStore } from "./flow/graph";
+import { useEditorSettingsStore, useComputationSettingsStore } from "./settings";
+import { useFlowGraphStore } from "./graph";
 import { useMetadataStore } from "./metadata";
 
 export const resetState = () => {

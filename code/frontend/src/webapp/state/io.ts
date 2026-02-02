@@ -7,9 +7,10 @@ import {
     ModelFileSchema,
     validateJson
 } from "@decision-support-ui/common";
-import { useFlowGraphStore } from "./flow/graph";
-import { useEditorSettingsStore } from "./editor/settings";
-import { useComputationSettingsStore } from "./computation/settings";
+
+import { useFlowGraphStore } from "./graph";
+import { useEditorSettingsStore } from "./settings";
+import { useComputationSettingsStore } from "./settings";
 import { useMetadataStore } from "./metadata";
 
 const getGraphState = (): Graph => {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { useFlowGraphStore } from "@/state/flow/graph";
+    import { useFlowGraphStore } from "@/state/graph";
     import {
         EMPTY_FUNCTION_TYPE,
         ESTIMATE_FUNCTION_TYPE,

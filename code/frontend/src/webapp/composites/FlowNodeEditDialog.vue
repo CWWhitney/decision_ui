@@ -6,7 +6,7 @@
         NODE_EDIT_GENERAL_TAB,
         NODE_EDIT_STYLE_TAB,
         useDialogsNodeEditStore
-    } from "@/state/dialogs/nodeEdit";
+    } from "@/state/dialogs";
 
     import FlowNodeEditGeneralTab from "./FlowNodeEditGeneralTab.vue";
     import FlowNodeEditFunctionTab from "./FlowNodeEditFunctionTab.vue";

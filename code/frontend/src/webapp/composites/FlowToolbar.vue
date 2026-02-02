@@ -1,10 +1,10 @@
 <script setup lang="ts">
-    import { useFlowGraphStore } from "@/state/flow/graph";
+    import { useFlowGraphStore } from "@/state/graph";
     import * as common from "@decision-support-ui/common";
     import { useVueFlow, type Rect, type XYPosition } from "@vue-flow/core";
 
     import FlowNodeBox from "../components/flow/FlowNodeBox.vue";
-    import { useEditorSettingsStore } from "@/state/editor/settings";
+    import { useEditorSettingsStore } from "@/state/settings";
 
     const { fitView, screenToFlowCoordinate, getIntersectingNodes, zoomTo, removeSelectedNodes, getSelectedNodes } =
         useVueFlow("editor");

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-    import { useFlowGraphStore } from "@/state/flow/graph";
+    import { useFlowGraphStore } from "@/state/graph";
     import { type Node } from "@decision-support-ui/common";
     import FlowVisualizeTypedTensor from "@/components/flow/FlowVisualizeTypedTensor.vue";
-    import { useComputationSettingsStore } from "@/state/computation/settings";
+    import { useComputationSettingsStore } from "@/state/settings";
 
     const node = defineModel<Node>({ required: true });
     const graphStore = useFlowGraphStore();
