@@ -25,7 +25,7 @@
             </div>
             <div class="menu">
                 <div>
-                    <v-btn to="/user/workspace/help/getting-started" class="menuButton">
+                    <v-btn to="/help/getting-started" class="menuButton">
                         <template #prepend>
                             <v-icon size="32px"> mdi-school-outline </v-icon>
                         </template>
@@ -49,7 +49,7 @@
                     </v-btn>
                 </div>
                 <div>
-                    <v-btn to="/user/workspace/flow" class="menuButton">
+                    <v-btn :to="{ name: 'editor' }" class="menuButton">
                         <template #prepend>
                             <v-icon size="32px"> mdi-graph mdi-rotate-90 </v-icon>
                         </template>

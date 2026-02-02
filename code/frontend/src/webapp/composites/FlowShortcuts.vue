@@ -1,0 +1,35 @@
+<script setup lang="ts">
+    import { useVueFlow } from "@vue-flow/core";
+    import { onMounted, onUnmounted } from "vue";
+
+    const { addSelectedNodes, getNodes, removeSelectedElements } = useVueFlow("editor");
+    const props = defineProps<{ focused: boolean }>();
+
+    const selectAllNodes = () => {
+        addSelectedNodes(getNodes.value);
+    };
+
+    const onKeyDown = (e: KeyboardEvent) => {
+        if (!props.focused) {
+            return;
+        }
+
+        // select all (ctrl + a)
+        if ((e.ctrlKey || e.metaKey) && e.key === "a") {
+            e.preventDefault();
+            selectAllNodes();
+        }
+
+        if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === "a") {
+            e.preventDefault();
+            removeSelectedElements();
+        }
+    };
+
+    onMounted(() => document.addEventListener("keydown", onKeyDown));
+    onUnmounted(() => document.removeEventListener("keydown", onKeyDown));
+</script>
+
+<template>
+    <div v-if="false" />
+</template>

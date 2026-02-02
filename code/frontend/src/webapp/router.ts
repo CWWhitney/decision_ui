@@ -1,80 +1,53 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 
-import FlowPage from "./composites/FlowPage.vue";
-import NodeEditor from "./components/NodeEditor.vue";
+import FlowPage from "./pages/ModelPage.vue";
 import ResultsDashboard from "./components/ResultsDashboard.vue";
 import EstimatesDashboard from "./components/EstimatesDashboard.vue";
 import CodeDashboard from "./components/CodeDashboard.vue";
-import UserArea from "./components/UserArea.vue";
 import LoginForm from "./components/LoginForm.vue";
 import RegistrationForm from "./components/RegistrationForm.vue";
-import Workspace from "./components/WorkspaceView.vue";
-import FileView from "./components/FileView.vue";
 import SettingsDashboard from "./components/SettingsDashboard.vue";
-import HelpDashboard from "./components/HelpDashboard.vue";
-import WelcomePage from "./components/WelcomePage.vue";
+import HelpPage from "./pages/HelpPage.vue";
+import WelcomePage from "./pages/WelcomePage.vue";
 
 const routes = [
     {
-        path: "/user/",
-        component: UserArea,
-        children: [
-            {
-                path: "workspace",
-                component: Workspace,
-                children: [
-                    {
-                        path: "",
-                        redirect: "/user/workspace/modeling"
-                    },
-                    {
-                        path: "flow",
-                        component: FlowPage
-                    },
-                    {
-                        path: "modeling",
-                        component: NodeEditor
-                    },
-                    {
-                        path: "estimates",
-                        component: EstimatesDashboard
-                    },
-                    {
-                        path: "results",
-                        component: ResultsDashboard
-                    },
-                    {
-                        path: "code",
-                        component: CodeDashboard
-                    },
-                    {
-                        path: "help/:path*",
-                        component: HelpDashboard
-                    },
-                    {
-                        path: "settings",
-                        component: SettingsDashboard
-                    }
-                ]
-            },
-            {
-                path: "files",
-                component: FileView
-            }
-        ]
+        path: "/",
+        component: WelcomePage
     },
-
     {
-        path: "/login/",
+        path: "/editor",
+        name: "editor",
+        component: FlowPage
+    },
+    {
+        path: "/estimates",
+        component: EstimatesDashboard
+    },
+    {
+        path: "/results",
+        component: ResultsDashboard
+    },
+    {
+        path: "/code",
+        component: CodeDashboard
+    },
+    {
+        path: "/help/:path*",
+        name: "help",
+        component: HelpPage
+    },
+    {
+        path: "/settings",
+        component: SettingsDashboard
+    },
+    {
+        path: "/login",
         component: LoginForm
     },
     {
-        path: "/register/",
+        path: "/register",
         component: RegistrationForm
-    },
-    {
-        path: "/",
-        component: WelcomePage
     }
 ];
 

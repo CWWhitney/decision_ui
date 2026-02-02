@@ -32,15 +32,8 @@
 
     import FlowNodeBox from "../components/flow/FlowNodeBox.vue";
 
-    const {
-        fitView,
-        screenToFlowCoordinate,
-        getIntersectingNodes,
-        zoomTo,
-        removeSelectedNodes,
-        getSelectedNodes,
-        setInteractive
-    } = useVueFlow();
+    const { fitView, screenToFlowCoordinate, getIntersectingNodes, zoomTo, removeSelectedNodes, getSelectedNodes } =
+        useVueFlow("editor");
 
     const optionsStore = useFlowOptionsStore();
     const graphStore = useFlowGraphStore();
@@ -150,17 +143,6 @@
         graphStore.addNewNodeAction(title, nodeType, functionType, styleType);
     };
 
-    const onLockGraphClick = () => {
-        if (optionsStore.locked) {
-            setInteractive(true);
-            optionsStore.setLocked(false);
-        } else {
-            removeSelectedNodes(getSelectedNodes.value);
-            setInteractive(false);
-            optionsStore.setLocked(true);
-        }
-    };
-
     const download = () => {
         const text = JSON.stringify({ nodes: graphStore.nodes, edges: graphStore.edges }, null, 2);
         const blob = new Blob([text], { type: "application/json" });
@@ -217,7 +199,7 @@
                         :icon="optionsStore.locked ? 'mdi-lock-outline' : 'mdi-lock-open-variant-outline'"
                         variant="outlined"
                         size="small"
-                        @click="onLockGraphClick"
+                        @click="optionsStore.toggleLocked"
                     ></v-btn>
                 </template>
             </v-tooltip>
