@@ -1,0 +1,86 @@
+import { Schema } from "jsonschema";
+
+import { Position, PositionSchema, Size, SizeSchema } from "../../draw";
+import {
+    EmptyNodeFunctionSchema,
+    EmptyNodeFunctionState,
+    NodeFunctionState,
+    NodeVariableFunctionSchema,
+    VariableNodeFunctionState
+} from "./function";
+import { CollectionNodeStyleState, NodeStyleSchema, NodeStyleState, VariableNodeStyleState } from "./style";
+import {
+    AVAILABLE_NODE_TYPES,
+    COLLECTION_NODE_TYPE,
+    CollectionNodeType,
+    VARIABLE_NODE_TYPE,
+    VariableNodeType
+} from "./type";
+
+export type NodeId = string;
+
+export interface AbstractNode<T, F extends NodeFunctionState, S extends NodeStyleState> {
+    id: NodeId;
+    type: T;
+    parentNodeId: NodeId | null;
+
+    function: F;
+
+    visualization: {
+        title: string;
+        position: Position;
+        size: Size;
+        style: S;
+    };
+}
+
+export type VariableNode = AbstractNode<VariableNodeType, VariableNodeFunctionState, VariableNodeStyleState>;
+export type CollectionNode = AbstractNode<CollectionNodeType, EmptyNodeFunctionState, CollectionNodeStyleState>;
+
+export type Node = VariableNode | CollectionNode;
+
+export const NodeVisualizationSchema: Schema = {
+    type: "object",
+    properties: {
+        title: { type: "string" },
+        position: PositionSchema,
+        size: SizeSchema,
+        style: NodeStyleSchema
+    },
+    required: ["title", "position", "size", "style"]
+};
+
+export const NodeSchema: Schema = {
+    type: "object",
+    properties: {
+        id: { type: "string" },
+        type: { enum: AVAILABLE_NODE_TYPES },
+        parentNodeId: { type: ["string", "null"] },
+        visualization: NodeVisualizationSchema
+    },
+    required: ["id", "type", "parentNodeId", "visualization"],
+    allOf: [
+        {
+            if: {
+                properties: { type: { const: VARIABLE_NODE_TYPE } }
+            },
+            then: {
+                properties: {
+                    function: NodeVariableFunctionSchema
+                },
+                required: ["function"]
+            }
+        },
+        {
+            if: {
+                properties: { type: { const: COLLECTION_NODE_TYPE } }
+            },
+            then: {
+                properties: {
+                    function: EmptyNodeFunctionSchema
+                },
+                required: ["function"]
+            }
+        }
+    ]
+};

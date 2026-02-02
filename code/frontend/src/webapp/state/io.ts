@@ -1,4 +1,12 @@
-import type { ComputationSettings, EditorSettings, ModelFile, Graph, ModelMetadata } from "@decision-support-ui/common";
+import {
+    type ComputationSettings,
+    type EditorSettings,
+    type ModelFile,
+    type Graph,
+    type ModelMetadata,
+    ModelFileSchema,
+    validateJson
+} from "@decision-support-ui/common";
 import { useFlowGraphStore } from "./flow/graph";
 import { useEditorSettingsStore } from "./editor/settings";
 import { useComputationSettingsStore } from "./computation/settings";
@@ -81,7 +89,12 @@ export const downloadModelFile = () => {
 export const uploadModelFile = async () => {
     const text = await uploadFile();
     const state = JSON.parse(text) as ModelFile;
-    loadModelFileToState(state);
+    const validationErrors = validateJson(state, ModelFileSchema);
+    if (!validationErrors) {
+        loadModelFileToState(state);
+    } else {
+        console.error("validation errors", validationErrors);
+    }
 };
 
 export const downloadJson = (json: object, filename: string) => {

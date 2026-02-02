@@ -13,3 +13,10 @@ export type DistributionFunctionType =
     | NormalDistributionType
     | PosnormDistributionType
     | TNorm01DistributionType;
+
+export const DISTRIBUTION_TYPES = [
+    DETERMINISTIC_DISTRIBUTION_TYPE,
+    NORMAL_DISTRIBUTION_TYPE,
+    POSNORM_DISTRIBUTION_TYPE,
+    TNORM01_DISTRIBUTION_TYPE
+];

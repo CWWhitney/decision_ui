@@ -1,3 +1,4 @@
+import { Schema } from "jsonschema";
 import { Node, NodeId } from "./node";
 
 export type EdgeId = string;
@@ -7,6 +8,16 @@ export interface Edge {
     source: NodeId;
     target: NodeId;
 }
+
+export const EdgeSchema: Schema = {
+    type: "object",
+    properties: {
+        id: { type: "string" },
+        source: { type: "string" },
+        target: { type: "string" }
+    },
+    required: ["id", "source", "target"]
+};
 
 export const getEdgeIdForNodes = (source: NodeId, target: NodeId): EdgeId => {
     return `${source}-${target}`;
