@@ -39,7 +39,7 @@
             <div>Filename.json</div>
             <div>
                 <v-btn-group divided>
-                    <v-btn prepend-icon="mdi-help-circle-outline" text="Help"></v-btn>
+                    <v-btn prepend-icon="mdi-help-circle-outline" :to="{ name: 'help' }" text="Help"></v-btn>
                     <v-btn prepend-icon="mdi-account-circle" text="Account"></v-btn>
                 </v-btn-group>
             </div>

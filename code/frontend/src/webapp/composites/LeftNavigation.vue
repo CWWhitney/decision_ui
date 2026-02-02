@@ -53,18 +53,6 @@
             </v-list>
             <template #append>
                 <v-list density="compact" nav>
-                    <v-tooltip location="right" text="open Help page" open-delay="500">
-                        <template #activator="{ props }">
-                            <v-list-item
-                                v-bind="props"
-                                :to="{ name: 'help' }"
-                                title="Help"
-                                prepend-icon="mdi-help-circle-outline"
-                            />
-                        </template>
-                    </v-tooltip>
-                </v-list>
-                <v-list density="compact" nav>
                     <v-tooltip
                         location="right"
                         :text="expanded ? 'collapse Navigation Menu' : 'expand Navigation Menu'"

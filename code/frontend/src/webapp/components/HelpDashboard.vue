@@ -66,10 +66,11 @@
 
     const markdown = computedAsync(async () => {
         if (route.name != "help") {
-            return;
+            return `route not correct (maybe path parameter is missing?)`;
         }
+
         const path = Array.isArray(route.params.path) ? route.params.path.join("/") : route.params.path;
-        const readme_url = `./static/documentation/${path}/README.md`.replace(/\/\//g, "/");
+        const readme_url = `./static/documentation/${path ?? ""}/README.md`.replace(/\/\//g, "/");
 
         const md = markdownit();
 
@@ -89,6 +90,7 @@
         });
 
         try {
+            console.log(`loading markdown from ${readme_url}`);
             return md.render(await fetchMarkdownSource(readme_url));
         } catch (err) {
             console.error(err);

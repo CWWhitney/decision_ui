@@ -33,6 +33,11 @@ const routes = [
         component: CodeDashboard
     },
     {
+        path: "/help",
+        name: "help",
+        component: HelpPage
+    },
+    {
         path: "/help/:path*",
         name: "help",
         component: HelpPage
