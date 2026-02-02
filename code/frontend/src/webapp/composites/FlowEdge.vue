@@ -48,7 +48,7 @@
         .vue-flow__edge-path {
             stroke-width: 1.5px;
             stroke-linecap: round;
-            stroke: #333;
+            stroke: #777;
         }
     }
 </style>
