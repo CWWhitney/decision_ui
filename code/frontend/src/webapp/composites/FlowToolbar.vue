@@ -169,6 +169,22 @@
                 </template>
             </v-tooltip>
 
+            <v-tooltip
+                location="bottom"
+                :text="editorSettings.snapToGrid ? 'snap to grid' : 'free movement'"
+                open-delay="500"
+            >
+                <template #activator="{ props }">
+                    <v-btn
+                        v-bind="props"
+                        :icon="editorSettings.snapToGrid ? 'mdi-grid' : 'mdi-cursor-move'"
+                        variant="outlined"
+                        size="small"
+                        @click="editorSettings.toggleSnapToGrid"
+                    ></v-btn>
+                </template>
+            </v-tooltip>
+
             <v-tooltip location="bottom" :text="editorSettings.locked ? 'unlock graph' : 'lock graph'" open-delay="500">
                 <template #activator="{ props }">
                     <v-btn

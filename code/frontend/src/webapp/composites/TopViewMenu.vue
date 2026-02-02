@@ -20,6 +20,10 @@
                 :title="editorSettings.locked ? 'Unlock Graph' : 'Lock Graph'"
                 @click="editorSettings.toggleLocked"
             />
+            <TopMenuItem
+                :title="editorSettings.snapToGrid ? 'Switch to Free Movement' : 'Switch to Snap to Grid'"
+                @click="editorSettings.toggleSnapToGrid"
+            />
             <v-divider />
             <TopMenuItem title="Change Edge Style" @click="editorSettings.switchEdgeStyle" />
             <TopMenuItem title="Change Background" @click="editorSettings.switchBackground" />

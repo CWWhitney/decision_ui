@@ -24,6 +24,14 @@ export const useEditorSettingsStore = defineStore(EDITOR_SETTINGS_STORE_ID, () =
         background.value = common.AVAILABLE_EDITOR_BACKGROUNDS[nextIdx] ?? common.DOTS_EDITOR_BACKGROUND;
     };
 
+    const toggleLocked = () => {
+        locked.value = !locked.value;
+    };
+
+    const toggleSnapToGrid = () => {
+        snapToGrid.value = !snapToGrid.value;
+    };
+
     const reset = () => {
         locked.value = false;
         snapToGrid.value = true;
@@ -31,11 +39,17 @@ export const useEditorSettingsStore = defineStore(EDITOR_SETTINGS_STORE_ID, () =
         background.value = common.DOTS_EDITOR_BACKGROUND;
     };
 
-    const toggleLocked = () => {
-        locked.value = !locked.value;
+    return {
+        locked,
+        snapToGrid,
+        edgeStyle,
+        background,
+        toggleLocked,
+        toggleSnapToGrid,
+        switchEdgeStyle,
+        switchBackground,
+        reset
     };
-
-    return { locked, snapToGrid, edgeStyle, background, toggleLocked, switchEdgeStyle, switchBackground, reset };
 });
 
 export const COMPUTATION_SETTINGS_STORE_ID = "settings.computation";

@@ -18,8 +18,8 @@
     import { computed } from "vue";
 
     const { getSelectedNodes, removeNodes } = useVueFlow();
-    const nodeEditStore = useDialogsNodeEditStore();
-    const graphStore = useFlowGraphStore();
+    const nodeEditDialog = useDialogsNodeEditStore();
+    const graph = useFlowGraphStore();
 
     defineEmits<{
         (e: "updateNodeInternals"): void;
@@ -27,14 +27,29 @@
 
     const flowNodeProps = defineProps<NodeProps>();
 
-    const node = computed(() => graphStore.getComputedNode(flowNodeProps.id).value);
+    const node = computed(() => graph.getComputedNode(flowNodeProps.id).value);
     const showToolbar = computed(
         () => getSelectedNodes.value.length == 1 && getSelectedNodes.value[0]?.id == flowNodeProps.id
     );
+
+    const onResizeStart = () => {
+        graph.history.pause();
+    };
+
+    const onResizeEnd = () => {
+        graph.history.resume();
+        graph.history.commit();
+    };
 </script>
 
 <template>
-    <NodeResizer :min-width="150" :min-height="50" :is-visible="flowNodeProps.selected" />
+    <NodeResizer
+        :min-width="150"
+        :min-height="50"
+        :is-visible="flowNodeProps.selected"
+        @resize-start="onResizeStart"
+        @resize-end="onResizeEnd"
+    />
 
     <NodeToolbar :is-visible="showToolbar" :position="Position.Top" class="nodrag nopan">
         <v-btn-group divided>
@@ -43,7 +58,7 @@
                     <v-btn
                         v-bind="props"
                         icon="mdi-information-outline"
-                        @click="nodeEditStore.openDialog(flowNodeProps.id, NODE_EDIT_GENERAL_TAB)"
+                        @click="nodeEditDialog.openDialog(flowNodeProps.id, NODE_EDIT_GENERAL_TAB)"
                     ></v-btn>
                 </template>
             </v-tooltip>
@@ -57,7 +72,7 @@
                     <v-btn
                         v-bind="props"
                         icon="mdi-function"
-                        @click="nodeEditStore.openDialog(flowNodeProps.id, NODE_EDIT_FUNCTION_TAB)"
+                        @click="nodeEditDialog.openDialog(flowNodeProps.id, NODE_EDIT_FUNCTION_TAB)"
                     ></v-btn>
                 </template>
             </v-tooltip>
@@ -71,7 +86,7 @@
                     <v-btn
                         v-bind="props"
                         icon="mdi-chart-histogram"
-                        @click="nodeEditStore.openDialog(flowNodeProps.id, NODE_EDIT_DATA_TAB)"
+                        @click="nodeEditDialog.openDialog(flowNodeProps.id, NODE_EDIT_DATA_TAB)"
                     ></v-btn>
                 </template>
             </v-tooltip>
@@ -80,7 +95,7 @@
                     <v-btn
                         v-bind="props"
                         icon="mdi-palette-outline"
-                        @click="nodeEditStore.openDialog(flowNodeProps.id, NODE_EDIT_STYLE_TAB)"
+                        @click="nodeEditDialog.openDialog(flowNodeProps.id, NODE_EDIT_STYLE_TAB)"
                     ></v-btn>
                 </template>
             </v-tooltip>

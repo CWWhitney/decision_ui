@@ -109,7 +109,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
                 node =>
                     ({
                         id: node.id,
-                        position: node.visualization.position,
+                        position: { ...node.visualization.position },
                         type: "custom",
                         class:
                             `${node.type}-type ` +
@@ -380,7 +380,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
     const updateNodeSizeAction = (nodeId: common.NodeId, size: common.Size) => {
         const node = getComputedNode(nodeId).value;
         if (node.visualization.size.width != size.width || node.visualization.size.height != size.height) {
-            node.visualization.size = size;
+            node.visualization.size = { ...size };
         }
     };
 
