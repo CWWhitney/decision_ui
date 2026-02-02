@@ -3,7 +3,7 @@ import { ref } from "vue";
 
 import * as common from "@decision-support-ui/common";
 
-export const EDITOR_SETTINGS_STORE_ID = "flow.options";
+export const EDITOR_SETTINGS_STORE_ID = "settings.editor";
 
 export const useEditorSettingsStore = defineStore(EDITOR_SETTINGS_STORE_ID, () => {
     const locked = ref(false);

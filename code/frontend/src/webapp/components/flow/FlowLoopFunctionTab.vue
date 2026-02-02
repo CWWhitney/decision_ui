@@ -3,16 +3,17 @@
      * Functions Tab of the Node Edit Dialog for Nodes with Loop Function Type
      */
     import { debounce } from "@/common/throttle";
-    import { type LoopNodeFunctionState, type AbstractNode } from "@decision-support-ui/common";
+    import { type LoopNodeFunctionState, type AbstractNode, type VariableNodeType } from "@decision-support-ui/common";
     import { computed, ref, watch } from "vue";
 
     import FlowExpressionInput from "./FlowExpressionInput.vue";
+    import { USER_INPUT_DEBOUNCE_TIME } from "@/common/constants";
 
-    const node = defineModel<AbstractNode<LoopNodeFunctionState, any>>({ required: true });
+    const node = defineModel<AbstractNode<VariableNodeType, LoopNodeFunctionState, any>>({ required: true });
     const props = defineProps({
         debounceTime: {
             type: Number,
-            default: 300,
+            default: USER_INPUT_DEBOUNCE_TIME,
             required: false
         }
     });
@@ -27,7 +28,9 @@
     watch(
         iterationsInputValue,
         debounce((value: number) => {
-            node.value.function.iterations = value;
+            if (node.value.function.iterations != value) {
+                node.value.function.iterations = value;
+            }
         }, props.debounceTime)
     );
 </script>

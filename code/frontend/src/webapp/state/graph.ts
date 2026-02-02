@@ -1,4 +1,4 @@
-import { computed, toRefs, type ComputedRef } from "vue";
+import { computed, type ComputedRef } from "vue";
 
 import {
     type Node as VueFlowNode,
@@ -10,13 +10,13 @@ import {
 
 import { getHandlePositions } from "@/common/layout";
 import { defineStore } from "pinia";
-import { useSessionStorage } from "@vueuse/core";
+import { useRefHistory, useSessionStorage } from "@vueuse/core";
 
 import * as common from "@decision-support-ui/common";
 
 import { useComputationSettingsStore } from "./settings";
 
-export const FLOW_GRAPH_STORE_ID = "flow.graph";
+export const FLOW_GRAPH_STORE_ID = "graph";
 
 const computedByKey = <K, T>(get: (key: K, previous: T | undefined) => T) => {
     const cache = new Map<K, ComputedRef<T>>();
@@ -63,7 +63,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         edges: [] as common.Edge[]
     });
 
-    const { nodes, edges } = toRefs(state.value);
+    const history = useRefHistory(state, { deep: true, capacity: 50 });
 
     // --- computed state
 
@@ -74,11 +74,13 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
             }) as common.ComputationContext
     );
 
-    const _nodesByIdMap = computed(() => common.getNodeByIdMap(nodes.value));
-    const _childrenByParentIdMap = computed(() => common.getChildrenByParentIdMap(nodes.value));
+    const _nodesByIdMap = computed(() => common.getNodeByIdMap(state.value.nodes));
+    const _childrenByParentIdMap = computed(() => common.getChildrenByParentIdMap(state.value.nodes));
     const _nodeIdByVariableMap = computed(
         () =>
-            new Map(nodes.value.filter(n => n.type == common.VARIABLE_NODE_TYPE).map(n => [n.function.variable, n.id]))
+            new Map(
+                state.value.nodes.filter(n => n.type == common.VARIABLE_NODE_TYPE).map(n => [n.function.variable, n.id])
+            )
     );
 
     const getComputedNode = computedByKey((nodeId: common.NodeId) => {
@@ -103,7 +105,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
 
     const getComputedVueFlowNodes = () =>
         computed(() => {
-            return nodes.value.map(
+            return state.value.nodes.map(
                 node =>
                     ({
                         id: node.id,
@@ -132,7 +134,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
     const getComputedVueFlowEdges = () =>
         computed(() => {
             const computationEdges = common.getComputationEdges(
-                nodes.value,
+                state.value.nodes,
                 (nodeId: string) => {
                     const dependencies = getComputedVariableDependencies(nodeId).value;
                     return dependencies.type == "success" ? dependencies.value : [];
@@ -145,7 +147,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
                 ...computationEdges.map(edge =>
                     getVueFlowEdge(edge, (nodeId: string) => getComputedNodePosition(nodeId).value)
                 ),
-                ...common.filterManualEdgesByComputationEdges(edges.value, computationEdges).map(edge =>
+                ...common.filterManualEdgesByComputationEdges(state.value.edges, computationEdges).map(edge =>
                     getVueFlowEdge(edge, (nodeId: string) => getComputedNodePosition(nodeId).value, {
                         strokeDasharray: 5
                     })
@@ -356,8 +358,8 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
 
     const addEdgeFromVueFlowConnectionAction = (connection: VueFlowConnection) => {
         const edgeId = common.getEdgeIdForNodes(connection.source, connection.target);
-        edges.value = edges.value.filter(e => e.id != edgeId);
-        edges.value.push({
+        state.value.edges = state.value.edges.filter(e => e.id != edgeId);
+        state.value.edges.push({
             id: edgeId,
             source: connection.source,
             target: connection.target
@@ -365,17 +367,21 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
     };
 
     const removeEdgeAction = (edge_id: string) => {
-        edges.value = edges.value.filter(e => e.id != edge_id);
+        state.value.edges = state.value.edges.filter(e => e.id != edge_id);
     };
 
     const updateNodePositionAction = (nodeId: common.NodeId, position: common.Position) => {
         const node = getComputedNode(nodeId).value;
-        node.visualization.position = position;
+        if (node.visualization.position.x != position.x || node.visualization.position.y != position.y) {
+            node.visualization.position = position;
+        }
     };
 
     const updateNodeSizeAction = (nodeId: common.NodeId, size: common.Size) => {
         const node = getComputedNode(nodeId).value;
-        node.visualization.size = size;
+        if (node.visualization.size.width != size.width || node.visualization.size.height != size.height) {
+            node.visualization.size = size;
+        }
     };
 
     const addNewNodeAction = (
@@ -384,30 +390,35 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         functionType: common.NodeFunctionType,
         styleType: common.NodeStyleType,
         options?: common.NewNodeOptions
-    ): common.NodeId => {
-        const newNode = common.getNewNode(title, nodeType, functionType, styleType, nodes.value, options);
-        nodes.value.push(newNode);
-        return newNode.id;
+    ) => {
+        const newNode = common.getNewNode(title, nodeType, functionType, styleType, state.value.nodes, options);
+        state.value.nodes = [...state.value.nodes, newNode];
     };
 
     const removeNodeAction = (nodeId: common.NodeId) => {
         const node = getComputedNode(nodeId).value;
         const removeNodeIds = [nodeId, ...getComputedDescendantNodes(node.id).value.map(n => n.id)];
-        const removeEdgeIds = edges.value
+        const removeEdgeIds = state.value.edges
             .filter(e => removeNodeIds.includes(e.source) || removeNodeIds.includes(e.target))
             .map(e => e.id);
-        nodes.value = nodes.value.filter(n => !removeNodeIds.includes(n.id));
-        edges.value = edges.value.filter(e => !removeEdgeIds.includes(e.id));
+
+        state.value.nodes = state.value.nodes.filter(n => !removeNodeIds.includes(n.id));
+        state.value.edges = state.value.edges.filter(e => !removeEdgeIds.includes(e.id));
     };
 
     const reset = () => {
-        nodes.value = [];
-        edges.value = [];
+        console.log("clear history");
+        state.value = {
+            nodes: [],
+            edges: []
+        };
+        history.commit();
+        history.clear();
     };
 
     return {
-        nodes,
-        edges,
+        state,
+        history,
         getComputedVueFlowNodes,
         getComputedVueFlowEdges,
         getComputedNode,

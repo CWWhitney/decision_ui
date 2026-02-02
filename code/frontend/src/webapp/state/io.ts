@@ -17,8 +17,8 @@ const getGraphState = (): Graph => {
     const graph = useFlowGraphStore();
 
     return {
-        nodes: graph.nodes,
-        edges: graph.edges
+        nodes: graph.state.nodes,
+        edges: graph.state.edges
     };
 };
 
@@ -68,16 +68,19 @@ export const getModelFileFromState = (): ModelFile => {
     };
 };
 
-export const loadModelFileToState = (state: ModelFile): void => {
+export const loadModelFileToState = (file: ModelFile): void => {
     const graph = useFlowGraphStore();
     const editorSettings = useEditorSettingsStore();
     const computationSettings = useComputationSettingsStore();
     const metadata = useMetadataStore();
 
-    graph.$patch(state.graph);
-    editorSettings.$patch(state.settings.editor);
-    computationSettings.$patch(state.settings.computation);
-    metadata.$patch(state.metadata);
+    graph.$patch({ state: file.graph });
+    graph.history.commit();
+    graph.history.clear();
+
+    editorSettings.$patch(file.settings.editor);
+    computationSettings.$patch(file.settings.computation);
+    metadata.$patch(file.metadata);
 };
 
 export const downloadModelFile = () => {

@@ -2,6 +2,7 @@
     /**
      * Functions Tab of the Node Edit Dialog for Nodes with Operation or Result Function Type
      */
+    import { USER_INPUT_DEBOUNCE_TIME } from "@/common/constants";
     import { debounce } from "@/common/throttle";
     import { getExpressionError } from "@decision-support-ui/common";
     import { computed, ref, watch } from "vue";
@@ -10,7 +11,7 @@
         required: true
     });
     const props = withDefaults(defineProps<{ debounceTime?: number; label?: string }>(), {
-        debounceTime: 300,
+        debounceTime: USER_INPUT_DEBOUNCE_TIME,
         label: "Expression or Formula"
     });
 
@@ -23,7 +24,9 @@
     watch(
         expressionInputValue,
         debounce((value: string) => {
-            expression.value = value;
+            if (expression.value != value) {
+                expression.value = value;
+            }
         }, props.debounceTime)
     );
 

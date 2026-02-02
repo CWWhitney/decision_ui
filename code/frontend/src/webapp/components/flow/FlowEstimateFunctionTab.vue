@@ -2,20 +2,22 @@
     /**
      * Functions Tab of the Node Edit Dialog for Nodes with Loop Function Type
      */
+    import { USER_INPUT_DEBOUNCE_TIME } from "@/common/constants";
     import { debounce } from "@/common/throttle";
     import { AVAILABLE_DISTRIBUTIONS } from "@/editor/distributions";
     import {
         type AbstractNode,
         type EstimateNodeFunctionState,
+        type VariableNodeType,
         DETERMINISTIC_DISTRIBUTION_TYPE
     } from "@decision-support-ui/common";
     import { computed, ref, watch } from "vue";
 
-    const node = defineModel<AbstractNode<EstimateNodeFunctionState, any>>({ required: true });
+    const node = defineModel<AbstractNode<VariableNodeType, EstimateNodeFunctionState, any>>({ required: true });
     const props = defineProps({
         debounceTime: {
             type: Number,
-            default: 300,
+            default: USER_INPUT_DEBOUNCE_TIME,
             required: false
         }
     });
@@ -37,9 +39,11 @@
     watch(
         lowerInputValue,
         debounce((value: number) => {
-            node.value.function.lower = value;
-            if (node.value.function.distribution == DETERMINISTIC_DISTRIBUTION_TYPE) {
-                node.value.function.upper = value;
+            if (node.value.function.lower != value) {
+                node.value.function.lower = value;
+                if (node.value.function.distribution == DETERMINISTIC_DISTRIBUTION_TYPE) {
+                    node.value.function.upper = value;
+                }
             }
         }, props.debounceTime)
     );
@@ -47,7 +51,9 @@
     watch(
         upperInputValue,
         debounce((value: number) => {
-            node.value.function.upper = value;
+            if (node.value.function.upper != value) {
+                node.value.function.upper = value;
+            }
         }, props.debounceTime)
     );
 </script>

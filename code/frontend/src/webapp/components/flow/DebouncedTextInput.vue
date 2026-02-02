@@ -2,6 +2,7 @@
     /**
      * Functions Tab of the Node Edit Dialog for Nodes with Operation or Result Function Type
      */
+    import { USER_INPUT_DEBOUNCE_TIME } from "@/common/constants";
     import { debounce } from "@/common/throttle";
     import { ref, watch } from "vue";
 
@@ -9,7 +10,7 @@
         required: true
     });
     const props = withDefaults(defineProps<{ debounceTime?: number; transform?: (text: string) => string }>(), {
-        debounceTime: 300,
+        debounceTime: USER_INPUT_DEBOUNCE_TIME,
         transform: (text: string) => text
     });
     const emits = defineEmits<{
@@ -24,12 +25,16 @@
 
     watch(
         inputValue,
-        debounce((v: string) => {
+        debounce((nextText: string) => {
             const previousText = model.value;
-            const newText = props.transform(v);
-            model.value = newText;
-            inputValue.value = newText;
-            emits("change", newText, previousText);
+            nextText = props.transform(nextText);
+            if (previousText != nextText) {
+                model.value = nextText;
+                emits("change", nextText, previousText);
+            }
+            if (inputValue.value != nextText) {
+                inputValue.value = nextText;
+            }
         }, props.debounceTime)
     );
 </script>

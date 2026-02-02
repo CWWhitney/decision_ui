@@ -122,12 +122,26 @@
         <div class="options">
             <v-tooltip location="bottom" text="undo" open-delay="500">
                 <template #activator="{ props }">
-                    <v-btn v-bind="props" icon="mdi-undo" variant="outlined" size="small" disabled></v-btn>
+                    <v-btn
+                        v-bind="props"
+                        icon="mdi-undo"
+                        variant="outlined"
+                        size="small"
+                        :disabled="!graphStore.history.canUndo"
+                        @click="graphStore.history.undo"
+                    ></v-btn>
                 </template>
             </v-tooltip>
             <v-tooltip location="bottom" text="redo" open-delay="500">
                 <template #activator="{ props }">
-                    <v-btn v-bind="props" icon="mdi-redo" variant="outlined" size="small" disabled></v-btn>
+                    <v-btn
+                        v-bind="props"
+                        icon="mdi-redo"
+                        variant="outlined"
+                        size="small"
+                        :disabled="!graphStore.history.canRedo"
+                        @click="graphStore.history.redo"
+                    ></v-btn>
                 </template>
             </v-tooltip>
 

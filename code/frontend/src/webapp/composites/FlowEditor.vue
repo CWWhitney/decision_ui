@@ -27,8 +27,20 @@
         applyEdgeChanges,
         setInteractive,
         removeSelectedNodes,
-        getSelectedNodes
+        getSelectedNodes,
+        onNodeDragStart,
+        onNodeDragStop
     } = useVueFlow("editor");
+
+    // disable history while moving
+    onNodeDragStart(() => {
+        graphStore.history.pause();
+    });
+
+    onNodeDragStop(() => {
+        graphStore.history.resume();
+        graphStore.history.commit();
+    });
 
     // edge events
     onEdgesChange(changes => {
