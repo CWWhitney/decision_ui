@@ -5,8 +5,8 @@
 
     import clean_model_json from "../helper/clean_model_json";
 
-    import { useModelStore, type DecisionSupportResult, type EVPIResult } from "../state/model";
-    import { useUserStore } from "../state/user";
+    import { useModelStore, type DecisionSupportResult, type EVPIResult } from "../state/old/model";
+    import { useUserStore } from "../state/old/user";
 
     import { doRunModel, type ExecutionError } from "../backend/models";
 

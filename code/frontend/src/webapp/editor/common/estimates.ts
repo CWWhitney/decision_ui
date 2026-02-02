@@ -4,7 +4,7 @@ import { parse } from "csv-parse";
 import { ESTIMATE_NODE_TYPE } from "./types";
 import { generateVariableName } from "@decision-support-ui/common/src/compute/variables";
 import { DETERMINISTIC_DISTRIBUTION } from "../distributions";
-import type { EstimatesTableRow } from "../../state/model";
+import type { EstimatesTableRow } from "../../state/old/model";
 
 type EstimatesTableRowKeys = keyof EstimatesTableRow;
 
