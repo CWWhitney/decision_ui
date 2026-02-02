@@ -2,7 +2,8 @@
     import { useVueFlow } from "@vue-flow/core";
     import { onMounted, onUnmounted } from "vue";
 
-    const { addSelectedNodes, getNodes, removeSelectedElements } = useVueFlow("editor");
+    const { addSelectedNodes, getNodes, removeSelectedElements, zoomIn, zoomOut, zoomTo, fitView } =
+        useVueFlow("editor");
     const props = defineProps<{ focused: boolean }>();
 
     const selectAllNodes = () => {
@@ -20,9 +21,34 @@
             selectAllNodes();
         }
 
+        // unselect all (ctrl + alt + a)
         if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === "a") {
             e.preventDefault();
             removeSelectedElements();
+        }
+
+        // zoom in (ctrl + +)
+        if ((e.ctrlKey || e.metaKey) && e.key === "+") {
+            e.preventDefault();
+            zoomIn();
+        }
+
+        // zoom out (ctrl + -)
+        if ((e.ctrlKey || e.metaKey) && e.key === "-") {
+            e.preventDefault();
+            zoomOut();
+        }
+
+        // reset zoom (ctrl + #)
+        if ((e.ctrlKey || e.metaKey) && e.key === "#") {
+            e.preventDefault();
+            zoomTo(1.0);
+        }
+
+        // zoom to fit (ctrl + .)
+        if ((e.ctrlKey || e.metaKey) && e.key === ".") {
+            e.preventDefault();
+            fitView();
         }
     };
 

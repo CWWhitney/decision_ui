@@ -1,12 +1,12 @@
 <script setup lang="ts">
     import { useFlowGraphStore } from "@/state/flow/graph";
-    import { useProjectSettingsStore } from "@/state/projects/settings";
     import { type Node } from "@decision-support-ui/common";
     import FlowVisualizeTypedTensor from "@/components/flow/FlowVisualizeTypedTensor.vue";
+    import { useComputationSettingsStore } from "@/state/computation/settings";
 
     const node = defineModel<Node>({ required: true });
     const graphStore = useFlowGraphStore();
-    const projectSettingsStore = useProjectSettingsStore();
+    const computationSettings = useComputationSettingsStore();
     const computedTypedTensor = graphStore.getComputedTypedTensor(node.value.id);
 </script>
 
@@ -15,7 +15,7 @@
         <FlowVisualizeTypedTensor
             :node-title="node.visualization.title"
             :tt="computedTypedTensor.value"
-            :bins="projectSettingsStore.histogramBins"
+            :bins="computationSettings.histogramBins"
         />
     </div>
     <div v-if="computedTypedTensor.type == 'error'">

@@ -8,16 +8,14 @@
     import FlowNodeEditDialog from "./FlowNodeEditDialog.vue";
     import FlowToolbar from "./FlowToolbar.vue";
 
-    import { useFlowOptionsStore } from "@/state/flow/options";
     import { useFlowGraphStore } from "@/state/flow/graph";
     import { useDialogsNodeEditStore } from "@/state/dialogs/nodeEdit";
-    import { useFlowStyleStore } from "@/state/flow/style";
     import { ref, watch } from "vue";
     import FlowShortcuts from "./FlowShortcuts.vue";
+    import { useEditorSettingsStore } from "@/state/editor/settings";
 
-    const optionsStore = useFlowOptionsStore();
     const graphStore = useFlowGraphStore();
-    const styleStore = useFlowStyleStore();
+    const editorSettings = useEditorSettingsStore();
     const nodeEditStore = useDialogsNodeEditStore();
 
     const {
@@ -68,12 +66,12 @@
     onConnect(connection => graphStore.addEdgeFromVueFlowConnectionAction(connection));
 
     onNodeDoubleClick(event => {
-        if (!optionsStore.locked) {
+        if (!editorSettings.locked) {
             nodeEditStore.openDialog(event.node.id);
         }
     });
 
-    watch(optionsStore, options => {
+    watch(editorSettings, options => {
         if (options.locked) {
             removeSelectedNodes(getSelectedNodes.value);
             setInteractive(false);
@@ -93,7 +91,7 @@
             :nodes="graphStore.getComputedVueFlowNodes().value"
             :edges="graphStore.getComputedVueFlowEdges().value"
             :connection-mode="ConnectionMode.Loose"
-            :snap-to-grid="optionsStore.snapToGrid"
+            :snap-to-grid="editorSettings.snapToGrid"
             :snap-grid="[10, 10]"
             :apply-default="false"
             :zoom-on-double-click="false"
@@ -114,7 +112,7 @@
             </template>
 
             <MiniMap v-if="false" pannable zoomable position="top-right" />
-            <Background v-if="styleStore.background != 'none'" :variant="styleStore.background" />
+            <Background v-if="editorSettings.background != 'none'" :variant="editorSettings.background" />
         </VueFlow>
     </div>
     <FlowNodeEditDialog />

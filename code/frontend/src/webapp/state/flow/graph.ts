@@ -13,7 +13,7 @@ import { defineStore } from "pinia";
 import { useSessionStorage } from "@vueuse/core";
 
 import * as common from "@decision-support-ui/common";
-import { useProjectSettingsStore } from "../projects/settings";
+import { useComputationSettingsStore } from "../computation/settings";
 
 export const FLOW_GRAPH_STORE_ID = "flow.graph";
 
@@ -52,7 +52,7 @@ const getVueFlowEdge = (
 };
 
 export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
-    const projectSettings = useProjectSettingsStore();
+    const projectSettings = useComputationSettingsStore();
     const evaluateExpressionForVariableDependencies = common.getExpressionEvaluatorForVariableDependencies();
     const evaluateExpressionForTypedTensor = common.getExpressionEvaluatorForTypedTensor();
 

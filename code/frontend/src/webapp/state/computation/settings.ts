@@ -6,7 +6,7 @@ export const FLOW_STYLE_STORE_ID = "project.settings";
 export const DEFAULT_MC_RUNS = 10000;
 export const DEFAULT_HISTOGRAM_BINS = 40;
 
-export const useProjectSettingsStore = defineStore(FLOW_STYLE_STORE_ID, () => {
+export const useComputationSettingsStore = defineStore(FLOW_STYLE_STORE_ID, () => {
     const mcRuns = ref(DEFAULT_MC_RUNS as number);
     const histogramBins = ref(DEFAULT_HISTOGRAM_BINS as number);
 

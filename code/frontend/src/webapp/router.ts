@@ -9,11 +9,17 @@ import RegistrationForm from "./components/RegistrationForm.vue";
 import SettingsDashboard from "./components/SettingsDashboard.vue";
 import HelpPage from "./pages/HelpPage.vue";
 import WelcomePage from "./pages/WelcomePage.vue";
+import MetadataPage from "./pages/MetadataPage.vue";
 
 const routes = [
     {
         path: "/",
         component: WelcomePage
+    },
+    {
+        path: "/metadata",
+        name: "metadata",
+        component: MetadataPage
     },
     {
         path: "/editor",

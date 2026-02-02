@@ -1,85 +1,58 @@
 <script setup lang="ts">
-    import { useStore } from "@/state";
     import { useFlowGraphStore } from "@/state/flow/graph";
-    import { useFlowOptionsStore } from "@/state/flow/options";
-    import {
-        BEZIER_EDGE_TYPE,
-        DOTS_BACKGROUND,
-        LINES_BACKGROUND,
-        STRAIGHT_EDGE_TYPE,
-        useFlowStyleStore
-    } from "@/state/flow/style";
-    import {
-        BENEFIT_STYLE_TYPE,
-        COLLECTION_NODE_TYPE,
-        COLLECTION_STYLE_TYPE,
-        COST_STYLE_TYPE,
-        EMPTY_FUNCTION_TYPE,
-        ESTIMATE_FUNCTION_TYPE,
-        GENERIC_STYLE_TYPE,
-        RESULT_FUNCTION_TYPE,
-        getDefaultNodeSize,
-        OPERATION_FUNCTION_TYPE,
-        RISK_STYLE_TYPE,
-        VARIABLE_NODE_TYPE,
-        type Node,
-        type NodeFunctionType,
-        type NodeStyleType,
-        type NodeType,
-        RESULT_STYLE_TYPE
-    } from "@decision-support-ui/common";
+    import * as common from "@decision-support-ui/common";
     import { useVueFlow, type Rect, type XYPosition } from "@vue-flow/core";
 
     import FlowNodeBox from "../components/flow/FlowNodeBox.vue";
+    import { useEditorSettingsStore } from "@/state/editor/settings";
 
     const { fitView, screenToFlowCoordinate, getIntersectingNodes, zoomTo, removeSelectedNodes, getSelectedNodes } =
         useVueFlow("editor");
 
-    const optionsStore = useFlowOptionsStore();
     const graphStore = useFlowGraphStore();
-    const styleStore = useFlowStyleStore();
+    const editorSettings = useEditorSettingsStore();
 
     const TOOLBAR_NODES: {
         title: string;
-        nodeType: NodeType;
-        functionType: NodeFunctionType;
-        styleType: NodeStyleType;
+        nodeType: common.NodeType;
+        functionType: common.NodeFunctionType;
+        styleType: common.NodeStyleType;
     }[] = [
         {
             title: "Cost",
-            nodeType: VARIABLE_NODE_TYPE,
-            functionType: ESTIMATE_FUNCTION_TYPE,
-            styleType: COST_STYLE_TYPE
+            nodeType: common.VARIABLE_NODE_TYPE,
+            functionType: common.ESTIMATE_FUNCTION_TYPE,
+            styleType: common.COST_STYLE_TYPE
         },
         {
             title: "Benefit",
-            nodeType: VARIABLE_NODE_TYPE,
-            functionType: ESTIMATE_FUNCTION_TYPE,
-            styleType: BENEFIT_STYLE_TYPE
+            nodeType: common.VARIABLE_NODE_TYPE,
+            functionType: common.ESTIMATE_FUNCTION_TYPE,
+            styleType: common.BENEFIT_STYLE_TYPE
         },
         {
             title: "Risk",
-            nodeType: VARIABLE_NODE_TYPE,
-            functionType: ESTIMATE_FUNCTION_TYPE,
-            styleType: RISK_STYLE_TYPE
+            nodeType: common.VARIABLE_NODE_TYPE,
+            functionType: common.ESTIMATE_FUNCTION_TYPE,
+            styleType: common.RISK_STYLE_TYPE
         },
         {
             title: "Generic",
-            nodeType: VARIABLE_NODE_TYPE,
-            functionType: OPERATION_FUNCTION_TYPE,
-            styleType: GENERIC_STYLE_TYPE
+            nodeType: common.VARIABLE_NODE_TYPE,
+            functionType: common.OPERATION_FUNCTION_TYPE,
+            styleType: common.GENERIC_STYLE_TYPE
         },
         {
             title: "Result",
-            nodeType: VARIABLE_NODE_TYPE,
-            functionType: RESULT_FUNCTION_TYPE,
-            styleType: RESULT_STYLE_TYPE
+            nodeType: common.VARIABLE_NODE_TYPE,
+            functionType: common.RESULT_FUNCTION_TYPE,
+            styleType: common.RESULT_STYLE_TYPE
         },
         {
             title: "Collection",
-            nodeType: COLLECTION_NODE_TYPE,
-            functionType: EMPTY_FUNCTION_TYPE,
-            styleType: COLLECTION_STYLE_TYPE
+            nodeType: common.COLLECTION_NODE_TYPE,
+            functionType: common.EMPTY_FUNCTION_TYPE,
+            styleType: common.COLLECTION_STYLE_TYPE
         }
     ];
 
@@ -91,7 +64,7 @@
 
         // remove any ancestor nodes from the list of intersecting nodes
         const ancestorsNodeIds = intersectingNodes
-            .reduce((p, n) => [...p, ...graphStore.getComputedAncestorNodes(n.id).value], [] as Node[])
+            .reduce((p, n) => [...p, ...graphStore.getComputedAncestorNodes(n.id).value], [] as common.Node[])
             .map(n => n.id);
 
         // consider only child nodes (remove any ancestor nodes)
@@ -104,9 +77,9 @@
     const onNodeDragEnd = (
         event: DragEvent,
         title: string,
-        nodeType: NodeType,
-        functionType: NodeFunctionType,
-        styleType: NodeStyleType
+        nodeType: common.NodeType,
+        functionType: common.NodeFunctionType,
+        styleType: common.NodeStyleType
     ) => {
         const topleft = screenToFlowCoordinate({
             x: event.clientX,
@@ -119,7 +92,7 @@
             (p, n) => ({ x: p.x + (n?.visualization.position.x ?? 0), y: p.y + (n?.visualization.position.y ?? 0) }),
             { x: 0, y: 0 } as XYPosition
         );
-        const newNodeSize = getDefaultNodeSize(nodeType);
+        const newNodeSize = common.getDefaultNodeSize(nodeType);
         const newNodePosition = {
             x: topleft.x - newNodeSize.width / 2 - ancestorOffset.x,
             y: topleft.y - newNodeSize.height / 2 - ancestorOffset.y
@@ -136,27 +109,17 @@
 
     const onNodeClick = (
         title: string,
-        nodeType: NodeType,
-        functionType: NodeFunctionType,
-        styleType: NodeStyleType
+        nodeType: common.NodeType,
+        functionType: common.NodeFunctionType,
+        styleType: common.NodeStyleType
     ) => {
         graphStore.addNewNodeAction(title, nodeType, functionType, styleType);
-    };
-
-    const download = () => {
-        const text = JSON.stringify({ nodes: graphStore.nodes, edges: graphStore.edges }, null, 2);
-        const blob = new Blob([text], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "graph.json";
-        a.click();
     };
 </script>
 
 <template>
     <div class="flowpage_toolbar">
-        <div class="toolbar_group">
+        <div class="options">
             <v-tooltip location="bottom" text="undo" open-delay="500">
                 <template #activator="{ props }">
                     <v-btn v-bind="props" icon="mdi-undo" variant="outlined" size="small" disabled></v-btn>
@@ -192,19 +155,19 @@
                 </template>
             </v-tooltip>
 
-            <v-tooltip location="bottom" :text="optionsStore.locked ? 'unlock graph' : 'lock graph'" open-delay="500">
+            <v-tooltip location="bottom" :text="editorSettings.locked ? 'unlock graph' : 'lock graph'" open-delay="500">
                 <template #activator="{ props }">
                     <v-btn
                         v-bind="props"
-                        :icon="optionsStore.locked ? 'mdi-lock-outline' : 'mdi-lock-open-variant-outline'"
+                        :icon="editorSettings.locked ? 'mdi-lock-outline' : 'mdi-lock-open-variant-outline'"
                         variant="outlined"
                         size="small"
-                        @click="optionsStore.toggleLocked"
+                        @click="editorSettings.toggleLocked"
                     ></v-btn>
                 </template>
             </v-tooltip>
         </div>
-        <div class="toolbar_group">
+        <div class="nodes">
             <FlowNodeBox
                 v-for="node in TOOLBAR_NODES"
                 :key="node.title"
@@ -221,21 +184,21 @@
                 >{{ node.title }}</FlowNodeBox
             >
         </div>
-        <div class="toolbar_group">
+        <div class="options">
             <v-tooltip location="bottom" text="change edge style" open-delay="500">
                 <template #activator="{ props }">
                     <v-btn
                         v-bind="props"
                         :icon="
-                            styleStore.edgeType == STRAIGHT_EDGE_TYPE
+                            editorSettings.edgeStyle == common.STRAIGHT_EDGE_STYLE_TYPE
                                 ? 'mdi-vector-polyline'
-                                : styleStore.edgeType == BEZIER_EDGE_TYPE
+                                : editorSettings.edgeStyle == common.BEZIER_EDGE_STYLE_TYPE
                                   ? 'mdi-vector-bezier'
                                   : 'mdi-square-wave'
                         "
                         variant="outlined"
                         size="small"
-                        @click="styleStore.switchEdgeType"
+                        @click="editorSettings.switchEdgeStyle"
                     ></v-btn>
                 </template>
             </v-tooltip>
@@ -244,43 +207,53 @@
                     <v-btn
                         v-bind="props"
                         :icon="
-                            styleStore.background == DOTS_BACKGROUND
+                            editorSettings.background == common.DOTS_EDITOR_BACKGROUND
                                 ? 'mdi-dots-grid'
-                                : styleStore.background == LINES_BACKGROUND
+                                : editorSettings.background == common.LINES_EDITOR_BACKGROUND
                                   ? 'mdi-grid'
                                   : ''
                         "
                         variant="outlined"
                         size="small"
-                        @click="styleStore.switchBackground"
+                        @click="editorSettings.switchBackground"
                     ></v-btn>
                 </template>
             </v-tooltip>
-
-            <v-btn icon="mdi-download-outline" size="small" variant="outlined" @click="download"></v-btn>
-            <v-btn prepend-icon="mdi-bug-outline" variant="outlined" text="reset" @click="useStore().reset"
-                >Reset</v-btn
-            >
         </div>
     </div>
 </template>
 
 <style lang="scss">
     .flowpage_toolbar {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5em;
-        justify-content: space-between;
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 1em;
+        align-items: center;
 
         background: #fff;
         padding: 0.5em;
 
-        .toolbar_group {
+        .nodes {
             display: flex;
             flex-wrap: wrap;
-            align-items: center;
+            gap: 0.5em;
+            justify-content: center;
+        }
+
+        .options {
+            justify-self: center;
+            display: flex;
+            flex-wrap: wrap;
             gap: 0.5em;
             background: #fff;
+
+            &:first-child {
+                justify-self: start;
+            }
+
+            &:last-child {
+                justify-self: end;
+            }
         }
 
         .flow-node-box {

@@ -1,30 +1,28 @@
 <script setup lang="ts">
     import TopMenuItem from "@/components/flow/TopMenuItem.vue";
-    import { useFlowOptionsStore } from "@/state/flow/options";
-    import { useFlowStyleStore } from "@/state/flow/style";
+    import { useEditorSettingsStore } from "@/state/editor/settings";
     import { useVueFlow } from "@vue-flow/core";
 
     const { fitView, zoomTo, zoomIn, zoomOut } = useVueFlow("editor");
 
-    const optionsStore = useFlowOptionsStore();
-    const styleStore = useFlowStyleStore();
+    const editorSettings = useEditorSettingsStore();
 </script>
 
 <template>
     <v-card class="card">
         <v-list class="list">
-            <TopMenuItem title="Zoom In" @click="zoomIn" />
-            <TopMenuItem title="Zoom Out" @click="zoomOut" />
-            <TopMenuItem title="Zoom to Fit" @click="fitView" />
-            <TopMenuItem title="Reset Zoom" @click="() => zoomTo(1.0)" />
+            <TopMenuItem title="Zoom In" shortcut="CTRL + PLUS" @click="zoomIn" />
+            <TopMenuItem title="Zoom Out" shortcut="CTRL + MINUS" @click="zoomOut" />
+            <TopMenuItem title="Zoom to Fit" shortcut="CTRL + ." @click="fitView" />
+            <TopMenuItem title="Reset Zoom" shortcut="CTRL + #" @click="() => zoomTo(1.0)" />
             <v-divider />
             <TopMenuItem
-                :title="optionsStore.locked ? 'Unlock Graph' : 'Lock Graph'"
-                @click="optionsStore.toggleLocked"
+                :title="editorSettings.locked ? 'Unlock Graph' : 'Lock Graph'"
+                @click="editorSettings.toggleLocked"
             />
             <v-divider />
-            <TopMenuItem title="Change Edge Style" @click="styleStore.switchEdgeType" />
-            <TopMenuItem title="Change Background" @click="styleStore.switchBackground" />
+            <TopMenuItem title="Change Edge Style" @click="editorSettings.switchEdgeStyle" />
+            <TopMenuItem title="Change Background" @click="editorSettings.switchBackground" />
         </v-list>
     </v-card>
 </template>

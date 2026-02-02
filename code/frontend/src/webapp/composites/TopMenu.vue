@@ -3,6 +3,9 @@
     import TopFileMenu from "./TopFileMenu.vue";
     import TopEditMenu from "./TopEditMenu.vue";
     import TopViewMenu from "./TopViewMenu.vue";
+    import { useMetadataStore } from "@/state/metadata";
+
+    const metadata = useMetadataStore();
 </script>
 
 <template>
@@ -36,7 +39,7 @@
                     </v-btn-group>
                 </div>
             </div>
-            <div>Filename.json</div>
+            <div>{{ metadata.name }}</div>
             <div>
                 <v-btn-group divided>
                     <v-btn prepend-icon="mdi-help-circle-outline" :to="{ name: 'help' }" text="Help"></v-btn>

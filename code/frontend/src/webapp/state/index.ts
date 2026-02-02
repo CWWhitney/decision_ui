@@ -1,14 +1,16 @@
-import { useFlowStore } from "./flow";
-import { useDialogsStore } from "./dialogs";
+import { useComputationSettingsStore } from "./computation/settings";
+import { useEditorSettingsStore } from "./editor/settings";
+import { useFlowGraphStore } from "./flow/graph";
+import { useMetadataStore } from "./metadata";
 
-export const useStore = () => {
-  const flow = useFlowStore();
-  const dialogs = useDialogsStore();
+export const resetState = () => {
+    const graph = useFlowGraphStore();
+    const editorSettings = useEditorSettingsStore();
+    const computationSettings = useComputationSettingsStore();
+    const metadata = useMetadataStore();
 
-  const reset = () => {
-    flow.reset();
-    dialogs.reset();
-  };
-
-  return { flow, dialogs, reset };
+    graph.reset();
+    editorSettings.reset();
+    computationSettings.reset();
+    metadata.reset();
 };

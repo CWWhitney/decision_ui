@@ -3,3 +3,6 @@ export * from "./graph";
 export * from "./compute";
 export * from "./draw";
 export * from "./util";
+export * from "./io";
+export * from "./editor";
+export * from "./metadata";

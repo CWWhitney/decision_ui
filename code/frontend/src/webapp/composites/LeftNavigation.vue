@@ -8,6 +8,16 @@
     <div class="container">
         <v-navigation-drawer :rail="!expanded" permanent class="navigation-drawer">
             <v-list density="compact" nav>
+                <v-tooltip location="right" text="open General Information page" open-delay="500">
+                    <template #activator="{ props }">
+                        <v-list-item
+                            :to="{ name: 'metadata' }"
+                            v-bind="props"
+                            prepend-icon="mdi-file-outline"
+                            title="Metadata"
+                        />
+                    </template>
+                </v-tooltip>
                 <v-tooltip location="right" text="open Model Editor" open-delay="500">
                     <template #activator="{ props }">
                         <v-list-item
