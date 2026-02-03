@@ -2,12 +2,23 @@ import * as tf from "@tensorflow/tfjs";
 
 import { VariableDependencies } from "../dependencies/semantics";
 import {
+    AbstractNode,
     ESTIMATE_FUNCTION_TYPE,
+    EstimateNodeFunctionState,
     LOOP_FUNCTION_TYPE,
+    LoopFunctionType,
+    LoopNodeFunctionState,
     Node,
+    NodeFunctionType,
     NodeId,
     OPERATION_FUNCTION_TYPE,
-    RESULT_FUNCTION_TYPE
+    OperationFunctionType,
+    OperationNodeFunctionState,
+    RESULT_FUNCTION_TYPE,
+    ResultFunctionType,
+    ResultNodeFunctionState,
+    VARIABLE_NODE_TYPE,
+    VariableNodeType
 } from "../../../graph";
 import {
     DETERMINISTIC_DISTRIBUTION_TYPE,
@@ -28,12 +39,88 @@ import {
 import { ExpressionTensorContext } from "./context";
 import { getTypedTensorFromConstant, TypedTensor } from "../../tensor";
 import { toProbabilistic } from "../../math/broadcast";
+import { SucceededMatchResult } from "ohm-js";
+import { matchExpression } from "./match";
 
-export const getTypedTensorForEstimateNode = (node: Node, context: ComputationContext): TypedTensor => {
-    if (node.function.type != ESTIMATE_FUNCTION_TYPE) {
-        throw new Error(`cannot calculate estimate node tensor for node of type '${node.type}'`);
+interface AbstractFunctionExpressionMatch<T extends NodeFunctionType> {
+    type: T;
+}
+
+interface OperationFunctionExpressionMatches extends AbstractFunctionExpressionMatch<OperationFunctionType> {
+    expressionMatch: SucceededMatchResult;
+}
+
+interface LoopFunctionExpressionMatches extends AbstractFunctionExpressionMatch<LoopFunctionType> {
+    initExpressionMatch: SucceededMatchResult;
+    iterExpressionMatch: SucceededMatchResult;
+}
+
+interface ResultFunctionExpressionMatches extends AbstractFunctionExpressionMatch<ResultFunctionType> {
+    expressionMatch: SucceededMatchResult;
+}
+
+type EstimateFunctionExpressionMatches = null;
+
+export type NodeFunctionExpressionMatches =
+    | EstimateFunctionExpressionMatches
+    | OperationFunctionExpressionMatches
+    | LoopFunctionExpressionMatches
+    | ResultFunctionExpressionMatches;
+
+export const getExpressionMatchesForOperationFunction = (node: Node): OperationFunctionExpressionMatches => {
+    if (node.function.type != OPERATION_FUNCTION_TYPE) {
+        throw new Error(`cannot match expressions for node of type '${node.type}'`);
     }
 
+    return {
+        type: OPERATION_FUNCTION_TYPE,
+        expressionMatch: matchExpression(node.function.expression)
+    };
+};
+
+export const getExpressionMatchesForLoopFunction = (node: Node): LoopFunctionExpressionMatches => {
+    if (node.function.type != LOOP_FUNCTION_TYPE) {
+        throw new Error(`cannot match expressions for node of type '${node.type}'`);
+    }
+
+    return {
+        type: LOOP_FUNCTION_TYPE,
+        initExpressionMatch: matchExpression(node.function.initExpression),
+        iterExpressionMatch: matchExpression(node.function.iterExpression)
+    };
+};
+
+export const getExpressionMatchesForResultFunction = (node: Node): ResultFunctionExpressionMatches => {
+    if (node.function.type != RESULT_FUNCTION_TYPE) {
+        throw new Error(`cannot match expressions for node of type '${node.type}'`);
+    }
+
+    return {
+        type: RESULT_FUNCTION_TYPE,
+        expressionMatch: matchExpression(node.function.expression)
+    };
+};
+
+export const getExpressionMatchesForNode = (node: Node): NodeFunctionExpressionMatches | null => {
+    if (node.type != VARIABLE_NODE_TYPE) {
+        throw new Error(`cannot match expression for non-variable node '${node.id}'`);
+    }
+    if (node.function.type == ESTIMATE_FUNCTION_TYPE) {
+        return null;
+    } else if (node.function.type == OPERATION_FUNCTION_TYPE) {
+        return getExpressionMatchesForOperationFunction(node);
+    } else if (node.function.type == LOOP_FUNCTION_TYPE) {
+        return getExpressionMatchesForLoopFunction(node);
+    } else if (node.function.type == RESULT_FUNCTION_TYPE) {
+        return getExpressionMatchesForResultFunction(node);
+    }
+    throw new Error(`unknown variable node function type '${(node as any).function.type}' when matching expressions`);
+};
+
+export const getTypedTensorForEstimateNode = (
+    node: AbstractNode<VariableNodeType, EstimateNodeFunctionState, any>,
+    context: ComputationContext
+): TypedTensor => {
     const { distribution, lower, upper } = node.function;
 
     if (distribution == DETERMINISTIC_DISTRIBUTION_TYPE) {
@@ -66,20 +153,14 @@ export const getTypedTensorForEstimateNode = (node: Node, context: ComputationCo
 };
 
 export const getTypedTensorForNodeWithExpression = (
-    node: Node,
+    node: AbstractNode<VariableNodeType, OperationNodeFunctionState | ResultNodeFunctionState, any>,
+    expressionMatches: OperationFunctionExpressionMatches | ResultFunctionExpressionMatches,
     getVariableDependencies: (nodeId: string) => VariableDependencies,
     getNodeIdForVariable: (variable: string) => NodeId,
-    evaluateExpressionForTensor: (expression: string, expressionContext: ExpressionTensorContext) => TypedTensor,
+    evaluateExpressionMatches: (match: SucceededMatchResult, expressionContext: ExpressionTensorContext) => TypedTensor,
     getTypedTensorForNode: (nodeId: string) => TypedTensor,
     computationContext: ComputationContext
 ): TypedTensor => {
-    if (!(node.function.type == OPERATION_FUNCTION_TYPE || node.function.type == RESULT_FUNCTION_TYPE)) {
-        throw new Error(`cannot calculate operation node tensor for node of type '${node.type}'`);
-    }
-
-    const { expression } = node.function;
-
-    // determine all required variable values as tensors
     const expressionContext: ExpressionTensorContext = {
         tensorByVariable: {},
         mcRuns: computationContext.mcRuns,
@@ -89,23 +170,20 @@ export const getTypedTensorForNodeWithExpression = (
         expressionContext.tensorByVariable[variable] = getTypedTensorForNode(getNodeIdForVariable(variable));
     }
 
-    return tf.tidy(() => evaluateExpressionForTensor(expression, expressionContext));
+    return tf.tidy(() => evaluateExpressionMatches(expressionMatches.expressionMatch, expressionContext));
 };
 
 export const getTypedTensorForLoopOperationNode = (
-    node: Node,
+    node: AbstractNode<VariableNodeType, LoopNodeFunctionState, any>,
+    expressionMatches: LoopFunctionExpressionMatches,
     getNode: (nodeId: string) => Node,
     getVariableDependencies: (nodeId: string) => VariableDependencies,
     getNodeIdForVariable: (variable: string) => NodeId,
-    evaluateExpressionForTensor: (expression: string, expressionContext: ExpressionTensorContext) => TypedTensor,
+    evaluateExpressionMatch: (match: SucceededMatchResult, expressionContext: ExpressionTensorContext) => TypedTensor,
     getTypedTensorForNode: (nodeId: string) => TypedTensor,
     computationContext: ComputationContext
 ): TypedTensor => {
-    if (node.function.type != LOOP_FUNCTION_TYPE) {
-        throw new Error(`cannot calculate loop operation node tensor for node of type '${node.type}'`);
-    }
-
-    const { iterations, initExpression, iterExpression } = node.function;
+    const { iterations } = node.function;
 
     // determine all required variable values as tensors
     const expressionContext: ExpressionTensorContext = {
@@ -122,11 +200,11 @@ export const getTypedTensorForLoopOperationNode = (
 
     return tf.tidy(() => {
         let tensorList = [] as TypedTensor[];
-        const initTensor = evaluateExpressionForTensor(initExpression, expressionContext);
+        const initTensor = evaluateExpressionMatch(expressionMatches.initExpressionMatch, expressionContext);
 
         tensorList.push(initTensor);
         for (let i = 1; i < iterations; i++) {
-            const iterTensor = evaluateExpressionForTensor(iterExpression, {
+            const iterTensor = evaluateExpressionMatch(expressionMatches.iterExpressionMatch, {
                 ...expressionContext,
                 index: {
                     ...expressionContext.index,
@@ -163,29 +241,35 @@ export const getTypedTensorForNodeRecursion = (
     getNode: (nodeId: string) => Node,
     getVariableDependencies: (nodeId: string) => VariableDependencies,
     getNodeIdForVariable: (variable: string) => NodeId,
-    evaluateExpressionForTensor: (expression: string, expressionContext: ExpressionTensorContext) => TypedTensor,
+    getExpressionMatchesForNode: (nodeId: string) => NodeFunctionExpressionMatches,
+    evaluateExpressionMatch: (match: SucceededMatchResult, expressionContext: ExpressionTensorContext) => TypedTensor,
     getTypedTensorForNode: (nodeId: string) => TypedTensor,
     computationContext: ComputationContext
 ): TypedTensor => {
     const node = getNode(nodeId);
     if (node.function.type == ESTIMATE_FUNCTION_TYPE) {
-        return getTypedTensorForEstimateNode(node, computationContext);
+        return getTypedTensorForEstimateNode(
+            node as AbstractNode<VariableNodeType, EstimateNodeFunctionState, any>,
+            computationContext
+        );
     } else if (node.function.type == OPERATION_FUNCTION_TYPE || node.function.type == RESULT_FUNCTION_TYPE) {
         return getTypedTensorForNodeWithExpression(
-            node,
+            node as AbstractNode<VariableNodeType, OperationNodeFunctionState | ResultNodeFunctionState, any>,
+            getExpressionMatchesForNode(nodeId) as OperationFunctionExpressionMatches | ResultFunctionExpressionMatches,
             getVariableDependencies,
             getNodeIdForVariable,
-            evaluateExpressionForTensor,
+            evaluateExpressionMatch,
             getTypedTensorForNode,
             computationContext
         );
     } else if (node.function.type == LOOP_FUNCTION_TYPE) {
         return getTypedTensorForLoopOperationNode(
-            node,
+            node as AbstractNode<VariableNodeType, LoopNodeFunctionState, any>,
+            getExpressionMatchesForNode(nodeId) as LoopFunctionExpressionMatches,
             getNode,
             getVariableDependencies,
             getNodeIdForVariable,
-            evaluateExpressionForTensor,
+            evaluateExpressionMatch,
             getTypedTensorForNode,
             computationContext
         );

@@ -6,6 +6,7 @@ import { netPresentValue } from "../../math/npv";
 import { valueVarier } from "../../math/vv";
 import { chanceEvent } from "../../math/chance_event";
 import { getSeriesLengthFromTypedTensor, getTypedTensorFromConstant, TypedTensor } from "../../tensor";
+import { SucceededMatchResult } from "ohm-js";
 
 const wrapUnaryTensorOperator = (operator: (t: tf.Tensor) => tf.Tensor) => (t: TypedTensor) => ({
     ...t,
@@ -322,15 +323,9 @@ export const createTensorEvaluationSemantics = () => {
     });
 };
 
-export const getExpressionEvaluatorForTypedTensor = () => {
+export const getExpressionMatchEvaluator = () => {
     const semantics = createTensorEvaluationSemantics();
-    return (expression: string, context: ExpressionTensorContext) => {
-        const match = expressionGrammar.match(expression);
-
-        if (match.failed()) {
-            throw Error("expression invalid: " + match.shortMessage);
-        }
-
+    return (match: SucceededMatchResult, context: ExpressionTensorContext) => {
         return semantics(match).eval(context) as TypedTensor;
     };
 };

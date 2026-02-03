@@ -55,7 +55,7 @@ const getVueFlowEdge = (
 export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
     const projectSettings = useComputationSettingsStore();
     const evaluateExpressionForVariableDependencies = common.getExpressionEvaluatorForVariableDependencies();
-    const evaluateExpressionForTypedTensor = common.getExpressionEvaluatorForTypedTensor();
+    const evaluateExpressionMatch = common.getExpressionMatchEvaluator();
 
     // --- persisted state
     const state = useSessionStorage(FLOW_GRAPH_STORE_ID, {
@@ -214,11 +214,30 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         }
     );
 
+    const getComputedExpressionMatches = computedByKey(
+        (nodeId: common.NodeId): common.ComputedResult<common.NodeFunctionExpressionMatches> => {
+            try {
+                const node = getComputedNode(nodeId).value;
+                return {
+                    type: "success",
+                    value: common.getExpressionMatchesForNode(node)
+                };
+            } catch (e) {
+                console.error(`error match expressions for node '${nodeId}'`, e);
+                return {
+                    type: "error",
+                    message: e instanceof Error ? `${e.message}` : `${e}`
+                };
+            }
+        }
+    );
+
     const getComputedTypedTensor = computedByKey(
         (
             nodeId: common.NodeId,
             previousTensor: common.ComputedResult<common.TypedTensor> | undefined
         ): common.ComputedResult<common.TypedTensor> => {
+            const started = +new Date();
             if (previousTensor && previousTensor.type == "success") {
                 previousTensor.value.tensor.dispose();
             }
@@ -231,23 +250,31 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
                     return computedDependencies.value;
                 };
                 const getNodeIdForVariable = (variable: string) => getComputedNodeIdFromVariableName(variable).value;
+                const getExpressionMatches = (nodeId: string) => {
+                    const computedMatches = getComputedExpressionMatches(nodeId).value;
+                    if (computedMatches.type == "error") throw new Error(computedMatches.message);
+                    return computedMatches.value;
+                };
                 const getTensorForNode = (nodeId: string) => {
                     const computedTensor = getComputedTypedTensor(nodeId).value;
                     if (computedTensor.type == "error") throw new Error(computedTensor.message);
                     return computedTensor.value;
                 };
-                return {
+                const result = {
                     type: "success",
                     value: common.getTypedTensorForNodeRecursion(
                         nodeId,
                         getNode,
                         getVariableDependencies,
                         getNodeIdForVariable,
-                        evaluateExpressionForTypedTensor,
+                        getExpressionMatches,
+                        evaluateExpressionMatch,
                         getTensorForNode,
                         computedComputationContext.value
                     )
                 } as common.ComputedResult<common.TypedTensor>;
+                console.log(`calculated tensor for node ${nodeId} in ${+new Date() - started}ms`);
+                return result;
             } catch (e) {
                 console.error(`error calculating tensor for node '${nodeId}'`, e);
                 return {
