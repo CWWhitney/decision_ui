@@ -153,7 +153,14 @@
             </template>
         </v-tooltip>
     </v-btn-group>
-    <v-text-field v-model="expressionInputValue" :label="props.label" single-line></v-text-field>
+    <v-textarea
+        v-model="expressionInputValue"
+        :label="props.label"
+        auto-grow
+        max-rows="5"
+        rows="1"
+        persistent-hint
+    ></v-textarea>
     <v-alert v-if="!!expressionError" type="error" :text="expressionError" />
 </template>
 
