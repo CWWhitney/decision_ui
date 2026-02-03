@@ -44,3 +44,18 @@ export const getSampleSizeFromTypedTensor = (tt: TypedTensor) => {
     }
     return tt.tensor.shape[0];
 };
+
+export const getCommonSeriesLengthFromTypedTensors = (ttList: TypedTensor[]): number => {
+    const seriesLengthSet = new Set<number>();
+    for (const tt of ttList) {
+        if (tt.isSeries) {
+            seriesLengthSet.add(getSeriesLengthFromTypedTensor(tt));
+        }
+    }
+    if (seriesLengthSet.size == 0) {
+        throw new Error(`cannot determine common series length from tensors that are all not a series`);
+    } else if (seriesLengthSet.size > 1) {
+        throw new Error(`tensors have different series lengths ${JSON.stringify([...seriesLengthSet])}`);
+    }
+    return [...seriesLengthSet][0];
+};

@@ -5,8 +5,14 @@ import { ExpressionTensorContext } from "./context";
 import { netPresentValue } from "../../math/npv";
 import { valueVarier } from "../../math/vv";
 import { chanceEvent } from "../../math/chance_event";
-import { getSeriesLengthFromTypedTensor, getTypedTensorFromConstant, TypedTensor } from "../../tensor";
+import {
+    getCommonSeriesLengthFromTypedTensors,
+    getSeriesLengthFromTypedTensor,
+    getTypedTensorFromConstant,
+    TypedTensor
+} from "../../tensor";
 import { SucceededMatchResult } from "ohm-js";
+import { toProbabilistic, toSeries } from "../../math/broadcast";
 
 const wrapUnaryTensorOperator = (operator: (t: tf.Tensor) => tf.Tensor) => (t: TypedTensor) => ({
     ...t,
@@ -138,39 +144,37 @@ export const createTensorEvaluationSemantics = () => {
         },
 
         IfExp(_if, _lp, condition, _rp, expTrue, _else, expFalse) {
-            const conditionTT = condition.eval(this.args.context) as TypedTensor;
-            const trueTT = expTrue.eval(this.args.context) as TypedTensor;
-            const falseTT = expFalse.eval(this.args.context) as TypedTensor;
+            const context = this.args.context as ExpressionTensorContext;
+            let conditionTT = condition.eval(this.args.context) as TypedTensor;
+            let trueTT = expTrue.eval(this.args.context) as TypedTensor;
+            let falseTT = expFalse.eval(this.args.context) as TypedTensor;
 
             if (conditionTT.tensor.dtype !== "bool") {
                 throw new Error(`condition value is not of boolean type, but ${conditionTT.tensor.dtype}`);
             }
 
-            if (
-                conditionTT.isProbabilistic != trueTT.isProbabilistic ||
-                conditionTT.isProbabilistic != falseTT.isProbabilistic
-            ) {
-                throw new Error(
-                    `condition value, true value and false value need to be all probabilistic or all not probabilistic`
-                );
+            if (!conditionTT.isProbabilistic && !conditionTT.isSeries && conditionTT.tensor.shape.length == 0) {
+                // this is a simple deterministic if condition
+                if (conditionTT.tensor.arraySync()) {
+                    return trueTT;
+                } else {
+                    return falseTT;
+                }
             }
 
-            if (conditionTT.isSeries != trueTT.isSeries || conditionTT.isSeries != falseTT.isSeries) {
-                throw new Error(
-                    `condition value, true value and false value need to be all a series or all not a series`
-                );
+            if (conditionTT.isProbabilistic || trueTT.isProbabilistic || falseTT.isProbabilistic) {
+                // if anything is probabilistic, make everything probabilisitc
+                conditionTT = toProbabilistic(conditionTT, context.mcRuns);
+                trueTT = toProbabilistic(trueTT, context.mcRuns);
+                falseTT = toProbabilistic(falseTT, context.mcRuns);
             }
 
-            if (
-                !tf.util.arraysEqual(conditionTT.tensor.shape, trueTT.tensor.shape) ||
-                !tf.util.arraysEqual(conditionTT.tensor.shape, falseTT.tensor.shape)
-            ) {
-                throw new Error(
-                    `condition value shape, true value shape and false value shape need to match, ` +
-                        `but are ${JSON.stringify(conditionTT.tensor.shape)} (condition), ` +
-                        `${JSON.stringify(trueTT.tensor.shape)} (true value) and ` +
-                        `${JSON.stringify(falseTT.tensor.shape)} (false value)`
-                );
+            if (conditionTT.iSeries || trueTT.isSeries || falseTT.isSeries) {
+                // if anything is series, make everything a series
+                const seriesLength = getCommonSeriesLengthFromTypedTensors([conditionTT, trueTT, falseTT]);
+                conditionTT = toSeries(conditionTT, seriesLength);
+                trueTT = toSeries(trueTT, seriesLength);
+                falseTT = toSeries(falseTT, seriesLength);
             }
 
             return {
