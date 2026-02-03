@@ -74,12 +74,18 @@ export const loadModelFileToState = (file: ModelFile): void => {
     const computationSettings = useComputationSettingsStore();
     const metadata = useMetadataStore();
 
+    graph.reset();
     graph.$patch({ state: file.graph });
     graph.history.commit();
     graph.history.clear();
 
+    editorSettings.reset();
     editorSettings.$patch(file.settings.editor);
+
+    computationSettings.reset();
     computationSettings.$patch(file.settings.computation);
+
+    metadata.reset();
     metadata.$patch(file.metadata);
 };
 
