@@ -45,7 +45,6 @@
         display: flex;
         gap: 1em;
         align-items: center;
-        margin: 1em 0;
     }
 
     .content {

@@ -12,6 +12,7 @@
         DETERMINISTIC_DISTRIBUTION_TYPE
     } from "@decision-support-ui/common";
     import { computed, ref, watch } from "vue";
+    import HelpHintWrapper from "./HelpHintWrapper.vue";
 
     const node = defineModel<AbstractNode<VariableNodeType, EstimateNodeFunctionState, any>>({ required: true });
     const props = defineProps({
@@ -59,32 +60,61 @@
 </script>
 
 <template>
-    <v-combobox v-model="node.function.distribution" label="Distribution" :items="AVAILABLE_DISTRIBUTIONS"></v-combobox>
-    <div v-if="node.function.distribution != DETERMINISTIC_DISTRIBUTION_TYPE" class="lower-upper-inputs">
-        <v-number-input
-            v-model="lowerInputValue"
-            :precision="null"
-            label="Lower"
-            control-variant="split"
-        ></v-number-input>
-        <v-number-input
-            v-model="upperInputValue"
-            :precision="null"
-            label="Upper"
-            control-variant="split"
-        ></v-number-input>
-    </div>
-    <div v-else>
-        <v-number-input
-            v-model="lowerInputValue"
-            :precision="null"
-            label="Value"
-            control-variant="split"
-        ></v-number-input>
+    <div class="estimateFunctionTabContainer">
+        <div>The value of this node is sampled from the following probabilistic distribution:</div>
+        <HelpHintWrapper>
+            <template #default>
+                <v-combobox
+                    v-model="node.function.distribution"
+                    label="Distribution"
+                    :items="AVAILABLE_DISTRIBUTIONS"
+                    hide-details
+                ></v-combobox>
+            </template>
+            <template #tooltip> text </template>
+        </HelpHintWrapper>
+        <HelpHintWrapper v-if="node.function.distribution != DETERMINISTIC_DISTRIBUTION_TYPE">
+            <template #default>
+                <div class="lower-upper-inputs">
+                    <v-number-input
+                        v-model="lowerInputValue"
+                        :precision="null"
+                        label="Lower"
+                        control-variant="split"
+                        hide-details
+                    ></v-number-input>
+                    <v-number-input
+                        v-model="upperInputValue"
+                        :precision="null"
+                        label="Upper"
+                        control-variant="split"
+                        hide-details
+                    ></v-number-input>
+                </div>
+            </template>
+        </HelpHintWrapper>
+        <HelpHintWrapper v-else>
+            <template #default>
+                <div>
+                    <v-number-input
+                        v-model="lowerInputValue"
+                        :precision="null"
+                        label="Value"
+                        control-variant="split"
+                    ></v-number-input>
+                </div>
+            </template>
+        </HelpHintWrapper>
     </div>
 </template>
 
 <style lang="scss" scoped>
+    .estimateFunctionTabContainer {
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+    }
+
     .lower-upper-inputs {
         display: flex;
         gap: 1em;

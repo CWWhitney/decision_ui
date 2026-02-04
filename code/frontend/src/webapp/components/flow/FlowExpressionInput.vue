@@ -5,17 +5,31 @@
     import { USER_INPUT_DEBOUNCE_TIME } from "@/common/constants";
     import { debounce } from "@/common/throttle";
     import { getExpressionError } from "@decision-support-ui/common";
-    import { computed, ref, watch } from "vue";
-    import type { ExpressionToolbarButtonInfo } from "./FlowExpressionInputButtonList.vue";
-    import FlowExpressionInputButtonList from "./FlowExpressionInputButtonList.vue";
+    import { computed, nextTick, ref, shallowRef, watch } from "vue";
+    import FlowExpressionInputButton from "./FlowExpressionInputToolbarButton.vue";
+    import FlowExpressionInputChanceEventDialog from "./FlowExpressionInputChanceEventDialog.vue";
 
     const expression = defineModel<string>({
         required: true
     });
-    const props = withDefaults(defineProps<{ emptyLabel: string; filledLabel: string; debounceTime?: number }>(), {
-        debounceTime: USER_INPUT_DEBOUNCE_TIME
-    });
+    const props = withDefaults(
+        defineProps<{
+            emptyLabel: string;
+            filledLabel: string;
+            debounceTime?: number;
+            showToolbar?: boolean;
+            hint?: string;
+            focusedRows?: number;
+        }>(),
+        {
+            debounceTime: USER_INPUT_DEBOUNCE_TIME,
+            showToolbar: true,
+            hint: undefined,
+            focusedRows: 3
+        }
+    );
 
+    const expressionInputRef = ref<HTMLElement | null>();
     const expressionInputValue = ref<string>(expression.value);
     const focused = ref<boolean>(false);
 
@@ -54,6 +68,24 @@
         }
     };
 
+    const chanceEventDialog = shallowRef<boolean>(false);
+
+    watch(chanceEventDialog, async isOpen => {
+        // update focus to textarea when dialog closes
+        if (!isOpen) {
+            await nextTick();
+            expressionInputRef.value?.focus();
+        }
+    });
+
+    export type ExpressionToolbarButtonInfo = {
+        label?: string;
+        icon?: string;
+        size?: string;
+        expression?: string;
+        tooltip?: string;
+    };
+
     const MATH_OPERATIONS: ExpressionToolbarButtonInfo[] = [
         {
             icon: "mdi-plus",
@@ -64,7 +96,7 @@
             icon: "mdi-minus",
             size: "x-small",
             expression: "x - y",
-            tooltip: "substract"
+            tooltip: "subtraction"
         },
         {
             icon: "mdi-multiplication",
@@ -146,7 +178,7 @@
             label: "not",
             size: "small",
             expression: "!",
-            tooltip: "reverses a condition, logical not "
+            tooltip: "logical not"
         }
     ];
 
@@ -160,42 +192,42 @@
             label: "sqrt",
             icon: "mdi-square-root",
             expression: "sqrt(x)",
-            tooltip: "add square root function"
+            tooltip: "square root function"
         },
         {
             label: "abs",
             expression: "abs(x)",
-            tooltip: "add absolute value function"
+            tooltip: "absolute value function"
         },
         {
             label: "sign",
             expression: "sign(x)",
-            tooltip: "add sign function"
+            tooltip: "sign function"
         },
         {
             label: "log",
             expression: "log(x)",
-            tooltip: "add logarithm function"
+            tooltip: "logarithm function"
         },
         {
             label: "exp",
             expression: "exp(x)",
-            tooltip: "add exponential function"
+            tooltip: "exponential function"
         },
         {
             label: "floor",
             expression: "floor(x)",
-            tooltip: "add floor function"
+            tooltip: "floor function"
         },
         {
             label: "ceil",
             expression: "ceil(x)",
-            tooltip: "add ceil function"
+            tooltip: "ceil function"
         },
         {
             label: "round",
             expression: "round(x)",
-            tooltip: "add round function"
+            tooltip: "round function"
         }
     ];
 
@@ -203,27 +235,27 @@
         {
             label: "sin",
             expression: "sin(x)",
-            tooltip: "add sine function"
+            tooltip: "sine function"
         },
         {
             label: "cos",
             expression: "cos(x)",
-            tooltip: "add cosine function"
+            tooltip: "cosine function"
         },
         {
             label: "tan",
             expression: "tan(x)",
-            tooltip: "add tan function"
+            tooltip: "tan function"
         },
         {
             label: "tanh",
             expression: "tanh(x)",
-            tooltip: "add tanh function"
+            tooltip: "tanh function"
         },
         {
             icon: "mdi-pi",
             expression: "pi",
-            tooltip: "add pi"
+            tooltip: "pi"
         }
     ];
 
@@ -231,27 +263,27 @@
         {
             label: "sum",
             expression: "sum(x)",
-            tooltip: "add series sum function"
+            tooltip: "sum of a series"
         },
         {
             label: "prod",
             expression: "prod(x)",
-            tooltip: "add series product function"
+            tooltip: "product over a series"
         },
         {
             label: "min",
             expression: "min(x)",
-            tooltip: "add series min function"
+            tooltip: "minimum of a series"
         },
         {
             label: "max",
             expression: "max(x)",
-            tooltip: "add series max function"
+            tooltip: "maximum of a series"
         },
         {
             label: "mean",
             expression: "mean(x)",
-            tooltip: "add series mean function"
+            tooltip: "mean of a series"
         }
     ];
 
@@ -259,66 +291,89 @@
         {
             label: "( )",
             expression: "( )",
-            tooltip: "add parentheses"
-        }
-    ];
-
-    const DECISION_SUPPORT_FUNCTIONS: ExpressionToolbarButtonInfo[] = [
-        {
-            label: "chance_event",
-            expression: "chance_event(chance, value_if, value_if_not, n, cv_if, cv_if_not, one_draw)",
-            tooltip: "add chance event function"
-        },
-        {
-            label: "vv",
-            expression: "vv(mean, cv, n, absolute_trend, relative_trend, lower_limit, upper_limit)",
-            tooltip: "add value varier function"
-        },
-        {
-            label: "discount",
-            expression: "discount(x, discount)",
-            tooltip: "add net present value function"
+            tooltip: "parentheses"
         }
     ];
 </script>
 
 <template>
-    <div class="container" tabindex="-1" @focusin="focused = true" @focusout="onFocusOut">
-        <div v-if="focused">
+    <div class="expressionInputContainer" tabindex="-1" @focusin="focused = true" @focusout="onFocusOut">
+        <div v-if="showToolbar && (focused || chanceEventDialog)">
             <v-btn-group class="functionGroup">
-                <FlowExpressionInputButtonList :list="MATH_OPERATIONS" :append-to-expression="appendToExpression" />
-                <v-divider vertical />
-                <FlowExpressionInputButtonList :list="GROUP_OPERATORS" :append-to-expression="appendToExpression" />
-                <v-divider vertical />
-                <FlowExpressionInputButtonList :list="COMARISON_OPERATORS" :append-to-expression="appendToExpression" />
-                <v-divider vertical />
-                <FlowExpressionInputButtonList :list="LOGIC_OPERATORS" :append-to-expression="appendToExpression" />
-                <v-divider vertical />
-                <FlowExpressionInputButtonList :list="MATH_FUNCTIONS" :append-to-expression="appendToExpression" />
+                <template
+                    v-for="(list, listIdx) in [MATH_OPERATIONS, GROUP_OPERATORS, COMARISON_OPERATORS, MATH_FUNCTIONS]"
+                    :key="listIdx"
+                >
+                    <FlowExpressionInputButton
+                        v-for="(item, itemIdx) in list"
+                        :key="itemIdx"
+                        :icon="item.icon"
+                        :label="item.label"
+                        :tooltip="item.tooltip"
+                        :size="item.size"
+                        :click="() => (item.expression ? appendToExpression(item.expression) : null)"
+                    />
+                    <v-divider vertical />
+                </template>
             </v-btn-group>
             <v-btn-group class="functionGroup">
-                <FlowExpressionInputButtonList
-                    :list="DECISION_SUPPORT_FUNCTIONS"
-                    :append-to-expression="appendToExpression"
+                <FlowExpressionInputButton
+                    label="chance_event"
+                    tooltip="chance event function"
+                    size="small"
+                    :click="
+                        () => {
+                            chanceEventDialog = true;
+                            console.log('open chance event dialog');
+                        }
+                    "
+                />
+                <FlowExpressionInputChanceEventDialog
+                    v-model="chanceEventDialog"
+                    :submit="(e: string) => appendToExpression(e)"
+                />
+                <FlowExpressionInputButton
+                    label="vv"
+                    tooltip="value varier function"
+                    size="small"
+                    :click="() => console.log('open vv dialog')"
+                />
+                <FlowExpressionInputButton
+                    label="discount"
+                    tooltip="net present value function"
+                    size="small"
+                    :click="() => console.log('open discount dialog')"
                 />
                 <v-divider vertical />
-                <FlowExpressionInputButtonList :list="SERIES_FUNCTIONS" :append-to-expression="appendToExpression" />
-                <v-divider vertical />
-                <FlowExpressionInputButtonList
-                    :list="TRIGONOMETRY_FUNCTIONS"
-                    :append-to-expression="appendToExpression"
-                />
+                <template
+                    v-for="(list, listIdx) in [LOGIC_OPERATORS, SERIES_FUNCTIONS, TRIGONOMETRY_FUNCTIONS]"
+                    :key="listIdx"
+                >
+                    <FlowExpressionInputButton
+                        v-for="(item, itemIdx) in list"
+                        :key="itemIdx"
+                        :icon="item.icon"
+                        :label="item.label"
+                        :tooltip="item.tooltip"
+                        :size="item.size"
+                        :click="() => (item.expression ? appendToExpression(item.expression) : null)"
+                    />
+                    <v-divider vertical />
+                </template>
             </v-btn-group>
         </div>
 
         <v-textarea
+            ref="expressionInputRef"
             v-model="expressionInputValue"
             :label="expressionInputValue ? filledLabel : emptyLabel"
             auto-grow
             max-rows="5"
-            :rows="focused ? 3 : 1"
+            :rows="focused ? props.focusedRows : 1"
             class="expressionInput"
-            :hide-details="!expressionError"
+            :persistent-hint="!!props.hint"
+            :hint="props.hint"
+            :hide-details="!expressionError && !props.hint"
             :error="!!expressionError"
             :error-messages="expressionError"
         ></v-textarea>
@@ -326,6 +381,12 @@
 </template>
 
 <style scoped lang="scss">
+    .expressionInputContainer {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+    }
+
     .functionGroup {
         flex-grow: 1;
         display: flex;
@@ -336,15 +397,6 @@
                 border-bottom: 0;
             }
         }
-
-        :deep(button) {
-            flex-grow: 1;
-            min-height: 4em;
-        }
-    }
-
-    .expressionInput {
-        margin: 1px 0;
     }
 
     :deep(.v-alert) {

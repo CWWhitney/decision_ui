@@ -17,6 +17,7 @@
 </script>
 
 <template>
+    <p>The value of this node is determined by the following mathematical expression:</p>
     <HelpHintWrapper to="/help/user-interface/model-editor">
         <template #default>
             <FlowExpressionInput
