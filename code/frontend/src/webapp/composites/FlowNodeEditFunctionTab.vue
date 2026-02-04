@@ -23,6 +23,7 @@
     import FlowEstimateFunctionTab from "@/components/flow/FlowEstimateFunctionTab.vue";
     import FlowOperationFunctionTab from "@/components/flow/FlowOperationFunctionTab.vue";
     import DebouncedTextInput from "@/components/flow/DebouncedTextInput.vue";
+    import HelpHintWrapper from "@/components/flow/HelpHintWrapper.vue";
 
     const node = defineModel<Node>({ required: true });
     const graphStore = useFlowGraphStore();
@@ -50,24 +51,55 @@
 <template>
     <div>
         <template v-if="node.function.type != EMPTY_FUNCTION_TYPE">
+            <p>Define how the value of this node is being calculated and referenced from other nodes:</p>
             <h4>Variable</h4>
-            <DebouncedTextInput
-                v-model="node.function.variable"
-                label="Variable Name"
-                hide-details
-                :transform="generateVariableName"
-            />
+            <HelpHintWrapper to="/help/user-interface/model-editor">
+                <template #default>
+                    <DebouncedTextInput
+                        v-model="node.function.variable"
+                        label="Variable Name"
+                        hide-details
+                        :transform="generateVariableName"
+                    />
+                </template>
+                <template #tooltip>
+                    The name of the variable representing the result of the calculation defined below. You can reference
+                    this node in other nodes using this variable name.
+                </template>
+            </HelpHintWrapper>
         </template>
         <h4>Type</h4>
         <div>
-            <v-btn-toggle v-model="functionType" divided border variant="text" color="primary">
-                <v-btn prepend-icon="mdi-tilde" text="Estimate" :value="ESTIMATE_FUNCTION_TYPE" />
-                <v-btn prepend-icon="mdi-plus-minus" text="Operation" :value="OPERATION_FUNCTION_TYPE" />
-                <v-btn prepend-icon="mdi-repeat" text="Loop" :value="LOOP_FUNCTION_TYPE" />
-                <v-btn prepend-icon="mdi-chart-histogram" text="Result" :value="RESULT_FUNCTION_TYPE" />
-            </v-btn-toggle>
+            <HelpHintWrapper to="/help/user-interface/model-editor">
+                <template #default>
+                    <v-btn-toggle
+                        v-model="functionType"
+                        divided
+                        border
+                        variant="text"
+                        color="primary"
+                        class="functionTypeGroup"
+                    >
+                        <v-btn prepend-icon="mdi-tilde" text="Estimate" :value="ESTIMATE_FUNCTION_TYPE" />
+                        <v-btn prepend-icon="mdi-plus-minus" text="Operation" :value="OPERATION_FUNCTION_TYPE" />
+                        <v-btn prepend-icon="mdi-repeat" text="Loop" :value="LOOP_FUNCTION_TYPE" />
+                        <v-btn prepend-icon="mdi-chart-histogram" text="Result" :value="RESULT_FUNCTION_TYPE" />
+                    </v-btn-toggle>
+                </template>
+                <template #tooltip>
+                    The function type of a node determines how the variable for this node is calculated:
+                    <ul>
+                        <li>Estimate - the variable is calculated from a random distribution with given parameters</li>
+                        <li>
+                            Operation - the variable is calculated from a mathemtical formula based on other variables
+                        </li>
+                        <li>Loop - the variable describes a time series calculated from two mathematical formulas</li>
+                        <li>Result - the variable describes the final output of the model that should be visualized</li>
+                    </ul>
+                </template>
+            </HelpHintWrapper>
         </div>
-        <h4>Options</h4>
+        <h4>Definition</h4>
         <div v-if="node.function.type == ESTIMATE_FUNCTION_TYPE">
             <FlowEstimateFunctionTab
                 v-model="
@@ -97,7 +129,20 @@
             />
         </div>
         <div>
-            <v-alert v-if="!!computationError" type="error" :text="`Computation Error: ${computationError}`" />
+            <v-alert
+                v-if="!!computationError"
+                type="error"
+                variant="outlined"
+                :text="`Computation Error: ${computationError}`"
+                class="functionAlert"
+            />
+            <v-alert
+                v-if="!computationError"
+                class="functionAlert"
+                type="success"
+                variant="outlined"
+                text="Variable definition is valid!"
+            />
         </div>
     </div>
 </template>
@@ -109,5 +154,19 @@
 
     .v-number-input {
         min-width: 15em;
+    }
+
+    .functionTypeGroup {
+        display: flex;
+        flex-wrap: wrap;
+
+        :deep(button) {
+            flex-grow: 1;
+        }
+    }
+
+    .functionAlert {
+        margin-top: 1em;
+        margin-right: 3em;
     }
 </style>

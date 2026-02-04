@@ -76,6 +76,9 @@ export const getDepedenciesSemantics = () => {
         FuncArgs(first, _c, rest) {
             return [...first.deps(), ...rest.children.reduce((p, c) => [...p, ...c.deps()], [])];
         },
+        pi(_) {
+            return [];
+        },
         IndexedVariable(v, _op) {
             return [...v.deps()];
         },

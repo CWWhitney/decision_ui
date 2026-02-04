@@ -14,7 +14,8 @@ export const drawHistogramChart = (
     ctx: CanvasRenderingContext2D,
     bins: number[],
     values: number[],
-    label: string
+    label: string,
+    devicePixelRatio: number = 1.0
 ): Chart<"bar"> => {
     const max_ticks = 7;
 
@@ -36,6 +37,7 @@ export const drawHistogramChart = (
             ]
         },
         options: {
+            devicePixelRatio,
             ...getDefaultHistogramOptions(),
             ...getDefaultHistogramScales(
                 label,
@@ -69,7 +71,8 @@ export const drawProbabilisticSeriesChart = (
     ctx: CanvasRenderingContext2D,
     means: number[],
     stddevs: number[],
-    label: string
+    label: string,
+    devicePixelRatio: number = 1.0
 ): Chart<"bar" | "scatter"> => {
     const max_ticks = 7;
 
@@ -98,6 +101,7 @@ export const drawProbabilisticSeriesChart = (
             ]
         },
         options: {
+            devicePixelRatio,
             ...getDefaultHistogramOptions(),
             ...(getDefaultScatterOptions() as any),
             ...getDefaultHistogramScales("time", label, means.length, 1, max_ticks, TEXT_COLOR, GRID_COLOR, false),

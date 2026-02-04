@@ -2,6 +2,8 @@
     import type { Chart } from "chart.js";
     import { onBeforeUnmount, onMounted, onUpdated, ref, useTemplateRef } from "vue";
     import { drawHistogramChart } from "../../charts/histogram/nodeEditDialog";
+    import { downloadChart } from "../../charts/download";
+    import FlowVisualizationDownloadButtons from "./FlowVisualizationDownloadButtons.vue";
 
     const { bins, counts, label } = defineProps<{ bins: number[]; counts: number[]; label: string }>();
 
@@ -23,13 +25,25 @@
         return ctx;
     };
 
-    const drawProbabilisticChart = () => {
+    const drawProbabilisticChart = (dpr: number = 1.0) => {
         const ctx = getCanvasContext();
         if (ctx == null) {
             // no canvas context
             return;
         }
-        graph.value = drawHistogramChart(graph.value, ctx, bins, counts, label);
+        graph.value = drawHistogramChart(graph.value, ctx, bins, counts, label, dpr);
+    };
+
+    const download = (filetype: string) => {
+        downloadChart(
+            dpr => {
+                drawProbabilisticChart(dpr);
+                return canvas.value;
+            },
+            label,
+            filetype,
+            2.0
+        );
     };
 
     onMounted(() => {
@@ -48,12 +62,21 @@
 </script>
 
 <template>
-    <div class="canvasContainer">
-        <canvas ref="canvas" class="canvas" />
+    <div class="container">
+        <FlowVisualizationDownloadButtons :download="download" />
+        <div class="canvasContainer">
+            <canvas ref="canvas" class="canvas" />
+        </div>
     </div>
 </template>
 
 <style scoped lang="scss">
+    .container {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
     .canvasContainer {
         flex-grow: 1;
         height: 100%;
@@ -66,5 +89,9 @@
 
     .canvas {
         position: absolute;
+    }
+
+    .downloadButtons {
+        text-align: right;
     }
 </style>

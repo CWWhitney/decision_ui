@@ -11,6 +11,7 @@
 </script>
 
 <template>
+    <p>The value of this node is evaluated to the data visualized below:</p>
     <div v-if="computedTypedTensor.type == 'success'" class="container">
         <FlowVisualizeTypedTensor
             :node-title="node.visualization.title"

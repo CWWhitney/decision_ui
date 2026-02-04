@@ -2,6 +2,8 @@
     import type { Chart } from "chart.js";
     import { onBeforeUnmount, onMounted, onUpdated, ref, useTemplateRef } from "vue";
     import { drawProbabilisticSeriesChart } from "../../charts/histogram/nodeEditDialog";
+    import { downloadChart } from "../../charts/download";
+    import FlowVisualizationDownloadButtons from "./FlowVisualizationDownloadButtons.vue";
 
     const { means, stddevs, label } = defineProps<{ means: number[]; stddevs: number[]; label: string }>();
 
@@ -23,13 +25,25 @@
         return ctx;
     };
 
-    const drawSeriesChart = () => {
+    const drawSeriesChart = (dpr: number = 1.0) => {
         const ctx = getCanvasContext();
         if (ctx == null) {
             // no canvas context
             return;
         }
-        graph.value = drawProbabilisticSeriesChart(graph.value, ctx, means, stddevs, label);
+        graph.value = drawProbabilisticSeriesChart(graph.value, ctx, means, stddevs, label, dpr);
+    };
+
+    const download = (filetype: string) => {
+        downloadChart(
+            dpr => {
+                drawSeriesChart(dpr);
+                return canvas.value;
+            },
+            label,
+            filetype,
+            2.0
+        );
     };
 
     onMounted(() => {
@@ -48,12 +62,21 @@
 </script>
 
 <template>
-    <div class="canvasContainer">
-        <canvas ref="canvas" class="canvas" />
+    <div class="container">
+        <FlowVisualizationDownloadButtons :download="download" />
+        <div class="canvasContainer">
+            <canvas ref="canvas" class="canvas" />
+        </div>
     </div>
 </template>
 
 <style scoped lang="scss">
+    .container {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
     .canvasContainer {
         flex-grow: 1;
         height: 100%;

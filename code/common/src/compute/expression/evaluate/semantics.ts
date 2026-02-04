@@ -34,10 +34,18 @@ const unaryOperators: { [key: string]: (t: tf.Tensor) => tf.Tensor } = {
     sin: tf.sin,
     cos: tf.cos,
     tan: tf.tan,
+    tanh: tf.tanh,
     exp: tf.exp,
     log: tf.log,
-    log10: (t: tf.Tensor) => tf.div(tf.log(t), tf.log(10)),
-    round: tf.round
+    round: tf.round,
+    sign: tf.sign
+};
+
+const seriesFunctions: { [key: string]: (t: tf.Tensor, axis: number) => tf.Tensor } = {
+    sum: tf.sum,
+    max: tf.max,
+    min: tf.min,
+    prod: tf.prod
 };
 
 export const createTensorEvaluationSemantics = () => {
@@ -198,24 +206,33 @@ export const createTensorEvaluationSemantics = () => {
                 return wrapUnaryTensorOperator(unaryOperators[name])(args[0]);
             }
 
-            if (name == "npv") {
+            if (name in seriesFunctions) {
+                if (args.length != 1) {
+                    throw new Error(`function '${name}' only accepts one parameter`);
+                }
+                const tt = args[0];
+                if (!tt.isSeries) {
+                    throw new Error(`function '${name}' can only be applied to time series data`);
+                }
+                return {
+                    tensor: seriesFunctions[name](tt.tensor, tt.isProbabilistic ? 1 : 0),
+                    isSeries: false,
+                    isProbabilistic: tt.isProbabilistic
+                };
+            }
+
+            if (name == "discount") {
                 if (args.length != 2) {
-                    throw new Error(`function 'npv' expects two parameters (time series, discount)`);
+                    throw new Error(`function 'discount' expects two parameters (x, discount_rate)`);
                 }
                 return netPresentValue(args[0], args[1]);
             }
 
             if (name == "vv") {
-                if (args.length < 3) {
+                if (args.length < 3 || args.length > 7) {
                     throw new Error(
-                        `function 'vv' expects at least 3 parameters ` +
-                            `(varMean, varCV, n, absoluteTrend, relativeTrend, lowerLimit, upperLimit)`
-                    );
-                }
-                if (args.length > 7) {
-                    throw new Error(
-                        `function 'vv' expects at most 7 parameters ` +
-                            `(varMean, varCV, n, absoluteTrend, relativeTrend, lowerLimit, upperLimit)`
+                        `function 'vv' expects at least 3 and at most 7 parameters ` +
+                            `(var_mean, var_cv, n, absolute_trend, relative_trend, lower_limit, upper_limit)`
                     );
                 }
                 const context = this.args.context as ExpressionTensorContext;
@@ -233,10 +250,10 @@ export const createTensorEvaluationSemantics = () => {
             }
 
             if (name == "chance_event") {
-                if (args.length < 1) {
+                if (args.length < 1 || args.length > 7) {
                     throw new Error(
-                        `function 'chance_event' expects at least 1 parameter ` +
-                            `(chance, valueIf, valueIfNot, n, cvIf, cvIfNot, oneDraw)`
+                        `function 'chance_event' expects at least 1 and at most 7 parameter ` +
+                            `(chance, value_if, value_if_not, n, cv_if, cv_if_not, one_draw)`
                     );
                 }
                 const context = this.args.context as ExpressionTensorContext;
@@ -257,6 +274,10 @@ export const createTensorEvaluationSemantics = () => {
 
         FuncArgs(first, _c, rest) {
             return [first.eval(this.args.context), ...rest.children.map(c => c.eval(this.args.context))];
+        },
+
+        pi(_) {
+            return getTypedTensorFromConstant(tf.scalar(Math.PI));
         },
 
         IndexedVariable(variable, sliceOp) {

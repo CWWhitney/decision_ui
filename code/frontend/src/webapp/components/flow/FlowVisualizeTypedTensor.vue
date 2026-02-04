@@ -107,20 +107,25 @@
             :label="nodeTitle"
         />
         <div class="options">
-            <div class="toggle">
-                <v-btn-toggle v-model="probabilisticSeriesMode" divided border variant="text" color="primary">
-                    <v-btn text="All Data" value="full" />
-                    <v-btn prepend-icon="mdi-scatter-plot" text="Single Sample" value="sample" />
-                    <v-btn prepend-icon="mdi-clock-outline" text="Single Time Step" value="timestep" />
-                </v-btn-toggle>
-            </div>
+            <v-btn-toggle
+                v-model="probabilisticSeriesMode"
+                divided
+                border
+                variant="text"
+                color="primary"
+                class="toggle"
+            >
+                <v-btn text="All Data" value="full" />
+                <v-btn prepend-icon="mdi-scatter-plot" text="Single Sample" value="sample" />
+                <v-btn prepend-icon="mdi-clock-outline" text="Single Time Step" value="timestep" />
+            </v-btn-toggle>
             <v-slider
                 v-if="probabilisticSeriesSingleSamplePlotData != null"
                 v-model="sampleId"
                 min="0"
                 :max="tt.tensor.shape[0]! - 1"
                 step="1"
-                label="Sample"
+                :label="`Sample ${String(sampleId + 1).padStart(Math.floor(Math.log(tt.tensor.shape[0]!) / Math.log(10)) + 1, '0')}`"
             ></v-slider>
             <v-slider
                 v-if="probabilisticSeriesSingleTimestepHistogramData != null"
@@ -128,7 +133,7 @@
                 min="0"
                 :max="tt.tensor.shape[1]! - 1"
                 step="1"
-                label="Timestep"
+                :label="`Time Step ${String(timestepId + 1).padStart(Math.floor(Math.log(tt.tensor.shape[1]!) / Math.log(10)) + 1, '0')}`"
             ></v-slider>
         </div>
     </template>
@@ -143,7 +148,10 @@
 
         .toggle {
             display: flex;
-            justify-content: center;
+
+            :deep(button) {
+                flex-grow: 1;
+            }
         }
 
         .v-slider {

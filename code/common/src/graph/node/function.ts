@@ -68,19 +68,19 @@ export const OperationNodeFunctionSchema: Schema = {
 };
 
 export interface LoopNodeFunctionState extends AbstractVariableNodeFunctionState<LoopFunctionType> {
-    iterations: number;
+    iterationsExpression: string;
     initExpression: string;
-    iterExpression: string;
+    loopExpression: string;
 }
 
 export const LoopNodeFunctionSchema: Schema = {
     type: "object",
     properties: {
-        iterations: { type: "number" },
+        iterationsExpression: { type: "string" },
         initExpression: { type: "string" },
-        iterExpression: { type: "string" }
+        loopExpression: { type: "string" }
     },
-    required: ["iterations", "initExpression", "iterExpression"]
+    required: ["iterationsExpression", "initExpression", "loopExpression"]
 };
 
 export interface ResultNodeFunctionState extends AbstractVariableNodeFunctionState<ResultFunctionType> {

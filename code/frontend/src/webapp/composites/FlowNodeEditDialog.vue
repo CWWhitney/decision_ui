@@ -8,15 +8,25 @@
         useDialogsNodeEditStore
     } from "@/state/dialogs";
 
-    import FlowNodeEditGeneralTab from "./FlowNodeEditGeneralTab.vue";
+    import FlowNodeEditGeneralTab from "../components/flow/FlowNodeEditGeneralTab.vue";
     import FlowNodeEditFunctionTab from "./FlowNodeEditFunctionTab.vue";
     import FlowNodeEditDebugTab from "./FlowNodeEditDebugTab.vue";
     import FlowNodeEditDataTab from "./FlowNodeEditDataTab.vue";
     import FlowNodeEditStyleTab from "../components/flow/FlowNodeEditStyleTab.vue";
-    import { ref } from "vue";
+    import { computed, ref } from "vue";
     import { VARIABLE_NODE_TYPE } from "@decision-support-ui/common";
+    import { useFlowGraphStore } from "@/state/graph";
 
     const store = useDialogsNodeEditStore();
+    const graph = useFlowGraphStore();
+
+    const node = computed(() => {
+        const nodeId = store.nodeId;
+        if (nodeId) {
+            return graph.getComputedNode(nodeId).value;
+        }
+        return null;
+    });
 
     const maximized = ref(false);
 
@@ -27,7 +37,7 @@
 
 <template>
     <v-dialog
-        v-if="store.node"
+        v-if="node"
         v-model="store.isOpen"
         :width="maximized ? '90%' : 'auto'"
         :height="maximized ? '90%' : 'auto'"
@@ -36,8 +46,30 @@
     >
         <v-card>
             <v-toolbar>
-                <v-toolbar-title>{{ store.node.visualization.title }}</v-toolbar-title>
+                <v-toolbar-title>{{ node.visualization.title }}</v-toolbar-title>
                 <v-toolbar-items>
+                    <v-tooltip location="bottom" text="undo" open-delay="500">
+                        <template #activator="{ props }">
+                            <v-btn
+                                v-bind="props"
+                                icon="mdi-undo"
+                                size="small"
+                                :disabled="!graph.history.canUndo"
+                                @click="graph.history.undo"
+                            ></v-btn>
+                        </template>
+                    </v-tooltip>
+                    <v-tooltip location="bottom" text="redo" open-delay="500">
+                        <template #activator="{ props }">
+                            <v-btn
+                                v-bind="props"
+                                icon="mdi-redo"
+                                size="small"
+                                :disabled="!graph.history.canRedo"
+                                @click="graph.history.redo"
+                            ></v-btn>
+                        </template>
+                    </v-tooltip>
                     <v-tooltip
                         location="bottom"
                         :text="maximized ? 'reduce window size' : 'maximize window size'"
@@ -60,20 +92,20 @@
                 <v-tabs v-model="store.tab" color="primary" direction="vertical">
                     <v-tab prepend-icon="mdi-information-outline" text="General" :value="NODE_EDIT_GENERAL_TAB"></v-tab>
                     <v-tab
-                        v-if="store.node.type == VARIABLE_NODE_TYPE"
+                        v-if="node.type == VARIABLE_NODE_TYPE"
                         prepend-icon="mdi-function"
                         text="Function"
                         :value="NODE_EDIT_FUNCTION_TAB"
                     ></v-tab>
                     <v-tab
-                        v-if="store.node.type == VARIABLE_NODE_TYPE"
+                        v-if="node.type == VARIABLE_NODE_TYPE"
                         prepend-icon="mdi-chart-histogram"
                         text="Data"
                         :value="NODE_EDIT_DATA_TAB"
                     ></v-tab>
                     <v-tab prepend-icon="mdi-palette-outline" text="Style" :value="NODE_EDIT_STYLE_TAB"></v-tab>
                     <v-tab
-                        v-if="store.node.type == VARIABLE_NODE_TYPE"
+                        v-if="node.type == VARIABLE_NODE_TYPE"
                         prepend-icon="mdi-bug-outline"
                         text="Debug"
                         :value="NODE_EDIT_DEBUG_TAB"
@@ -81,19 +113,19 @@
                 </v-tabs>
                 <v-tabs-window v-model="store.tab">
                     <v-tabs-window-item :value="NODE_EDIT_GENERAL_TAB">
-                        <FlowNodeEditGeneralTab v-model="store.node" />
+                        <FlowNodeEditGeneralTab v-model="node" />
                     </v-tabs-window-item>
                     <v-tabs-window-item :value="NODE_EDIT_FUNCTION_TAB">
-                        <FlowNodeEditFunctionTab v-model="store.node" />
+                        <FlowNodeEditFunctionTab v-model="node" />
                     </v-tabs-window-item>
                     <v-tabs-window-item :value="NODE_EDIT_DATA_TAB">
-                        <FlowNodeEditDataTab v-model="store.node" />
+                        <FlowNodeEditDataTab v-model="node" />
                     </v-tabs-window-item>
                     <v-tabs-window-item :value="NODE_EDIT_STYLE_TAB">
-                        <FlowNodeEditStyleTab v-model="store.node" />
+                        <FlowNodeEditStyleTab v-model="node" />
                     </v-tabs-window-item>
                     <v-tabs-window-item :value="NODE_EDIT_DEBUG_TAB">
-                        <FlowNodeEditDebugTab v-model="store.node" />
+                        <FlowNodeEditDebugTab v-model="node" />
                     </v-tabs-window-item>
                 </v-tabs-window>
             </v-card-text>
@@ -128,7 +160,7 @@
 
         .v-window {
             width: 100%;
-            min-width: 20em;
+            min-width: 35em;
             overflow: auto;
 
             .v-window__container {
@@ -147,6 +179,14 @@
             font-weight: 500;
             margin: 1.5em 0 1em 0;
             text-transform: uppercase;
+
+            &:first-child {
+                margin-top: 0;
+            }
+        }
+
+        p {
+            margin: 1em 0;
 
             &:first-child {
                 margin-top: 0;

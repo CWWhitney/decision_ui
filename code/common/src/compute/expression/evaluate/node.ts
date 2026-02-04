@@ -51,8 +51,9 @@ interface OperationFunctionExpressionMatches extends AbstractFunctionExpressionM
 }
 
 interface LoopFunctionExpressionMatches extends AbstractFunctionExpressionMatch<LoopFunctionType> {
+    iterationsExpressionMatch: SucceededMatchResult;
     initExpressionMatch: SucceededMatchResult;
-    iterExpressionMatch: SucceededMatchResult;
+    loopExpressionMatch: SucceededMatchResult;
 }
 
 interface ResultFunctionExpressionMatches extends AbstractFunctionExpressionMatch<ResultFunctionType> {
@@ -67,9 +68,11 @@ export type NodeFunctionExpressionMatches =
     | LoopFunctionExpressionMatches
     | ResultFunctionExpressionMatches;
 
-export const getExpressionMatchesForOperationFunction = (node: Node): OperationFunctionExpressionMatches => {
-    if (node.function.type != OPERATION_FUNCTION_TYPE) {
-        throw new Error(`cannot match expressions for node of type '${node.type}'`);
+export const getExpressionMatchesForOperationFunction = (
+    node: AbstractNode<VariableNodeType, OperationNodeFunctionState, any>
+): OperationFunctionExpressionMatches => {
+    if (!node.function.expression || node.function.expression == "") {
+        throw new Error(`expression may not be empty`);
     }
 
     return {
@@ -78,21 +81,29 @@ export const getExpressionMatchesForOperationFunction = (node: Node): OperationF
     };
 };
 
-export const getExpressionMatchesForLoopFunction = (node: Node): LoopFunctionExpressionMatches => {
-    if (node.function.type != LOOP_FUNCTION_TYPE) {
-        throw new Error(`cannot match expressions for node of type '${node.type}'`);
+export const getExpressionMatchesForLoopFunction = (
+    node: AbstractNode<VariableNodeType, LoopNodeFunctionState, any>
+): LoopFunctionExpressionMatches => {
+    if (!node.function.initExpression || node.function.initExpression == "") {
+        throw new Error(`expression for initial value may not be empty`);
+    }
+    if (!node.function.loopExpression || node.function.loopExpression == "") {
+        throw new Error(`expression for iteration value may not be empty`);
     }
 
     return {
         type: LOOP_FUNCTION_TYPE,
+        iterationsExpressionMatch: matchExpression(node.function.iterationsExpression),
         initExpressionMatch: matchExpression(node.function.initExpression),
-        iterExpressionMatch: matchExpression(node.function.iterExpression)
+        loopExpressionMatch: matchExpression(node.function.loopExpression)
     };
 };
 
-export const getExpressionMatchesForResultFunction = (node: Node): ResultFunctionExpressionMatches => {
-    if (node.function.type != RESULT_FUNCTION_TYPE) {
-        throw new Error(`cannot match expressions for node of type '${node.type}'`);
+export const getExpressionMatchesForResultFunction = (
+    node: AbstractNode<VariableNodeType, ResultNodeFunctionState, any>
+): ResultFunctionExpressionMatches => {
+    if (!node.function.expression || node.function.expression == "") {
+        throw new Error(`expression may not be empty`);
     }
 
     return {
@@ -108,11 +119,15 @@ export const getExpressionMatchesForNode = (node: Node): NodeFunctionExpressionM
     if (node.function.type == ESTIMATE_FUNCTION_TYPE) {
         return null;
     } else if (node.function.type == OPERATION_FUNCTION_TYPE) {
-        return getExpressionMatchesForOperationFunction(node);
+        return getExpressionMatchesForOperationFunction(
+            node as AbstractNode<VariableNodeType, OperationNodeFunctionState, any>
+        );
     } else if (node.function.type == LOOP_FUNCTION_TYPE) {
-        return getExpressionMatchesForLoopFunction(node);
+        return getExpressionMatchesForLoopFunction(node as AbstractNode<VariableNodeType, LoopNodeFunctionState, any>);
     } else if (node.function.type == RESULT_FUNCTION_TYPE) {
-        return getExpressionMatchesForResultFunction(node);
+        return getExpressionMatchesForResultFunction(
+            node as AbstractNode<VariableNodeType, ResultNodeFunctionState, any>
+        );
     }
     throw new Error(`unknown variable node function type '${(node as any).function.type}' when matching expressions`);
 };
@@ -183,28 +198,54 @@ export const getTypedTensorForLoopOperationNode = (
     getTypedTensorForNode: (nodeId: string) => TypedTensor,
     computationContext: ComputationContext
 ): TypedTensor => {
-    const { iterations } = node.function;
-
-    // determine all required variable values as tensors
     const expressionContext: ExpressionTensorContext = {
         tensorByVariable: {},
         mcRuns: computationContext.mcRuns,
-        index: {
-            iteration: 0,
-            length: iterations
-        }
+        index: null
     };
+    // determine all required variable values as tensors
     for (const variable of getVariableDependencies(node.id)) {
         expressionContext.tensorByVariable[variable] = getTypedTensorForNode(getNodeIdForVariable(variable));
     }
 
-    return tf.tidy(() => {
-        let tensorList = [] as TypedTensor[];
-        const initTensor = evaluateExpressionMatch(expressionMatches.initExpressionMatch, expressionContext);
+    // evaluate iterations expression
+    const iterationsTT = tf.tidy(() => {
+        return evaluateExpressionMatch(expressionMatches.iterationsExpressionMatch, expressionContext);
+    });
 
+    if (iterationsTT.isProbabilistic || iterationsTT.isSeries || iterationsTT.tensor.shape.length != 0) {
+        iterationsTT.tensor.dispose();
+        const variableDescription = iterationsTT.isProbabilistic ? "probabilisitc" : "a time series";
+        throw new Error(`iterations expression must yield a deterministic value, but was ${variableDescription}`);
+    }
+
+    const iterations = iterationsTT.tensor.arraySync() as number;
+    iterationsTT.tensor.dispose();
+
+    if (iterations != Math.floor(iterations)) {
+        throw new Error(`iterations expression must yield a integer value, but was ${iterations}`);
+    }
+
+    // evaluate loop
+    return tf.tidy(() => {
+        // evaluate init expression
+        let tensorList = [] as TypedTensor[];
+        const initTensor = evaluateExpressionMatch(expressionMatches.initExpressionMatch, {
+            ...expressionContext,
+            index: {
+                iteration: 0,
+                length: iterations
+            },
+            tensorByVariable: {
+                ...expressionContext.tensorByVariable,
+                i: getTypedTensorFromConstant(tf.scalar(0))
+            }
+        });
         tensorList.push(initTensor);
+
+        // evaluate iter expression in loop
         for (let i = 1; i < iterations; i++) {
-            const iterTensor = evaluateExpressionMatch(expressionMatches.iterExpressionMatch, {
+            const iterTensor = evaluateExpressionMatch(expressionMatches.loopExpressionMatch, {
                 ...expressionContext,
                 index: {
                     ...expressionContext.index,

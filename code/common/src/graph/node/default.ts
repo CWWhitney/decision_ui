@@ -69,9 +69,9 @@ export const getDefaultFunctionState = (variable: string, functionType: NodeFunc
             return {
                 type: LOOP_FUNCTION_TYPE,
                 variable,
-                iterations: 10,
+                iterationsExpression: "10",
                 initExpression: "",
-                iterExpression: ""
+                loopExpression: ""
             } as LoopNodeFunctionState;
         case RESULT_FUNCTION_TYPE:
             return {

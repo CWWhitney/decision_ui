@@ -41,6 +41,7 @@ Arithmetic {
     = "(" Exp ")"  -- paren
     | IfExp
     | FuncExp
+    | pi
     | IndexedVariable
     | variable
     | number
@@ -64,19 +65,28 @@ Arithmetic {
   funcName  (a function)
     = "chance_event"
     | "vv"
-    | "npv"
+    | "discount"
     | "abs"
+    | "sign"
     | "ceiling"
     | "floor"
     | "sin"
     | "cos"
     | "tan"
+    | "tanh"
     | "exp"
     | "log"
-    | "log10"
     | "round"
     | "trunc"
     | "sqrt"
+    | "sum"
+    | "prod"
+    | "min"
+    | "max"
+    | "mean"
+
+  pi  (pi)
+    = "pi"
 
   variable  (a variable)
     = variableStart variableContinue*
