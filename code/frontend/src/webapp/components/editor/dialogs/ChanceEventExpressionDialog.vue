@@ -6,9 +6,33 @@
 
     const chanceExpression = ref<string>("");
     const valueIfExpression = ref<string>("");
+    const valueIfNotExpression = ref<string>("");
+    const nExpression = ref<string>("");
+    const cvIfExpression = ref<string>("");
+    const cvIfNotExpression = ref<string>("");
+    const oneDrawExpression = ref<string>("");
 
-    const props = defineProps<{
-        submit: (e: string) => void;
+    const getExpression = (): string => {
+        const argList = [
+            chanceExpression.value,
+            valueIfExpression.value,
+            valueIfNotExpression.value,
+            nExpression.value,
+            cvIfExpression.value,
+            cvIfNotExpression.value,
+            oneDrawExpression.value
+        ];
+
+        const defaults = ["", "1", "0", "1", "0", "0", "0"];
+
+        const lastNonEmptyIndex = argList.reduce((p, v, i) => (v != "" ? i : p), 0);
+        const argsWithDefaults = argList.map((v, i) => (v != "" ? v : defaults[i]));
+        const sliced = argsWithDefaults.slice(0, lastNonEmptyIndex + 1);
+        return `chance_event(${sliced.join(", ")})`;
+    };
+
+    const emits = defineEmits<{
+        submit: [string];
     }>();
 </script>
 
@@ -30,7 +54,7 @@
                     filled-label="chance ="
                     :show-toolbar="false"
                     :focused-rows="1"
-                    hint="Probability that the risky event will occur (between 0 and 1)"
+                    hint="Required: probability that the risky event will occur (between 0 and 1)"
                 />
                 <ExpressionInput
                     v-model="valueIfExpression"
@@ -38,50 +62,50 @@
                     filled-label="value_if ="
                     :show-toolbar="false"
                     :focused-rows="1"
-                    hint="Output value in case the event occurs. This can be either a single numeric value or a numeric vector. Defaults to 1."
+                    hint="Optional (default 1): output value in case the event occurs. This can be either a single numeric value or a numeric vector."
                 />
                 <ExpressionInput
-                    v-model="valueIfExpression"
+                    v-model="valueIfNotExpression"
                     empty-label="value_if_not"
                     filled-label="value_if_not ="
                     :show-toolbar="false"
                     :focused-rows="1"
-                    hint="output value in case the event does not occur. This can be either a single
+                    hint="Optional (default 0): output value in case the event does not occur. This can be either a single
                         numeric value or a numeric vector. If it is a vector, it must have the same length as value_if"
                 />
                 <ExpressionInput
-                    v-model="valueIfExpression"
+                    v-model="nExpression"
                     empty-label="n"
                     filled-label="n ="
                     :show-toolbar="false"
                     :focused-rows="1"
-                    hint="number of times the risky event is simulated. This is ignored if length(value_if)>1."
+                    hint="Optional (default 1): number of times the risky event is simulated. This is ignored if length(value_if)>1."
                 />
                 <ExpressionInput
-                    v-model="valueIfExpression"
+                    v-model="cvIfExpression"
                     empty-label="CV_if"
                     filled-label="CV_if ="
                     :show-toolbar="false"
                     :focused-rows="1"
-                    hint="coefficient of variation for introducing randomness into the value_if data set. This
+                    hint="Optional (default 0): coefficient of variation for introducing randomness into the value_if data set. This
                         defaults to 0 for no artificial variation. See documentation for the vv function for details."
                 />
                 <ExpressionInput
-                    v-model="valueIfExpression"
+                    v-model="cvIfNotExpression"
                     empty-label="CV_if_not"
                     filled-label="CV_if_not ="
                     :show-toolbar="false"
                     :focused-rows="1"
-                    hint="coefficient of variation for introducing randomness into the value_if_not data set.
+                    hint="Optional (default CV_if): coefficient of variation for introducing randomness into the value_if_not data set.
                         This defaults to the value for CV_if. See documentation for the vv function for details."
                 />
                 <ExpressionInput
-                    v-model="valueIfExpression"
+                    v-model="oneDrawExpression"
                     empty-label="one_draw"
                     filled-label="one_draw ="
                     :show-toolbar="false"
                     :focused-rows="1"
-                    hint="boolean coefficient indicating if event occurrence is determined only once (TRUE)
+                    hint="Optional (default false): boolean coefficient indicating if event occurrence is determined only once (TRUE)
                         with results applying to all elements of the results vector, or if event occurrence is
                         determined independently for each element (FALSE; the default)"
                 />
@@ -96,21 +120,26 @@
                     see
                     <a
                         href="https://cran.r-project.org/web/packages/decisionSupport/refman/decisionSupport.html#chance_event"
-                        >R CRAN documentation</a
+                        target="_blank"
+                        rel="nofollow"
                     >
+                        CRAN decisionSupport documentation
+                    </a>
                 </p>
             </v-card-text>
             <v-card-actions>
-                <v-btn color="primary" variant="text" @click="model = false">cancel</v-btn>
+                <v-btn color="grey" variant="text" @click="model = false">cancel</v-btn>
                 <v-btn
                     color="primary"
                     variant="text"
+                    :disabled="chanceExpression == ''"
                     @click="
-                        props.submit('chance_event()');
+                        emits('submit', getExpression());
                         model = false;
                     "
-                    >insert</v-btn
                 >
+                    insert
+                </v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>

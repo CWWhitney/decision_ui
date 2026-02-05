@@ -330,7 +330,7 @@
                 />
                 <ChanceEventExpressionDialog
                     v-model="chanceEventDialog"
-                    :submit="(e: string) => appendToExpression(e)"
+                    @submit="(e: string) => appendToExpression(e)"
                 />
                 <ExpressionToolbarButton
                     label="vv"
