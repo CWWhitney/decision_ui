@@ -248,7 +248,7 @@ export const getTypedTensorForLoopOperationNode = (
             const iterTensor = evaluateExpressionMatch(expressionMatches.loopExpressionMatch, {
                 ...expressionContext,
                 index: {
-                    ...expressionContext.index,
+                    length: iterations,
                     iteration: i
                 },
                 tensorByVariable: {

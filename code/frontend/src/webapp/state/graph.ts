@@ -196,6 +196,7 @@ export const useFlowGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
                     return {
                         type: "success",
                         value: [
+                            ...evaluateExpressionForVariableDependencies(node.function.iterationsExpression),
                             ...evaluateExpressionForVariableDependencies(node.function.initExpression),
                             ...evaluateExpressionForVariableDependencies(node.function.loopExpression)
                         ].filter(v => v !== "previous" && v !== "i")

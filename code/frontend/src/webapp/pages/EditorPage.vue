@@ -1,13 +1,13 @@
 <script setup lang="ts">
+    import EditorComposite from "@/composites/editor/EditorComposite.vue";
     import TopMenu from "@/composites/menu/TopMenu.vue";
     import LeftNavigation from "@/composites/menu/LeftNavigation.vue";
-    import HelpDashboard from "@/components/old/HelpDashboard.vue";
 </script>
 
 <template>
     <TopMenu>
         <LeftNavigation>
-            <HelpDashboard />
+            <EditorComposite />
         </LeftNavigation>
     </TopMenu>
 </template>

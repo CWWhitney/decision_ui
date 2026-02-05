@@ -1,12 +1,12 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 
-import FlowPage from "./pages/ModelPage.vue";
-import ResultsDashboard from "./components/ResultsDashboard.vue";
-import EstimatesDashboard from "./components/EstimatesDashboard.vue";
-import CodeDashboard from "./components/CodeDashboard.vue";
-import LoginForm from "./components/LoginForm.vue";
-import RegistrationForm from "./components/RegistrationForm.vue";
-import SettingsDashboard from "./components/SettingsDashboard.vue";
+import EditorPage from "./pages/EditorPage.vue";
+import ResultsDashboard from "./components/old/ResultsDashboard.vue";
+import EstimatesDashboard from "./components/old/EstimatesDashboard.vue";
+import CodeDashboard from "./components/old/CodeDashboard.vue";
+import LoginForm from "./components/old/LoginForm.vue";
+import RegistrationForm from "./components/old/RegistrationForm.vue";
+import SettingsDashboard from "./components/old/SettingsDashboard.vue";
 import HelpPage from "./pages/HelpPage.vue";
 import WelcomePage from "./pages/WelcomePage.vue";
 import MetadataPage from "./pages/MetadataPage.vue";
@@ -24,7 +24,7 @@ const routes = [
     {
         path: "/editor",
         name: "editor",
-        component: FlowPage
+        component: EditorPage
     },
     {
         path: "/estimates",

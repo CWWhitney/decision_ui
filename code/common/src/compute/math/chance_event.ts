@@ -64,6 +64,6 @@ export const chanceEvent = ({
     return {
         tensor: tf.add(tf.mul(occurrence, valueIfT), tf.mul(tf.sub(1, occurrence), valueIfNotT)),
         isProbabilistic: true,
-        isSeries: valueIf.isSeries || nValue > 1
+        isSeries: (valueIf && valueIf.isSeries) || nValue > 1
     };
 };

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-    import LoginRefresh from "./components/LoginRefresh.vue";
-    import NetworkErrorSnackbar from "./components/NetworkErrorSnackbar.vue";
+    import LoginRefresh from "./components/old/LoginRefresh.vue";
+    import NetworkErrorSnackbar from "./components/old/NetworkErrorSnackbar.vue";
     import GlobalShortcuts from "./composites/GlobalShortcuts.vue";
 </script>
 
