@@ -115,19 +115,19 @@
                 </v-tabs>
                 <v-tabs-window v-model="store.tab">
                     <v-tabs-window-item :value="NODE_EDIT_GENERAL_TAB">
-                        <NodeEditGeneralTab v-model="node" />
+                        <NodeEditGeneralTab v-if="store.tab == NODE_EDIT_GENERAL_TAB" v-model="node" />
                     </v-tabs-window-item>
                     <v-tabs-window-item :value="NODE_EDIT_FUNCTION_TAB">
-                        <NodeEditFunctionTab v-model="node" />
+                        <NodeEditFunctionTab v-if="store.tab == NODE_EDIT_FUNCTION_TAB" v-model="node" />
                     </v-tabs-window-item>
                     <v-tabs-window-item :value="NODE_EDIT_DATA_TAB">
-                        <NodeEditDataTab v-model="node" />
+                        <NodeEditDataTab v-if="store.tab == NODE_EDIT_DATA_TAB" v-model="node" />
                     </v-tabs-window-item>
                     <v-tabs-window-item :value="NODE_EDIT_STYLE_TAB">
-                        <NodeEditStyleTab v-model="node" />
+                        <NodeEditStyleTab v-if="store.tab == NODE_EDIT_STYLE_TAB" v-model="node" />
                     </v-tabs-window-item>
                     <v-tabs-window-item :value="NODE_EDIT_DEBUG_TAB">
-                        <NodeEditDebugTab v-model="node" />
+                        <NodeEditDebugTab v-if="store.tab == NODE_EDIT_DEBUG_TAB" v-model="node" />
                     </v-tabs-window-item>
                 </v-tabs-window>
             </v-card-text>
