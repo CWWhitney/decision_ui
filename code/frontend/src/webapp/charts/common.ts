@@ -12,6 +12,8 @@ import {
     Tooltip
 } from "chart.js";
 
+import { BoxPlotController, BoxAndWiskers } from "@sgratzl/chartjs-chart-boxplot";
+
 /* eslint @typescript-eslint/no-unsafe-function-type: 0 */
 
 // copied from internal chartjs typings
@@ -40,6 +42,8 @@ export const CHART_COLORS = [
 Chart.register(
     BarController,
     ScatterController,
+    BoxPlotController,
+    BoxAndWiskers,
     LinearScale,
     BarElement,
     PointElement,
@@ -49,7 +53,7 @@ Chart.register(
     Tooltip
 );
 
-export const getDefaultHistogramScales = (
+export const getDefaultChartScales = (
     xLabel: string,
     yLabel: string,
     maxValue: number,
@@ -58,7 +62,7 @@ export const getDefaultHistogramScales = (
     textColor: string,
     gridColor: string,
     beginAtZero: boolean
-): DeepPartial<ScaleChartOptions<"bar" | "scatter">> => {
+): DeepPartial<ScaleChartOptions<"bar" | "scatter" | "boxplot">> => {
     return {
         scales: {
             x: {
@@ -123,7 +127,7 @@ export const getDefaultHistogramLegend = (textColor: string): DeepPartial<Legend
     };
 };
 
-export const getDefaultHistogramOptions = (): ChartOptions<"bar"> => {
+export const getDefaultChartOptions = (): ChartOptions<any> => {
     return {
         responsive: true,
         resizeDelay: 0,

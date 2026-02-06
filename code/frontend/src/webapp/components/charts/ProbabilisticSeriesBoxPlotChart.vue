@@ -1,14 +1,16 @@
 <script setup lang="ts">
     import type { Chart } from "chart.js";
     import { onBeforeUnmount, onMounted, onUpdated, ref, useTemplateRef } from "vue";
-    import { drawProbabilisticSeriesChart } from "../../charts/histogram/nodeEditDialog";
+    import { drawProbabilisticSeriesBoxPlotChart } from "../../charts/boxplot";
     import { downloadChart } from "../../charts/download";
     import ChartDownloadButtons from "./ChartDownloadButtons.vue";
+    import type { BoxPlotPoint } from "@decision-support-ui/common";
+    import { CHART_DOWNLOAD_DPR } from "@/common/constants";
 
-    const { means, stddevs, label } = defineProps<{ means: number[]; stddevs: number[]; label: string }>();
+    const { label, boxPlotData } = defineProps<{ label: string; boxPlotData: BoxPlotPoint[] }>();
 
     const canvas = useTemplateRef<HTMLCanvasElement | null>("canvas");
-    const graph = ref<Chart<"bar"> | Chart<any> | null>(null);
+    const graph = ref<Chart<"boxplot"> | Chart<any> | null>(null);
 
     const getCanvasContext = () => {
         if (!canvas.value) {
@@ -25,13 +27,13 @@
         return ctx;
     };
 
-    const drawSeriesChart = (dpr: number = 1.0) => {
+    const drawSeriesChart = (dpr: number = window.devicePixelRatio) => {
         const ctx = getCanvasContext();
         if (ctx == null) {
             // no canvas context
             return;
         }
-        graph.value = drawProbabilisticSeriesChart(graph.value, ctx, means, stddevs, label, dpr);
+        graph.value = drawProbabilisticSeriesBoxPlotChart(graph.value, ctx, boxPlotData, label, dpr);
     };
 
     const download = (filetype: string) => {
@@ -42,7 +44,7 @@
             },
             label,
             filetype,
-            2.0
+            CHART_DOWNLOAD_DPR
         );
     };
 

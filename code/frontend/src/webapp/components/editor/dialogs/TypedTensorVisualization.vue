@@ -5,9 +5,9 @@
     import { ref } from "vue";
 
     import DeterministicValueChart from "../../charts/DeterministicValueChart.vue";
-    import ProbabilisticSeriesChart from "../../charts/ProbabilisticSeriesChart.vue";
     import ProbabilisticValueChart from "../../charts/ProbabilisticValueChart.vue";
     import DeterministicSeriesChart from "../../charts/DeterministicSeriesChart.vue";
+    import ProbabilisticSeriesBoxPlotChart from "../../charts/ProbabilisticSeriesBoxPlotChart.vue";
 
     const { nodeTitle, tt, bins } = defineProps<{
         nodeTitle: string;
@@ -40,9 +40,9 @@
         return null;
     });
 
-    const probabilisticSeriesPlotData = computedAsync(async () => {
+    const probabilisticSeriesBoxPlotData = computedAsync(async () => {
         if (tt.isSeries && tt.isProbabilistic && probabilisticSeriesMode.value == "full") {
-            return await common.getProbabilisticSeriesPlotDataFromTensor(tt.tensor);
+            return await common.getProbabilisticSeriesBoxPlotDataFromTensor(tt.tensor);
         }
         return null;
     });
@@ -89,10 +89,9 @@
         <DeterministicSeriesChart :values="deterministicSeriesPlotData.values" :label="nodeTitle" />
     </template>
     <template v-if="tt.isSeries && tt.isProbabilistic">
-        <ProbabilisticSeriesChart
-            v-if="probabilisticSeriesPlotData != null"
-            :means="probabilisticSeriesPlotData.means"
-            :stddevs="probabilisticSeriesPlotData.stddevs"
+        <ProbabilisticSeriesBoxPlotChart
+            v-if="probabilisticSeriesBoxPlotData != null"
+            :box-plot-data="probabilisticSeriesBoxPlotData"
             :label="nodeTitle"
         />
         <DeterministicSeriesChart

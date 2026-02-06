@@ -1,6 +1,6 @@
 import { Chart, type ChartDataset } from "chart.js";
 
-import { getDefaultHistogramOptions, getDefaultHistogramScales } from "./common";
+import { getDefaultChartOptions, getDefaultChartScales } from "../common";
 
 const TEXT_COLOR = "rgba(255, 255, 255, 1)";
 const GRID_COLOR = "rgba(255, 255, 255, 0.2)";
@@ -30,8 +30,8 @@ export const drawNodeHistogram = (
             ]
         },
         options: {
-            ...getDefaultHistogramOptions(),
-            ...getDefaultHistogramScales(max_ticks, TEXT_COLOR, GRID_COLOR, true),
+            ...getDefaultChartOptions(),
+            ...getDefaultChartScales(max_ticks, TEXT_COLOR, GRID_COLOR, true),
             plugins: {
                 legend: { display: false }
             }

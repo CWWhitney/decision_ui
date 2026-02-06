@@ -1,9 +1,10 @@
 <script setup lang="ts">
     import type { Chart } from "chart.js";
     import { onBeforeUnmount, onMounted, onUpdated, ref, useTemplateRef } from "vue";
-    import { drawHistogramChart } from "../../charts/histogram/nodeEditDialog";
+    import { drawHistogramChart } from "../../charts/histogram";
     import { downloadChart } from "../../charts/download";
     import ChartDownloadButtons from "./ChartDownloadButtons.vue";
+    import { CHART_DOWNLOAD_DPR } from "@/common/constants";
 
     const { bins, counts, label } = defineProps<{ bins: number[]; counts: number[]; label: string }>();
 
@@ -25,7 +26,7 @@
         return ctx;
     };
 
-    const drawProbabilisticChart = (dpr: number = 1.0) => {
+    const drawProbabilisticChart = (dpr: number = window.devicePixelRatio) => {
         const ctx = getCanvasContext();
         if (ctx == null) {
             // no canvas context
@@ -42,7 +43,7 @@
             },
             label,
             filetype,
-            2.0
+            CHART_DOWNLOAD_DPR
         );
     };
 

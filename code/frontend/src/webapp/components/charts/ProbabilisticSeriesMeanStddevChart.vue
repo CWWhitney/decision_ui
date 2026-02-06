@@ -2,10 +2,11 @@
     import type { Chart } from "chart.js";
     import { onBeforeUnmount, onMounted, onUpdated, ref, useTemplateRef } from "vue";
     import { drawProbabilisticSeriesChart } from "../../charts/series";
-    import ChartDownloadButtons from "./ChartDownloadButtons.vue";
     import { downloadChart } from "../../charts/download";
+    import ChartDownloadButtons from "./ChartDownloadButtons.vue";
+    import { CHART_DOWNLOAD_DPR } from "@/common/constants";
 
-    const { values, label } = defineProps<{ values: number[]; label: string }>();
+    const { means, stddevs, label } = defineProps<{ means: number[]; stddevs: number[]; label: string }>();
 
     const canvas = useTemplateRef<HTMLCanvasElement | null>("canvas");
     const graph = ref<Chart<"bar"> | Chart<any> | null>(null);
@@ -25,13 +26,13 @@
         return ctx;
     };
 
-    const drawSeriesChart = (dps: number = 1.0) => {
+    const drawSeriesChart = (dpr: number = window.devicePixelRatio) => {
         const ctx = getCanvasContext();
         if (ctx == null) {
             // no canvas context
             return;
         }
-        graph.value = drawProbabilisticSeriesChart(graph.value, ctx, values, Array(values.length).fill(0), label, dps);
+        graph.value = drawProbabilisticSeriesChart(graph.value, ctx, means, stddevs, label, dpr);
     };
 
     const download = (filetype: string) => {
@@ -42,7 +43,7 @@
             },
             label,
             filetype,
-            3.0
+            CHART_DOWNLOAD_DPR
         );
     };
 

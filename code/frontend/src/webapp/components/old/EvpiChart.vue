@@ -4,7 +4,7 @@
     import { useModelStore } from "../../state/old/model";
     import { useTemplateRef, ref, watch, onMounted, computed } from "vue";
     import type { Chart } from "chart.js";
-    import { drawEvpiBoxChart } from "../../charts/histogram/evpi";
+    import { drawEvpiBoxChart } from "../../charts/old/evpi";
     import RunButton from "./RunButton.vue";
     import { downloadChart } from "../../charts/download";
 
