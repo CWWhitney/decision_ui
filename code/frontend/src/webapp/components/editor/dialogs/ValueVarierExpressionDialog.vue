@@ -104,7 +104,7 @@
                     filled-label="lower_limit ="
                     :show-toolbar="false"
                     :focused-rows="1"
-                    hint="Optional (default none): lowest possible value for elements of the resulting vector"
+                    hint="Optional (default NA): lowest possible value for elements of the resulting vector"
                 />
                 <ExpressionInput
                     v-model="lowerLimitExpression"
@@ -112,7 +112,7 @@
                     filled-label="upper_limit ="
                     :show-toolbar="false"
                     :focused-rows="1"
-                    hint="Optional (default none): upper possible value for elements of the resulting vector"
+                    hint="Optional (default NA): upper possible value for elements of the resulting vector"
                 />
                 <h4>Note</h4>
                 <p>

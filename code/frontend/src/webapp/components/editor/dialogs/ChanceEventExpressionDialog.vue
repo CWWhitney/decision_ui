@@ -111,9 +111,10 @@
                 />
                 <h4>Return Value</h4>
                 <p>
-                    Returns a numeric vector of the same length as value_if or, if length(value_if)==1 of length n,
-                    containing outputs of a probabilistic simulation that assigns value_if if the event occurs, or
-                    value_if_not if is does not occur (both optionally with artificial variation)
+                    Returns a numeric vector of the same length as <code>value_if</code> or, if
+                    <code>length(value_if)==1</code> of length <code>n</code>, containing outputs of a probabilistic
+                    simulation that assigns <code>value_if</code> if the event occurs, or <code>value_if_not</code> if
+                    is does not occur (both optionally with artificial variation)
                 </p>
                 <h4>Further Information</h4>
                 <p>

@@ -21,8 +21,8 @@
 </script>
 
 <template>
-    <div>
-        <p>General properties of this node:</p>
+    <div class="generalTabContainer">
+        <div>General properties of this node:</div>
 
         <HelpHintWrapper to="/help/user-interface/model-editor">
             <template #default>
@@ -72,6 +72,12 @@
 </template>
 
 <style scoped lang="scss">
+    .generalTabContainer {
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+    }
+
     .v-text-field {
         min-width: 18em;
     }

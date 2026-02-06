@@ -56,12 +56,13 @@
                     filled-label="calculate_NPV ="
                     :show-toolbar="false"
                     :focused-rows="1"
-                    hint="Required: boolean; if set to TRUE, the discounted time values are summed, otherwise, they are returned as a vector"
+                    hint="Optional: boolean (default FALSE); if set to TRUE, the discounted time values are summed, otherwise, they are returned as a vector"
                 />
                 <h4>Return Value</h4>
                 <p>
-                    If calculate_NPV=TRUE, the function returns the Net Present Value (NPV) as a numeric value. If
-                    calculate_NPV=FALSE, the time-discounted values are returned as a numeric vector.
+                    If <code>calculate_NPV=TRUE</code>, the function returns the Net Present Value (NPV) as a numeric
+                    value. If <code>calculate_NPV=FALSE</code>, the time-discounted values are returned as a numeric
+                    vector.
                 </p>
                 <h4>Further Information</h4>
                 <p>

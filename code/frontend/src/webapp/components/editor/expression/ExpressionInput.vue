@@ -10,6 +10,7 @@
     import ChanceEventExpressionDialog from "../dialogs/ChanceEventExpressionDialog.vue";
     import ValueVarierExpressionDialog from "../dialogs/ValueVarierExpressionDialog.vue";
     import DiscountExpressionDialog from "../dialogs/DiscountExpressionDialog.vue";
+    import IfExpressionDialog from "../dialogs/IfExpressionDialog.vue";
 
     const expression = defineModel<string>({
         required: true
@@ -112,31 +113,31 @@
     const MATH_OPERATIONS: ExpressionToolbarButtonInfo[] = [
         {
             icon: "mdi-plus",
-            expression: "x + y",
+            expression: "X + Y",
             tooltip: "addition"
         },
         {
             icon: "mdi-minus",
             size: "x-small",
-            expression: "x - y",
+            expression: "X - Y",
             tooltip: "subtraction"
         },
         {
             icon: "mdi-multiplication",
             size: "x-small",
-            expression: "x * y",
+            expression: "X * Y",
             tooltip: "multiplication"
         },
         {
             icon: "mdi-division",
             size: "x-small",
-            expression: "x / y",
+            expression: "X / Y",
             tooltip: "division"
         },
         {
             icon: "mdi-percent",
             size: "x-small",
-            expression: "x % y",
+            expression: "X % Y",
             tooltip: "modulo"
         }
     ];
@@ -145,62 +146,56 @@
         {
             icon: "mdi-less-than",
             size: "x-small",
-            expression: "x < y",
+            expression: "X < Y",
             tooltip: "less than condition"
         },
         {
             icon: "mdi-less-than-or-equal",
             size: "x-small",
-            expression: "x <= y",
+            expression: "X <= Y",
             tooltip: "less than or equal condition"
         },
         {
             icon: "mdi-equal",
-            expression: "x == y",
+            expression: "X == Y",
             tooltip: "equal condition"
         },
         {
             icon: "mdi-not-equal-variant",
-            expression: "x != y",
+            expression: "X != Y",
             tooltip: "not equal condition"
         },
         {
             icon: "mdi-greater-than",
             size: "x-small",
-            expression: "x > y",
+            expression: "X > Y",
             tooltip: "greater than condition"
         },
         {
             icon: "mdi-greater-than-or-equal",
             size: "x-small",
-            expression: "x >= y",
+            expression: "X >= Y",
             tooltip: "greater than or equal condition"
         }
     ];
 
     const LOGIC_OPERATORS: ExpressionToolbarButtonInfo[] = [
         {
-            label: "if",
-            size: "small",
-            expression: "if ( CONDITION ) TRUE_VALUE else FALSE_VALUE",
-            tooltip: "if condition"
-        },
-        {
             label: "and",
             size: "small",
-            expression: "x & y",
+            expression: "X & Y",
             tooltip: "logical and of two conditions"
         },
         {
             label: "or",
             size: "small",
-            expression: "x | y",
+            expression: "X | Y",
             tooltip: "logical or of two conditions"
         },
         {
             label: "not",
             size: "small",
-            expression: "!",
+            expression: "!X",
             tooltip: "logical not"
         },
         {
@@ -220,48 +215,48 @@
     const MATH_FUNCTIONS: ExpressionToolbarButtonInfo[] = [
         {
             icon: "mdi-exponent",
-            expression: "x ^ y",
-            tooltip: "power of "
+            expression: "X ^ Y",
+            tooltip: "exponentiation"
         },
         {
             label: "sqrt",
             icon: "mdi-square-root",
-            expression: "sqrt(x)",
+            expression: "sqrt(X)",
             tooltip: "square root function"
         },
         {
             label: "abs",
-            expression: "abs(x)",
+            expression: "abs(X)",
             tooltip: "absolute value function"
         },
         {
             label: "sign",
-            expression: "sign(x)",
-            tooltip: "sign function"
+            expression: "sign(X)",
+            tooltip: "sign function (either 1 or -1 if value of positive or negative)"
         },
         {
             label: "log",
-            expression: "log(x)",
+            expression: "log(X)",
             tooltip: "logarithm function"
         },
         {
             label: "exp",
-            expression: "exp(x)",
+            expression: "exp(X)",
             tooltip: "exponential function"
         },
         {
             label: "floor",
-            expression: "floor(x)",
-            tooltip: "floor function"
+            expression: "floor(X)",
+            tooltip: "round down to nearest integer"
         },
         {
             label: "ceil",
-            expression: "ceil(x)",
-            tooltip: "ceil function"
+            expression: "ceil(X)",
+            tooltip: "round up to nearest integer"
         },
         {
             label: "round",
-            expression: "round(x)",
+            expression: "round(X)",
             tooltip: "round function"
         }
     ];
@@ -269,27 +264,27 @@
     const TRIGONOMETRY_FUNCTIONS: ExpressionToolbarButtonInfo[] = [
         {
             label: "sin",
-            expression: "sin(x)",
-            tooltip: "sine function"
+            expression: "sin(X)",
+            tooltip: "trigonometric sine function"
         },
         {
             label: "cos",
-            expression: "cos(x)",
-            tooltip: "cosine function"
+            expression: "cos(X)",
+            tooltip: "trigonometric cosine function"
         },
         {
             label: "tan",
-            expression: "tan(x)",
-            tooltip: "tan function"
+            expression: "tan(X)",
+            tooltip: "trigonometric tan function"
         },
         {
             label: "tanh",
-            expression: "tanh(x)",
-            tooltip: "tanh function"
+            expression: "tanh(X)",
+            tooltip: "trigonometric tanh function"
         },
         {
             icon: "mdi-pi",
-            expression: "pi",
+            expression: "mathematical constant pi",
             tooltip: "pi"
         }
     ];
@@ -297,27 +292,27 @@
     const SERIES_FUNCTIONS: ExpressionToolbarButtonInfo[] = [
         {
             label: "sum",
-            expression: "sum(x)",
+            expression: "sum(X)",
             tooltip: "sum of a series"
         },
         {
             label: "prod",
-            expression: "prod(x)",
+            expression: "prod(X)",
             tooltip: "product over a series"
         },
         {
             label: "min",
-            expression: "min(x)",
+            expression: "min(X)",
             tooltip: "minimum of a series"
         },
         {
             label: "max",
-            expression: "max(x)",
+            expression: "max(X)",
             tooltip: "maximum of a series"
         },
         {
             label: "mean",
-            expression: "mean(x)",
+            expression: "mean(X)",
             tooltip: "mean of a series"
         }
     ];
@@ -326,7 +321,7 @@
         {
             label: "( )",
             expression: "( )",
-            tooltip: "parentheses"
+            tooltip: "parentheses for grouping operations"
         }
     ];
 </script>
@@ -336,7 +331,7 @@
         <div v-if="shouldShowToolbar">
             <v-btn-group class="functionGroup">
                 <template
-                    v-for="(list, listIdx) in [MATH_OPERATIONS, GROUP_OPERATORS, COMARISON_OPERATORS, MATH_FUNCTIONS]"
+                    v-for="(list, listIdx) in [MATH_OPERATIONS, GROUP_OPERATORS, COMARISON_OPERATORS]"
                     :key="listIdx"
                 >
                     <ExpressionToolbarButton
@@ -345,6 +340,43 @@
                         :icon="item.icon"
                         :label="item.label"
                         :tooltip="item.tooltip"
+                        :syntax="item.expression"
+                        :size="item.size"
+                        :click="() => (item.expression ? appendToExpression(item.expression) : null)"
+                    />
+                    <v-divider vertical />
+                </template>
+                <ExpressionToolbarButton
+                    label="if"
+                    tooltip="if condition"
+                    syntax="if ( CONDITION ) VALUE_IF else VALUE_IF_NOT"
+                    size="small"
+                    :click="() => (isIfDialogOpen = true)"
+                />
+                <IfExpressionDialog v-model="isIfDialogOpen" @submit="(e: string) => appendToExpression(e)" />
+                <template v-for="(list, listIdx) in [LOGIC_OPERATORS]" :key="listIdx">
+                    <ExpressionToolbarButton
+                        v-for="(item, itemIdx) in list"
+                        :key="itemIdx"
+                        :icon="item.icon"
+                        :label="item.label"
+                        :tooltip="item.tooltip"
+                        :syntax="item.expression"
+                        :size="item.size"
+                        :click="() => (item.expression ? appendToExpression(item.expression) : null)"
+                    />
+                    <v-divider vertical />
+                </template>
+            </v-btn-group>
+            <v-btn-group class="functionGroup">
+                <template v-for="(list, listIdx) in [MATH_FUNCTIONS, TRIGONOMETRY_FUNCTIONS]" :key="listIdx">
+                    <ExpressionToolbarButton
+                        v-for="(item, itemIdx) in list"
+                        :key="itemIdx"
+                        :icon="item.icon"
+                        :label="item.label"
+                        :tooltip="item.tooltip"
+                        :syntax="item.expression"
                         :size="item.size"
                         :click="() => (item.expression ? appendToExpression(item.expression) : null)"
                     />
@@ -354,7 +386,8 @@
             <v-btn-group class="functionGroup">
                 <ExpressionToolbarButton
                     label="chance_event"
-                    tooltip="chance event function"
+                    tooltip="decisionSupport 'chance_event' function"
+                    syntax="chance_event(CHANCE, VALUE_IF, VALUE_IF_NOT, N, CV_IF, CV_IF_NOT, ONE_DRAW)"
                     size="small"
                     :click="() => (isChanceEventDialogOpen = true)"
                 />
@@ -364,7 +397,8 @@
                 />
                 <ExpressionToolbarButton
                     label="vv"
-                    tooltip="value varier function"
+                    tooltip="decisionSupport 'vv' function (value varier)"
+                    syntax="vv(VAR_MEAN, VAR_CV, N, DISTRIBUTION, ABSOLUTE_TREND, RELATIVE_TREND, LOWER_LIMIT, UPPER_LIMIT)"
                     size="small"
                     :click="() => (isValueVarierDialogOpen = true)"
                 />
@@ -374,7 +408,8 @@
                 />
                 <ExpressionToolbarButton
                     label="discount"
-                    tooltip="net present value function"
+                    tooltip="decisionSupport 'discount' function (net present value)"
+                    syntax="discount(X, DISCOUNT_RATE, CALCULATE_NPV)"
                     size="small"
                     :click="() => (isDiscountDialogOpen = true)"
                 />
@@ -383,10 +418,7 @@
                     @submit="(e: string) => appendToExpression(e)"
                 />
                 <v-divider vertical />
-                <template
-                    v-for="(list, listIdx) in [LOGIC_OPERATORS, SERIES_FUNCTIONS, TRIGONOMETRY_FUNCTIONS]"
-                    :key="listIdx"
-                >
+                <template v-for="(list, listIdx) in [SERIES_FUNCTIONS]" :key="listIdx">
                     <ExpressionToolbarButton
                         v-for="(item, itemIdx) in list"
                         :key="itemIdx"

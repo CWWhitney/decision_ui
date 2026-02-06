@@ -20,7 +20,7 @@
         />
     </div>
     <div v-if="computedTypedTensor.type == 'error'">
-        <v-alert type="error" :text="`Computation Error: ${computedTypedTensor.message}`" />
+        <v-alert type="error" variant="outlined" :text="`Computation Error: ${computedTypedTensor.message}`" />
     </div>
 </template>
 

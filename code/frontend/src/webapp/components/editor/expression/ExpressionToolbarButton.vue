@@ -6,6 +6,7 @@
         icon?: string;
         size?: string;
         tooltip?: string;
+        syntax?: string;
         prependIcon?: string;
         click: () => void;
     }>();
@@ -32,7 +33,14 @@
         </template>
 
         <template #default>
-            <slot name="tooltip">{{ props.tooltip }}</slot>
+            <slot name="tooltip">
+                <p v-if="props.tooltip">
+                    {{ props.tooltip }}
+                </p>
+                <p v-if="props.syntax">
+                    <code>{{ props.syntax }}</code>
+                </p>
+            </slot>
         </template>
     </v-tooltip>
 </template>
@@ -50,6 +58,8 @@
             max-width: 50em !important;
             overflow: auto;
         }
+
+        text-align: center;
 
         :deep(ul) {
             margin: 0.5em;
