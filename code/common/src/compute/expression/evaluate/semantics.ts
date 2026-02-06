@@ -2,32 +2,43 @@ import * as tf from "@tensorflow/tfjs";
 
 import { expressionGrammar } from "../grammar";
 import { ExpressionTensorContext } from "./context";
-import { netPresentValue } from "../../math/npv";
-import { valueVarier } from "../../math/vv";
-import { chanceEvent } from "../../math/chance_event";
-import {
-    getCommonSeriesLengthFromTypedTensors,
-    getSeriesLengthFromTypedTensor,
-    getTypedTensorFromConstant,
-    TypedTensor
-} from "../../tensor";
+import { netPresentValueExpression } from "./npv";
+import { valueVarierExpression } from "./value_varier";
+import { chanceEventExpression } from "./chance_event";
+import { getCommonSeriesLengthFromTypedTensors, getSeriesLengthFromTypedTensor, TypedTensor } from "../../tensor";
 import { SucceededMatchResult } from "ohm-js";
-import { toProbabilistic, toSeries } from "../../math/broadcast";
+import { ttToProbabilistic, ttToSeries } from "../../math/broadcast";
+import {
+    assertTensorValue,
+    constantTypedTensorValue,
+    ExpressionValue,
+    nullValue,
+    textValue,
+    TYPED_TENSOR_VALUE_TYPE,
+    typedTensorValue,
+    TypedTensorValue
+} from "./value";
 
-const wrapUnaryTensorOperator = (operator: (t: tf.Tensor) => tf.Tensor) => (t: TypedTensor) => ({
-    ...t,
-    tensor: operator(t.tensor)
-});
+const wrapUnaryTensorOperator =
+    (operator: (t: tf.Tensor) => tf.Tensor) =>
+    (t: TypedTensorValue): TypedTensorValue => {
+        return {
+            ...t,
+            type: TYPED_TENSOR_VALUE_TYPE,
+            tensor: operator(t.tensor)
+        };
+    };
 
 const wrapBinaryTensorOperator =
     (operator: (l: tf.Tensor, r: tf.Tensor) => tf.Tensor) =>
-    (l: TypedTensor, r: TypedTensor): TypedTensor => ({
+    (l: TypedTensor, r: TypedTensor): TypedTensorValue => ({
+        type: TYPED_TENSOR_VALUE_TYPE,
         tensor: operator(l.tensor, r.tensor),
         isProbabilistic: l.isProbabilistic || r.isProbabilistic,
         isSeries: l.isSeries || r.isSeries
     });
 
-const unaryOperators: { [key: string]: (t: tf.Tensor) => tf.Tensor } = {
+const UNARY_OPERATORS: { [key: string]: (t: tf.Tensor) => tf.Tensor } = {
     abs: tf.abs,
     ceiling: tf.ceil,
     floor: tf.floor,
@@ -41,21 +52,33 @@ const unaryOperators: { [key: string]: (t: tf.Tensor) => tf.Tensor } = {
     sign: tf.sign
 };
 
-const seriesFunctions: { [key: string]: (t: tf.Tensor, axis: number) => tf.Tensor } = {
+const SERIES_FUNCTIONS: { [key: string]: (t: tf.Tensor, axis: number) => tf.Tensor } = {
     sum: tf.sum,
     max: tf.max,
     min: tf.min,
     prod: tf.prod
 };
 
+const COMPARISON_OPERATORS: { [key: string]: (l: tf.Tensor, r: tf.Tensor) => tf.Tensor } = {
+    "<": tf.less,
+    ">": tf.greater,
+    "<=": tf.lessEqual,
+    ">=": tf.greaterEqual,
+    "==": tf.equal,
+    "!=": tf.notEqual
+};
+
 export const createTensorEvaluationSemantics = () => {
-    return expressionGrammar.createSemantics().addOperation<TypedTensor | TypedTensor[]>("eval(context)", {
+    return expressionGrammar.createSemantics().addOperation<ExpressionValue | ExpressionValue[]>("eval(context)", {
         Exp(e) {
             return e.eval(this.args.context);
         },
 
         OrExp_or(l, _op, r) {
-            return wrapBinaryTensorOperator(tf.logicalOr)(l.eval(this.args.context), r.eval(this.args.context));
+            return wrapBinaryTensorOperator(tf.logicalOr)(
+                assertTensorValue(l.eval(this.args.context), "left side of 'or'"),
+                assertTensorValue(r.eval(this.args.context), "right side of 'or'")
+            );
         },
 
         OrExp(e) {
@@ -63,7 +86,10 @@ export const createTensorEvaluationSemantics = () => {
         },
 
         AndExp_and(l, _op, r) {
-            return wrapBinaryTensorOperator(tf.logicalAnd)(l.eval(this.args.context), r.eval(this.args.context));
+            return wrapBinaryTensorOperator(tf.logicalAnd)(
+                assertTensorValue(l.eval(this.args.context), "left side of 'and' operation"),
+                assertTensorValue(r.eval(this.args.context), "right side of 'and' operation")
+            );
         },
 
         AndExp(e) {
@@ -71,7 +97,9 @@ export const createTensorEvaluationSemantics = () => {
         },
 
         NegExp_not(_op, x) {
-            return wrapUnaryTensorOperator(tf.logicalNot)(x.eval(this.args.context));
+            return wrapUnaryTensorOperator(tf.logicalNot)(
+                assertTensorValue(x.eval(this.args.context), "logical not value")
+            );
         },
 
         NegExp(e) {
@@ -79,24 +107,16 @@ export const createTensorEvaluationSemantics = () => {
         },
 
         RelExp_rel(l, c, r) {
-            switch (c.sourceString) {
-                case "<":
-                    return wrapBinaryTensorOperator(tf.less)(l.eval(this.args.context), r.eval(this.args.context));
-                case ">":
-                    return wrapBinaryTensorOperator(tf.greater)(l.eval(this.args.context), r.eval(this.args.context));
-                case "<=":
-                    return wrapBinaryTensorOperator(tf.lessEqual)(l.eval(this.args.context), r.eval(this.args.context));
-                case ">=":
-                    return wrapBinaryTensorOperator(tf.greaterEqual)(
-                        l.eval(this.args.context),
-                        r.eval(this.args.context)
-                    );
-                case "==":
-                    return wrapBinaryTensorOperator(tf.equal)(l.eval(this.args.context), r.eval(this.args.context));
-                case "!=":
-                    return wrapBinaryTensorOperator(tf.notEqual)(l.eval(this.args.context), r.eval(this.args.context));
+            const operator = c.sourceString;
+
+            if (!(operator in COMPARISON_OPERATORS)) {
+                throw new Error(`unknown comparison operator '${operator}'`);
             }
-            throw new Error(`unknown comparison operator '${c.sourceString}'`);
+
+            return wrapBinaryTensorOperator(COMPARISON_OPERATORS[operator])(
+                assertTensorValue(l.eval(this.args.context), `left side of '${operator}'`),
+                assertTensorValue(r.eval(this.args.context), `right side of '${operator}'`)
+            );
         },
 
         RelExp(e) {
@@ -153,9 +173,9 @@ export const createTensorEvaluationSemantics = () => {
 
         IfExp(_if, _lp, condition, _rp, expTrue, _else, expFalse) {
             const context = this.args.context as ExpressionTensorContext;
-            let conditionTT = condition.eval(this.args.context) as TypedTensor;
-            let trueTT = expTrue.eval(this.args.context) as TypedTensor;
-            let falseTT = expFalse.eval(this.args.context) as TypedTensor;
+            let conditionTT = assertTensorValue(condition.eval(this.args.context), "condition");
+            let trueTT = assertTensorValue(expTrue.eval(this.args.context), "true branch of if condition");
+            let falseTT = assertTensorValue(expFalse.eval(this.args.context), "false branch of if condition");
 
             if (conditionTT.tensor.dtype !== "bool") {
                 throw new Error(`condition value is not of boolean type, but ${conditionTT.tensor.dtype}`);
@@ -172,80 +192,89 @@ export const createTensorEvaluationSemantics = () => {
 
             if (conditionTT.isProbabilistic || trueTT.isProbabilistic || falseTT.isProbabilistic) {
                 // if anything is probabilistic, make everything probabilisitc
-                conditionTT = toProbabilistic(conditionTT, context.mcRuns);
-                trueTT = toProbabilistic(trueTT, context.mcRuns);
-                falseTT = toProbabilistic(falseTT, context.mcRuns);
+                conditionTT = ttToProbabilistic(conditionTT, context.mcRuns);
+                trueTT = ttToProbabilistic(trueTT, context.mcRuns);
+                falseTT = ttToProbabilistic(falseTT, context.mcRuns);
             }
 
             if (conditionTT.iSeries || trueTT.isSeries || falseTT.isSeries) {
                 // if anything is series, make everything a series
                 const seriesLength = getCommonSeriesLengthFromTypedTensors([conditionTT, trueTT, falseTT]);
-                conditionTT = toSeries(conditionTT, seriesLength);
-                trueTT = toSeries(trueTT, seriesLength);
-                falseTT = toSeries(falseTT, seriesLength);
+                conditionTT = ttToSeries(conditionTT, seriesLength);
+                trueTT = ttToSeries(trueTT, seriesLength);
+                falseTT = ttToSeries(falseTT, seriesLength);
             }
 
             return {
+                type: TYPED_TENSOR_VALUE_TYPE,
                 tensor: tf.add(
                     tf.mul(conditionTT.tensor, trueTT.tensor),
                     tf.mul(tf.sub(1, conditionTT.tensor), falseTT.tensor)
                 ),
                 isProbabilistic: conditionTT.isProbabilistic,
                 isSeries: conditionTT.isSeries
-            } as TypedTensor;
+            } as TypedTensorValue;
         },
 
         FuncExp(nameNode, _l, argListNode, _r) {
             const name = nameNode.sourceString;
-            const args = argListNode.eval(this.args.context) as TypedTensor[];
+            const args = argListNode.eval(this.args.context) as ExpressionValue[];
+            const context = this.args.context as ExpressionTensorContext;
 
-            if (name in unaryOperators) {
+            if (name in UNARY_OPERATORS) {
                 if (args.length != 1) {
                     throw new Error(`function '${name}' only accepts one parameter`);
                 }
-                return wrapUnaryTensorOperator(unaryOperators[name])(args[0]);
+                return wrapUnaryTensorOperator(UNARY_OPERATORS[name])(assertTensorValue(args[0], `${name} parameter`));
             }
 
-            if (name in seriesFunctions) {
+            if (name in SERIES_FUNCTIONS) {
                 if (args.length != 1) {
                     throw new Error(`function '${name}' only accepts one parameter`);
                 }
-                const tt = args[0];
+                const tt = assertTensorValue(args[0], `${name} parameter`);
                 if (!tt.isSeries) {
                     throw new Error(`function '${name}' can only be applied to time series data`);
                 }
-                return {
-                    tensor: seriesFunctions[name](tt.tensor, tt.isProbabilistic ? 1 : 0),
+                return typedTensorValue({
+                    tensor: SERIES_FUNCTIONS[name](tt.tensor, tt.isProbabilistic ? 1 : 0),
                     isSeries: false,
                     isProbabilistic: tt.isProbabilistic
-                };
+                });
             }
 
             if (name == "discount") {
-                if (args.length != 2) {
-                    throw new Error(`function 'discount' expects two parameters (x, discount_rate)`);
+                if (args.length < 2 || args.length > 3) {
+                    throw new Error(
+                        `function 'discount' expects two or three parameters (x, discount_rate, calculate_NPV)`
+                    );
                 }
-                return netPresentValue(args[0], args[1]);
+                return netPresentValueExpression({
+                    mcRuns: context.mcRuns,
+                    x: args[0],
+                    discountRate: args[1],
+                    calculateNpv: args[2] ?? undefined
+                });
             }
 
             if (name == "vv") {
-                if (args.length < 3 || args.length > 7) {
+                if (args.length < 3 || args.length > 8) {
                     throw new Error(
-                        `function 'vv' expects at least 3 and at most 7 parameters ` +
-                            `(var_mean, var_cv, n, absolute_trend, relative_trend, lower_limit, upper_limit)`
+                        `function 'vv' expects at least 3 and at most 8 parameters ` +
+                            `(var_mean, var_cv, n, distribution, absolute_trend, relative_trend, ` +
+                            `lower_limit, upper_limit)`
                     );
                 }
-                const context = this.args.context as ExpressionTensorContext;
-                return valueVarier({
+                return valueVarierExpression({
                     mcRuns: context.mcRuns,
                     varMean: args[0],
                     varCv: args[1],
                     n: args[2],
-                    distribution: "normal",
-                    absoluteTrend: args[3] ?? null,
-                    relativeTrend: args[4] ?? null,
-                    lowerLimit: args[5] ?? null,
-                    upperLimit: args[6] ?? null
+                    distribution: args[3],
+                    absoluteTrend: args[4],
+                    relativeTrend: args[5],
+                    lowerLimit: args[6],
+                    upperLimit: args[7]
                 });
             }
 
@@ -256,16 +285,15 @@ export const createTensorEvaluationSemantics = () => {
                             `(chance, value_if, value_if_not, n, cv_if, cv_if_not, one_draw)`
                     );
                 }
-                const context = this.args.context as ExpressionTensorContext;
-                return chanceEvent({
+                return chanceEventExpression({
                     mcRuns: context.mcRuns,
                     chance: args[0],
-                    valueIf: args[1] ?? null,
-                    valueIfNot: args[2] ?? null,
-                    n: args[3] ?? null,
-                    cvIf: args[4] ?? null,
-                    cvIfNot: args[5] ?? null,
-                    oneDraw: args[6] ?? null
+                    valueIf: args[1],
+                    valueIfNot: args[2],
+                    n: args[3],
+                    cvIf: args[4],
+                    cvIfNot: args[5],
+                    oneDraw: args[6]
                 });
             }
 
@@ -277,12 +305,31 @@ export const createTensorEvaluationSemantics = () => {
         },
 
         pi(_) {
-            return getTypedTensorFromConstant(tf.scalar(Math.PI));
+            return constantTypedTensorValue(tf.scalar(Math.PI));
+        },
+
+        true(_) {
+            return constantTypedTensorValue(tf.scalar(1));
+        },
+
+        false(_) {
+            return constantTypedTensorValue(tf.scalar(0));
+        },
+
+        null(_) {
+            return nullValue();
+        },
+
+        quotedText(_l, _text, _r) {
+            return textValue(_text.sourceString);
         },
 
         IndexedVariable(variable, sliceOp) {
             const context = this.args.context as ExpressionTensorContext;
-            const seriesTT = variable.eval(this.args.context) as TypedTensor;
+            const seriesTT = assertTensorValue(
+                variable.eval(this.args.context),
+                `indexed variable ${variable.sourceString}`
+            );
             const slice = sliceOp.sourceString;
 
             if (!context.index) {
@@ -309,21 +356,21 @@ export const createTensorEvaluationSemantics = () => {
             }
 
             if (seriesTT.isProbabilistic) {
-                return {
+                return typedTensorValue({
                     ...seriesTT,
                     tensor: tf.squeeze(
                         tf.slice2d(seriesTT.tensor as tf.Tensor2D, [0, iteration], [context.mcRuns, 1]),
                         [1]
                     ),
                     isSeries: false
-                };
+                });
             }
 
-            return {
+            return typedTensorValue({
                 ...seriesTT,
                 tensor: tf.squeeze(tf.slice1d(seriesTT.tensor as tf.Tensor1D, iteration, 1), [0]),
                 isSeries: false
-            };
+            });
         },
 
         variable(_l, _ns) {
@@ -333,17 +380,17 @@ export const createTensorEvaluationSemantics = () => {
                 throw new Error(`Undefined variable: ${variable}`);
             }
             if (variable == "previous" || variable == "i") {
-                return context.tensorByVariable[variable];
+                return typedTensorValue(context.tensorByVariable[variable]);
             }
             const tt = context.tensorByVariable[variable];
-            return {
+            return typedTensorValue({
                 ...tt,
                 tensor: tf.keep(tt.tensor).clone()
-            } as TypedTensor;
+            });
         },
 
         number(n) {
-            return getTypedTensorFromConstant(tf.scalar(parseFloat(n.sourceString)));
+            return constantTypedTensorValue(tf.scalar(parseFloat(n.sourceString)));
         }
     });
 };
@@ -351,6 +398,6 @@ export const createTensorEvaluationSemantics = () => {
 export const getExpressionMatchEvaluator = () => {
     const semantics = createTensorEvaluationSemantics();
     return (match: SucceededMatchResult, context: ExpressionTensorContext) => {
-        return semantics(match).eval(context) as TypedTensor;
+        return assertTensorValue(semantics(match).eval(context), "expression value") as TypedTensor;
     };
 };

@@ -79,6 +79,18 @@ export const getDepedenciesSemantics = () => {
         pi(_) {
             return [];
         },
+        true(_) {
+            return [];
+        },
+        false(_) {
+            return [];
+        },
+        null(_) {
+            return [];
+        },
+        quotedText(_l, _text, _r) {
+            return [];
+        },
         IndexedVariable(v, _op) {
             return [...v.deps()];
         },

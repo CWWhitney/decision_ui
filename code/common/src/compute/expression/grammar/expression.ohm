@@ -41,7 +41,8 @@ Arithmetic {
     = "(" Exp ")"  -- paren
     | IfExp
     | FuncExp
-    | pi
+    | constants
+    | quotedText
     | IndexedVariable
     | variable
     | number
@@ -58,6 +59,10 @@ Arithmetic {
   IndexedVariable
     = #(variable "[i]")
     | #(variable "[i-1]")
+
+  quotedText
+    = "\"" alnum* "\""
+    | "'" alnum* "'"
 
   relOperation  (a comparison)
     = ">=" | "<=" | ">" | "<" | "==" | "!="
@@ -85,8 +90,23 @@ Arithmetic {
     | "max"
     | "mean"
 
+  constants
+    = pi
+    | true
+    | false
+    | null
+
   pi  (pi)
     = "pi"
+
+  true  (true)
+    = "TRUE"
+
+  false  (false)
+    = "FALSE"
+
+  null  (null)
+    = "NA"
 
   variable  (a variable)
     = variableStart variableContinue*

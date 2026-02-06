@@ -23,7 +23,7 @@
             oneDrawExpression.value
         ];
 
-        const defaults = ["", "1", "0", "1", "0", "0", "0"];
+        const defaults = ["", "1", "0", "1", "0", "NA", "0"];
 
         const lastNonEmptyIndex = argList.reduce((p, v, i) => (v != "" ? i : p), 0);
         const argsWithDefaults = argList.map((v, i) => (v != "" ? v : defaults[i]));
@@ -39,7 +39,7 @@
 <template>
     <v-dialog v-model="model" width="auto" height="auto" @click:outside="model = false">
         <v-card>
-            <v-card-title> Chance Event Function </v-card-title>
+            <v-card-title>Chance Event Function</v-card-title>
             <v-card-text>
                 <p>
                     In many simulations, certain events can either occur or not, and values for dependent variables can

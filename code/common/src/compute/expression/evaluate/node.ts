@@ -38,7 +38,7 @@ import {
 
 import { ExpressionTensorContext } from "./context";
 import { getTypedTensorFromConstant, TypedTensor } from "../../tensor";
-import { toProbabilistic } from "../../math/broadcast";
+import { ttToProbabilistic } from "../../math/broadcast";
 import { SucceededMatchResult } from "ohm-js";
 import { matchExpression } from "./match";
 
@@ -263,7 +263,7 @@ export const getTypedTensorForLoopOperationNode = (
         // check if any tensor is probabilistic and broadcast all others if so
         const isAnyProbabilistic = tensorList.reduce((p, t) => p || t.isProbabilistic, false);
         if (isAnyProbabilistic) {
-            tensorList = tensorList.map(t => toProbabilistic(t, computationContext.mcRuns));
+            tensorList = tensorList.map(t => ttToProbabilistic(t, computationContext.mcRuns));
         }
 
         return {

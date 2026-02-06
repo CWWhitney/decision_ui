@@ -8,6 +8,8 @@
     import { computed, nextTick, ref, shallowRef, watch } from "vue";
     import ExpressionToolbarButton from "./ExpressionToolbarButton.vue";
     import ChanceEventExpressionDialog from "../dialogs/ChanceEventExpressionDialog.vue";
+    import ValueVarierExpressionDialog from "../dialogs/ValueVarierExpressionDialog.vue";
+    import DiscountExpressionDialog from "../dialogs/DiscountExpressionDialog.vue";
 
     const expression = defineModel<string>({
         required: true
@@ -20,12 +22,14 @@
             showToolbar?: boolean;
             hint?: string;
             focusedRows?: number;
+            disabled?: boolean;
         }>(),
         {
             debounceTime: USER_INPUT_DEBOUNCE_TIME,
             showToolbar: true,
             hint: undefined,
-            focusedRows: 3
+            focusedRows: 3,
+            disabled: false
         }
     );
 
@@ -68,15 +72,34 @@
         }
     };
 
-    const chanceEventDialog = shallowRef<boolean>(false);
+    const isChanceEventDialogOpen = shallowRef<boolean>(false);
+    const isValueVarierDialogOpen = shallowRef<boolean>(false);
+    const isDiscountDialogOpen = shallowRef<boolean>(false);
+    const isIfDialogOpen = shallowRef<boolean>(false);
 
-    watch(chanceEventDialog, async isOpen => {
+    const refocusExpressionInput = async (isOpen: boolean) => {
         // update focus to textarea when dialog closes
         if (!isOpen) {
             await nextTick();
             expressionInputRef.value?.focus();
         }
-    });
+    };
+
+    watch(isChanceEventDialogOpen, refocusExpressionInput);
+    watch(isValueVarierDialogOpen, refocusExpressionInput);
+    watch(isDiscountDialogOpen, refocusExpressionInput);
+    watch(isIfDialogOpen, refocusExpressionInput);
+
+    const shouldShowToolbar = computed(
+        () =>
+            props.showToolbar &&
+            !props.disabled &&
+            (focused.value ||
+                isChanceEventDialogOpen.value ||
+                isValueVarierDialogOpen.value ||
+                isDiscountDialogOpen.value ||
+                isIfDialogOpen.value)
+    );
 
     export type ExpressionToolbarButtonInfo = {
         label?: string;
@@ -298,7 +321,7 @@
 
 <template>
     <div class="expressionInputContainer" tabindex="-1" @focusin="focused = true" @focusout="onFocusOut">
-        <div v-if="showToolbar && (focused || chanceEventDialog)">
+        <div v-if="shouldShowToolbar">
             <v-btn-group class="functionGroup">
                 <template
                     v-for="(list, listIdx) in [MATH_OPERATIONS, GROUP_OPERATORS, COMARISON_OPERATORS, MATH_FUNCTIONS]"
@@ -321,28 +344,31 @@
                     label="chance_event"
                     tooltip="chance event function"
                     size="small"
-                    :click="
-                        () => {
-                            chanceEventDialog = true;
-                            console.log('open chance event dialog');
-                        }
-                    "
+                    :click="() => (isChanceEventDialogOpen = true)"
                 />
                 <ChanceEventExpressionDialog
-                    v-model="chanceEventDialog"
+                    v-model="isChanceEventDialogOpen"
                     @submit="(e: string) => appendToExpression(e)"
                 />
                 <ExpressionToolbarButton
                     label="vv"
                     tooltip="value varier function"
                     size="small"
-                    :click="() => console.log('open vv dialog')"
+                    :click="() => (isValueVarierDialogOpen = true)"
+                />
+                <ValueVarierExpressionDialog
+                    v-model="isValueVarierDialogOpen"
+                    @submit="(e: string) => appendToExpression(e)"
                 />
                 <ExpressionToolbarButton
                     label="discount"
                     tooltip="net present value function"
                     size="small"
-                    :click="() => console.log('open discount dialog')"
+                    :click="() => (isDiscountDialogOpen = true)"
+                />
+                <DiscountExpressionDialog
+                    v-model="isDiscountDialogOpen"
+                    @submit="(e: string) => appendToExpression(e)"
                 />
                 <v-divider vertical />
                 <template
@@ -376,6 +402,7 @@
             :hide-details="!expressionError && !props.hint"
             :error="!!expressionError"
             :error-messages="expressionError"
+            :disabled="props.disabled"
         ></v-textarea>
     </div>
 </template>

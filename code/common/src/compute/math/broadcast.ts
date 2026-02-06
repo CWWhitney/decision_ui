@@ -2,20 +2,36 @@ import * as tf from "@tensorflow/tfjs";
 
 import { TypedTensor } from "../tensor";
 
-export const toProbabilistic = (tt: TypedTensor, mcRuns: number): TypedTensor => {
+export const scalarTensorToProbabilisitc = (t: tf.Tensor | number, mcRuns: number): tf.Tensor => {
+    return tf.tile(tf.expandDims(t, 0), [mcRuns]);
+};
+
+export const scalarTensorToSeries = (t: tf.Tensor | number, n: number): tf.Tensor => {
+    return tf.tile(tf.expandDims(t, 0), [n]);
+};
+
+export const probabilisticTensorToProbabilisticSeries = (t: tf.Tensor, n: number): tf.Tensor => {
+    return tf.tile(tf.expandDims(t, 1), [1, n]);
+};
+
+export const deterministicSeriesToProbabilisticSeries = (t: tf.Tensor, mcRuns: number): tf.Tensor => {
+    return tf.tile(tf.expandDims(t, 0), [mcRuns, 1]);
+};
+
+export const ttToProbabilistic = <T extends TypedTensor>(tt: T, mcRuns: number): T => {
     if (!tt.isProbabilistic) {
         if (!tt.isSeries) {
             // deterministic
             return {
                 ...tt,
-                tensor: tf.tile(tf.expandDims(tt.tensor, 0), [mcRuns]),
+                tensor: scalarTensorToProbabilisitc(tt.tensor, mcRuns),
                 isProbabilistic: true
             };
         } else {
             // deterministic series
             return {
                 ...tt,
-                tensor: tf.tile(tf.expandDims(tt.tensor, 0), [mcRuns, 1]),
+                tensor: deterministicSeriesToProbabilisticSeries(tt.tensor, mcRuns),
                 isProbabilistic: true
             };
         }
@@ -23,20 +39,20 @@ export const toProbabilistic = (tt: TypedTensor, mcRuns: number): TypedTensor =>
     return tt;
 };
 
-export const toSeries = (tt: TypedTensor, n: number): TypedTensor => {
+export const ttToSeries = <T extends TypedTensor>(tt: T, n: number): T => {
     if (!tt.isSeries) {
         if (!tt.isProbabilistic) {
             // deterministic
             return {
                 ...tt,
-                tensor: tf.tile(tf.expandDims(tt.tensor, 0), [n]),
+                tensor: scalarTensorToSeries(tt.tensor, n),
                 isSeries: true
             };
         } else {
             // probabilistic
             return {
                 ...tt,
-                tensor: tf.tile(tf.expandDims(tt.tensor, 1), [1, n]),
+                tensor: probabilisticTensorToProbabilisticSeries(tt.tensor, n),
                 isSeries: true
             };
         }

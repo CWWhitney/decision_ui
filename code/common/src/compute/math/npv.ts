@@ -1,30 +1,41 @@
 import * as tf from "@tensorflow/tfjs";
-import { getSampleSizeFromTypedTensor, getSeriesLengthFromTypedTensor, TypedTensor } from "../tensor";
 
-export const netPresentValue = (x: TypedTensor, discount: TypedTensor): TypedTensor => {
-    if (!x.isSeries) {
-        throw new Error(`function 'npv' expects a time series as first parameter`);
+import {
+    deterministicSeriesToProbabilisticSeries,
+    probabilisticTensorToProbabilisticSeries,
+    scalarTensorToSeries
+} from "./broadcast";
+
+export const netPresentValue = ({
+    mcRuns,
+    seriesLength,
+    x,
+    discountRate,
+    calculateNpv = true
+}: {
+    mcRuns: number;
+    seriesLength: number;
+    x: tf.Tensor;
+    discountRate: tf.Tensor;
+    calculateNpv?: boolean;
+}): tf.Tensor => {
+    const probabilistic = mcRuns > 0;
+
+    const exponent = probabilistic
+        ? deterministicSeriesToProbabilisticSeries(tf.range(0, seriesLength), mcRuns)
+        : tf.range(0, seriesLength);
+
+    const discountFactor = tf.div(1, tf.add(1, tf.div(discountRate, 100.0)));
+
+    const base = probabilistic
+        ? probabilisticTensorToProbabilisticSeries(discountFactor, seriesLength)
+        : scalarTensorToSeries(discountFactor, seriesLength);
+
+    const npvSeries = tf.mul(x, tf.pow(base, exponent));
+
+    if (!calculateNpv) {
+        return npvSeries;
     }
-    if (discount.isSeries) {
-        throw new Error(`discount rate may not be a series value`);
-    }
-    const seriesLength = getSeriesLengthFromTypedTensor(x);
 
-    let exponent: tf.Tensor = tf.range(0, seriesLength);
-    let base: tf.Tensor = tf.div(1, tf.add(1, tf.div(discount.tensor, 100.0)));
-
-    // broadcast exponent and base
-    if (x.isProbabilistic || discount.isProbabilistic) {
-        const mcRuns = x.isProbabilistic ? getSampleSizeFromTypedTensor(x) : getSampleSizeFromTypedTensor(discount);
-        exponent = tf.tile(tf.expandDims(exponent, 0), [mcRuns, 1]);
-        base = tf.tile(tf.expandDims(base, 1), [1, seriesLength]);
-    } else {
-        base = tf.tile(tf.expandDims(base, 0), [seriesLength]);
-    }
-
-    return {
-        tensor: tf.sum(tf.mul(x.tensor, tf.pow(base, exponent)), 1),
-        isProbabilistic: x.isProbabilistic,
-        isSeries: false
-    };
+    return tf.sum(npvSeries, 1);
 };
