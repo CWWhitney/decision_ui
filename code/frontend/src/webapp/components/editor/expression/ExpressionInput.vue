@@ -202,6 +202,18 @@
             size: "small",
             expression: "!",
             tooltip: "logical not"
+        },
+        {
+            label: "true",
+            size: "small",
+            expression: "TRUE",
+            tooltip: "logical true value"
+        },
+        {
+            label: "false",
+            size: "small",
+            expression: "FALSE",
+            tooltip: "logical false value"
         }
     ];
 
@@ -386,6 +398,12 @@
                     />
                     <v-divider vertical />
                 </template>
+                <ExpressionToolbarButton
+                    label="NA"
+                    tooltip="unavailable function argument"
+                    size="small"
+                    :click="() => appendToExpression('NA')"
+                />
             </v-btn-group>
         </div>
 

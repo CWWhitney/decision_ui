@@ -124,11 +124,17 @@ export const createTensorEvaluationSemantics = () => {
         },
 
         AddExp_plus(a, _op, b) {
-            return wrapBinaryTensorOperator(tf.add)(a.eval(this.args.context), b.eval(this.args.context));
+            return wrapBinaryTensorOperator(tf.add)(
+                assertTensorValue(a.eval(this.args.context), `left side of addition`),
+                assertTensorValue(b.eval(this.args.context), `right side of addition`)
+            );
         },
 
         AddExp_minus(a, _op, b) {
-            return wrapBinaryTensorOperator(tf.sub)(a.eval(this.args.context), b.eval(this.args.context));
+            return wrapBinaryTensorOperator(tf.sub)(
+                assertTensorValue(a.eval(this.args.context), `left side of subtraction`),
+                assertTensorValue(b.eval(this.args.context), `right side of subtraction`)
+            );
         },
 
         AddExp(e) {
@@ -136,15 +142,24 @@ export const createTensorEvaluationSemantics = () => {
         },
 
         MulExp_times(a, _op, b) {
-            return wrapBinaryTensorOperator(tf.mul)(a.eval(this.args.context), b.eval(this.args.context));
+            return wrapBinaryTensorOperator(tf.mul)(
+                assertTensorValue(a.eval(this.args.context), `left side of multiplication`),
+                assertTensorValue(b.eval(this.args.context), `right side of multiplication`)
+            );
         },
 
         MulExp_divide(a, _op, b) {
-            return wrapBinaryTensorOperator(tf.div)(a.eval(this.args.context), b.eval(this.args.context));
+            return wrapBinaryTensorOperator(tf.div)(
+                assertTensorValue(a.eval(this.args.context), `left side of division`),
+                assertTensorValue(b.eval(this.args.context), `right side of division`)
+            );
         },
 
         MulExp_modulo(a, _op, b) {
-            return wrapBinaryTensorOperator(tf.mod)(a.eval(this.args.context), b.eval(this.args.context));
+            return wrapBinaryTensorOperator(tf.mod)(
+                assertTensorValue(a.eval(this.args.context), `left side of modulo`),
+                assertTensorValue(b.eval(this.args.context), `right side of modulo`)
+            );
         },
 
         MulExp(e) {
@@ -152,7 +167,9 @@ export const createTensorEvaluationSemantics = () => {
         },
 
         UnaryExp_neg(_op, x) {
-            return wrapUnaryTensorOperator(tf.neg)(x.eval(this.args.context));
+            return wrapUnaryTensorOperator(tf.neg)(
+                assertTensorValue(x.eval(this.args.context), `right side of negation`)
+            );
         },
 
         UnaryExp(e) {
@@ -160,7 +177,10 @@ export const createTensorEvaluationSemantics = () => {
         },
 
         ExpExp_power(a, _op, b) {
-            return wrapBinaryTensorOperator(tf.pow)(a.eval(this.args.context), b.eval(this.args.context));
+            return wrapBinaryTensorOperator(tf.pow)(
+                assertTensorValue(a.eval(this.args.context), `base`),
+                assertTensorValue(b.eval(this.args.context), `exponent`)
+            );
         },
 
         ExpExp(e) {
