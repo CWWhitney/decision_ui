@@ -26,7 +26,15 @@ export type VariableNodeStyleType =
 
 export type CollectionNodeStyleType = CollectionStyleType | CustomStyleType;
 
-export type NodeStyleType = VariableNodeStyleType | CollectionNodeStyleType;
+export type SubgraphNodeStyleType =
+    | CostStyleType
+    | BenefitStyleType
+    | RiskStyleType
+    | GenericStyleType
+    | ResultStyleType
+    | CustomStyleType;
+
+export type NodeStyleType = VariableNodeStyleType | CollectionNodeStyleType | SubgraphNodeStyleType;
 
 export const AVAILABLE_VARIABLE_NODE_STYLE_TYPES: VariableNodeStyleType[] = [
     COST_STYLE_TYPE,
@@ -39,6 +47,15 @@ export const AVAILABLE_VARIABLE_NODE_STYLE_TYPES: VariableNodeStyleType[] = [
 
 export const AVAILABLE_COLLECTION_NODE_STYLE_TYPES: CollectionNodeStyleType[] = [
     COLLECTION_STYLE_TYPE,
+    CUSTOM_STYLE_TYPE
+];
+
+export const AVAILABLE_SUBGRAPH_NODE_STYLE_TYPES: SubgraphNodeStyleType[] = [
+    COST_STYLE_TYPE,
+    BENEFIT_STYLE_TYPE,
+    RISK_STYLE_TYPE,
+    RESULT_STYLE_TYPE,
+    GENERIC_STYLE_TYPE,
     CUSTOM_STYLE_TYPE
 ];
 
@@ -87,12 +104,17 @@ export type VariableNodePresetStyleState = AbstractNodeStyleState<
     CostStyleType | RiskStyleType | BenefitStyleType | ResultStyleType | GenericStyleType
 >;
 
+export type SubgraphNodePresetStyleState = AbstractNodeStyleState<
+    CostStyleType | RiskStyleType | BenefitStyleType | ResultStyleType | GenericStyleType
+>;
+
 export type CollectionNodePresetStyleState = AbstractNodeStyleState<CollectionStyleType>;
 
 export type VariableNodeStyleState = VariableNodePresetStyleState | CustomNodeStyleState;
 export type CollectionNodeStyleState = CollectionNodePresetStyleState | CustomNodeStyleState;
+export type SubgraphNodeStyleState = SubgraphNodePresetStyleState | CustomNodeStyleState;
 
-export type NodeStyleState = VariableNodeStyleState | CollectionNodeStyleState;
+export type NodeStyleState = VariableNodeStyleState | CollectionNodeStyleState | SubgraphNodeStyleState;
 
 export const NodeStyleSchema: Schema = {
     type: "object",

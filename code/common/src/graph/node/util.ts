@@ -27,7 +27,7 @@ export const getNodeByIdFromMap = (nodeId: NodeId, nodeMap: NodeByIdMap) => {
     return node;
 };
 
-export const getChildrenByParentIdMap = (nodes: Node[]): NodeChildrenByParentIdMap => {
+export const getNodeChildrenByParentIdMap = (nodes: Node[]): NodeChildrenByParentIdMap => {
     const map = new Map<NodeId, Node[]>();
 
     for (const node of nodes) {
@@ -102,25 +102,39 @@ export const getNewNode = (
 };
 
 export const getAncestorNodesRecursion = (
-    nodeId: NodeId,
+    node: Node,
     getNode: (nodeId: string) => Node,
-    self: (nodeId: NodeId, getNode: (nodeId: string) => Node) => Node[]
+    self: (node: Node, getNode: (nodeId: string) => Node) => Node[]
 ): Node[] => {
-    const node = getNode(nodeId);
     if (node.parentNodeId) {
         const parentNode = getNode(node.parentNodeId);
-        return [parentNode, ...self(parentNode.id, getNode)];
+        return [parentNode, ...self(parentNode, getNode)];
     }
     return [] as Node[];
 };
 
 export const getDescendantNodesRecursion = (
-    nodeId: NodeId,
+    node: Node,
     childrenByParentIdMap: Map<NodeId, Node[]>,
-    self: (nodeId: NodeId, childrenByParentIdMap: Map<NodeId, Node[]>) => Node[]
+    self: (node: Node, childrenByParentIdMap: Map<NodeId, Node[]>) => Node[]
 ): Node[] => {
-    return (childrenByParentIdMap.get(nodeId) ?? []).reduce(
-        (p, n) => [...p, n, ...self(n.id, childrenByParentIdMap)],
+    return (childrenByParentIdMap.get(node.id) ?? []).reduce(
+        (p, n) => [...p, n, ...self(n, childrenByParentIdMap)],
         [] as Node[]
     );
+};
+
+export const getAncestorNodesSlow = (node: Node, nodes: Node[]) => {
+    const nodeByIdMap = getNodeByIdMap(nodes);
+    const getNode = (nodeId: NodeId) => getNodeByIdFromMap(nodeId, nodeByIdMap);
+    const _getAncestorNodes = (node: Node, getNode: (nodeId: string) => Node) =>
+        getAncestorNodesRecursion(node, getNode, _getAncestorNodes);
+    return _getAncestorNodes(node, getNode);
+};
+
+export const getDescendantNodesSlow = (node: Node, nodes: Node[]): Node[] => {
+    const childrenByParentIdMap = getNodeChildrenByParentIdMap(nodes);
+    const _getDescendantNodes = (node: Node, childrenByParentIdMap: Map<NodeId, Node[]>) =>
+        getDescendantNodesRecursion(node, childrenByParentIdMap, _getDescendantNodes);
+    return _getDescendantNodes(node, childrenByParentIdMap);
 };

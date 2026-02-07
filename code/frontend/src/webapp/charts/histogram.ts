@@ -19,8 +19,6 @@ export const drawHistogramChart = (
 
     if (chart) chart.destroy();
 
-    console.log(`draw histogram with bins=${JSON.stringify(bins)} and counts=${JSON.stringify(values)}`);
-
     return new Chart<"bar">(ctx, {
         type: "bar",
         data: {

@@ -8,7 +8,7 @@ export type NormalDistributionType = "norm";
 export type PosnormDistributionType = "posnorm";
 export type TNorm01DistributionType = "tnorm_0_1";
 
-export type DistributionFunctionType =
+export type DistributionType =
     | DeterministicDistributionType
     | NormalDistributionType
     | PosnormDistributionType

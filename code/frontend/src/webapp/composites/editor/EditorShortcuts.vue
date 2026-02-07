@@ -1,12 +1,12 @@
 <script setup lang="ts">
-    import { useFlowGraphStore } from "@/state/graph";
+    import { useGraphStore } from "@/state/graph";
     import { useVueFlow } from "@vue-flow/core";
     import { onMounted, onUnmounted } from "vue";
 
     const { addSelectedNodes, getNodes, removeSelectedElements, zoomIn, zoomOut, zoomTo, fitView } =
         useVueFlow("editor");
 
-    const graph = useFlowGraphStore();
+    const graph = useGraphStore();
 
     const props = defineProps<{ focused: boolean }>();
 

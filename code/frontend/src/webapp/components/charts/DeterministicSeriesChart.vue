@@ -4,6 +4,7 @@
     import { drawProbabilisticSeriesChart } from "../../charts/series";
     import ChartDownloadButtons from "./ChartDownloadButtons.vue";
     import { downloadChart } from "../../charts/download";
+    import { CHART_DOWNLOAD_DPR } from "@/common/constants";
 
     const { values, label } = defineProps<{ values: number[]; label: string }>();
 
@@ -25,7 +26,7 @@
         return ctx;
     };
 
-    const drawSeriesChart = (dps: number = 1.0) => {
+    const drawSeriesChart = (dps: number = window.devicePixelRatio) => {
         const ctx = getCanvasContext();
         if (ctx == null) {
             // no canvas context
@@ -42,7 +43,7 @@
             },
             label,
             filetype,
-            3.0
+            CHART_DOWNLOAD_DPR
         );
     };
 

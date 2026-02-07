@@ -98,10 +98,11 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 0.75em 1em;
+        padding: 0.5em 1em;
         overflow: hidden;
         text-align: center;
         word-break: break-word;
+        cursor: pointer;
     }
 
     .cost-style-type .background {
@@ -121,7 +122,9 @@
 
     .generic-style-type .background {
         background-color: rgba(255, 255, 255, 0.8);
-        border: 1.5px solid #888888;
+        border-style: solid;
+        border-width: 1.5px;
+        border-color: #888888;
     }
 
     .result-style-type .background {
@@ -137,6 +140,11 @@
 
     .collection-type .content {
         align-items: flex-start;
+    }
+
+    .subgraph-type .background {
+        border-style: double;
+        border-width: 4px;
     }
 
     .estimate-function-type .background {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { useFlowGraphStore } from "@/state/graph";
+    import { useGraphStore } from "@/state/graph";
     import {
         EMPTY_FUNCTION_TYPE,
         ESTIMATE_FUNCTION_TYPE,
@@ -26,12 +26,13 @@
     import HelpHintWrapper from "@/components/form/HelpHintWrapper.vue";
 
     const node = defineModel<Node>({ required: true });
-    const graphStore = useFlowGraphStore();
+    const graphStore = useGraphStore();
 
     const computationError = computed(() => {
-        const computedTypedTensor = graphStore.getComputedTypedTensor(node.value.id);
-        if (computedTypedTensor.value.type == "error") {
-            return computedTypedTensor.value.message;
+        try {
+            graphStore.getComputedTypedTensor(node.value.id);
+        } catch (e) {
+            return e instanceof Error ? e.message : `${e}`;
         }
         return null;
     });

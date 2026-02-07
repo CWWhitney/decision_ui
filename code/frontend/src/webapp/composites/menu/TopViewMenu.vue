@@ -1,11 +1,11 @@
 <script setup lang="ts">
     import TopMenuItem from "@/components/menu/TopMenuItem.vue";
-    import { useEditorSettingsStore } from "@/state/settings";
+    import { useEditorStore } from "@/state/editor";
     import { useVueFlow } from "@vue-flow/core";
 
     const { fitView, zoomTo, zoomIn, zoomOut } = useVueFlow("editor");
 
-    const editorSettings = useEditorSettingsStore();
+    const editorSettings = useEditorStore();
 </script>
 
 <template>

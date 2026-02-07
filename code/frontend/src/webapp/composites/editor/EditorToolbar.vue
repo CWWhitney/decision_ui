@@ -1,16 +1,16 @@
 <script setup lang="ts">
-    import { useFlowGraphStore } from "@/state/graph";
+    import { useGraphStore } from "@/state/graph";
     import * as common from "@decision-support-ui/common";
     import { useVueFlow, type Rect, type XYPosition } from "@vue-flow/core";
 
     import FlowNodeBox from "../../components/editor/graph/FlowNodeBox.vue";
-    import { useEditorSettingsStore } from "@/state/settings";
+    import { useEditorStore } from "@/state/editor";
 
     const { fitView, screenToFlowCoordinate, getIntersectingNodes, zoomTo, removeSelectedNodes, getSelectedNodes } =
         useVueFlow("editor");
 
-    const graphStore = useFlowGraphStore();
-    const editorSettings = useEditorSettingsStore();
+    const graph = useGraphStore();
+    const editor = useEditorStore();
 
     const TOOLBAR_NODES: {
         title: string;
@@ -49,6 +49,12 @@
             styleType: common.RESULT_STYLE_TYPE
         },
         {
+            title: "Subgraph",
+            nodeType: common.SUBGRAPH_NODE_TYPE,
+            functionType: common.EMPTY_FUNCTION_TYPE,
+            styleType: common.GENERIC_STYLE_TYPE
+        },
+        {
             title: "Collection",
             nodeType: common.COLLECTION_NODE_TYPE,
             functionType: common.EMPTY_FUNCTION_TYPE,
@@ -60,11 +66,11 @@
         // determine which node could be the best parent node based on cursor position
         // (there might be multiple in case of nested nodes or overlapping nodes)
         const intersectingGraphNodes = getIntersectingNodes({ ...position, width: 1, height: 1 } as Rect, false);
-        const intersectingNodes = intersectingGraphNodes.map(n => graphStore.getComputedNode(n.id).value);
+        const intersectingNodes = intersectingGraphNodes.map(n => graph.getComputedNode(n.id));
 
         // remove any ancestor nodes from the list of intersecting nodes
         const ancestorsNodeIds = intersectingNodes
-            .reduce((p, n) => [...p, ...graphStore.getComputedAncestorNodes(n.id).value], [] as common.Node[])
+            .reduce((p, n) => [...p, ...editor.getComputedVisibleAncestorNodes(n.id)], [] as common.Node[])
             .map(n => n.id);
 
         // consider only child nodes (remove any ancestor nodes)
@@ -87,7 +93,7 @@
         });
 
         const parentNode = determineParentNode(topleft);
-        const ancestorNodes = parentNode ? graphStore.getComputedAncestorNodes(parentNode.id).value : [];
+        const ancestorNodes = parentNode ? editor.getComputedVisibleAncestorNodes(parentNode.id) : [];
         const ancestorOffset = [parentNode, ...ancestorNodes].reduce(
             (p, n) => ({ x: p.x + (n?.visualization.position.x ?? 0), y: p.y + (n?.visualization.position.y ?? 0) }),
             { x: 0, y: 0 } as XYPosition
@@ -98,10 +104,10 @@
             y: topleft.y - newNodeSize.height / 2 - ancestorOffset.y
         };
 
-        graphStore.addNewNodeAction(title, nodeType, functionType, styleType, {
+        graph.addNewNodeAction(title, nodeType, functionType, styleType, {
             position: newNodePosition,
             size: newNodeSize,
-            parentNodeId: parentNode?.id
+            parentNodeId: parentNode ? parentNode.id : editor.subgraphNodeId
         });
 
         removeSelectedNodes(getSelectedNodes.value);
@@ -113,7 +119,7 @@
         functionType: common.NodeFunctionType,
         styleType: common.NodeStyleType
     ) => {
-        graphStore.addNewNodeAction(title, nodeType, functionType, styleType);
+        graph.addNewNodeAction(title, nodeType, functionType, styleType);
     };
 </script>
 
@@ -127,8 +133,8 @@
                         icon="mdi-undo"
                         variant="outlined"
                         size="small"
-                        :disabled="!graphStore.history.canUndo"
-                        @click="graphStore.history.undo"
+                        :disabled="!graph.history.canUndo"
+                        @click="graph.history.undo"
                     ></v-btn>
                 </template>
             </v-tooltip>
@@ -139,8 +145,8 @@
                         icon="mdi-redo"
                         variant="outlined"
                         size="small"
-                        :disabled="!graphStore.history.canRedo"
-                        @click="graphStore.history.redo"
+                        :disabled="!graph.history.canRedo"
+                        @click="graph.history.redo"
                     ></v-btn>
                 </template>
             </v-tooltip>
@@ -168,34 +174,6 @@
                     ></v-btn>
                 </template>
             </v-tooltip>
-
-            <v-tooltip
-                location="bottom"
-                :text="editorSettings.snapToGrid ? 'snap to grid' : 'free movement'"
-                open-delay="500"
-            >
-                <template #activator="{ props }">
-                    <v-btn
-                        v-bind="props"
-                        :icon="editorSettings.snapToGrid ? 'mdi-grid' : 'mdi-cursor-move'"
-                        variant="outlined"
-                        size="small"
-                        @click="editorSettings.toggleSnapToGrid"
-                    ></v-btn>
-                </template>
-            </v-tooltip>
-
-            <v-tooltip location="bottom" :text="editorSettings.locked ? 'unlock graph' : 'lock graph'" open-delay="500">
-                <template #activator="{ props }">
-                    <v-btn
-                        v-bind="props"
-                        :icon="editorSettings.locked ? 'mdi-lock-outline' : 'mdi-lock-open-variant-outline'"
-                        variant="outlined"
-                        size="small"
-                        @click="editorSettings.toggleLocked"
-                    ></v-btn>
-                </template>
-            </v-tooltip>
         </div>
         <div class="nodes">
             <FlowNodeBox
@@ -215,20 +193,43 @@
             >
         </div>
         <div class="options">
+            <v-tooltip location="bottom" :text="editor.snapToGrid ? 'snap to grid' : 'free movement'" open-delay="500">
+                <template #activator="{ props }">
+                    <v-btn
+                        v-bind="props"
+                        :icon="editor.snapToGrid ? 'mdi-grid' : 'mdi-cursor-move'"
+                        variant="outlined"
+                        size="small"
+                        @click="editor.toggleSnapToGrid"
+                    ></v-btn>
+                </template>
+            </v-tooltip>
+
+            <v-tooltip location="bottom" :text="editor.locked ? 'unlock graph' : 'lock graph'" open-delay="500">
+                <template #activator="{ props }">
+                    <v-btn
+                        v-bind="props"
+                        :icon="editor.locked ? 'mdi-lock-outline' : 'mdi-lock-open-variant-outline'"
+                        variant="outlined"
+                        size="small"
+                        @click="editor.toggleLocked"
+                    ></v-btn>
+                </template>
+            </v-tooltip>
             <v-tooltip location="bottom" text="change edge style" open-delay="500">
                 <template #activator="{ props }">
                     <v-btn
                         v-bind="props"
                         :icon="
-                            editorSettings.edgeStyle == common.STRAIGHT_EDGE_STYLE_TYPE
+                            editor.edgeStyle == common.STRAIGHT_EDGE_STYLE_TYPE
                                 ? 'mdi-vector-polyline'
-                                : editorSettings.edgeStyle == common.BEZIER_EDGE_STYLE_TYPE
+                                : editor.edgeStyle == common.BEZIER_EDGE_STYLE_TYPE
                                   ? 'mdi-vector-bezier'
                                   : 'mdi-square-wave'
                         "
                         variant="outlined"
                         size="small"
-                        @click="editorSettings.switchEdgeStyle"
+                        @click="editor.switchEdgeStyle"
                     ></v-btn>
                 </template>
             </v-tooltip>
@@ -237,15 +238,15 @@
                     <v-btn
                         v-bind="props"
                         :icon="
-                            editorSettings.background == common.DOTS_EDITOR_BACKGROUND
+                            editor.background == common.DOTS_EDITOR_BACKGROUND
                                 ? 'mdi-dots-grid'
-                                : editorSettings.background == common.LINES_EDITOR_BACKGROUND
+                                : editor.background == common.LINES_EDITOR_BACKGROUND
                                   ? 'mdi-grid'
                                   : ''
                         "
                         variant="outlined"
                         size="small"
-                        @click="editorSettings.switchBackground"
+                        @click="editor.switchBackground"
                     ></v-btn>
                 </template>
             </v-tooltip>
@@ -258,7 +259,6 @@
         display: grid;
         grid-template-columns: 1fr auto 1fr;
         gap: 1em;
-        align-items: center;
 
         background: #fff;
         padding: 0.5em;
@@ -287,7 +287,8 @@
         }
 
         .flow-node-box {
-            min-width: 6em;
+            min-width: 5em;
+            max-height: 5em;
         }
     }
 </style>

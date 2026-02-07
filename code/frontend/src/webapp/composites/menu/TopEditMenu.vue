@@ -1,6 +1,6 @@
 <script setup lang="ts">
     import TopMenuItem from "@/components/menu/TopMenuItem.vue";
-    import { useFlowGraphStore } from "@/state/graph";
+    import { useGraphStore } from "@/state/graph";
     import { useVueFlow } from "@vue-flow/core";
     import { useRoute } from "vue-router";
 
@@ -14,7 +14,7 @@
         getNodes
     } = useVueFlow("editor");
 
-    const graph = useFlowGraphStore();
+    const graph = useGraphStore();
 
     const route = useRoute();
     const isEditorRoute = route.name == "editor";

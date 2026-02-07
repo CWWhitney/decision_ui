@@ -8,11 +8,19 @@ import {
     NodeVariableFunctionSchema,
     VariableNodeFunctionState
 } from "./function";
-import { CollectionNodeStyleState, NodeStyleSchema, NodeStyleState, VariableNodeStyleState } from "./style";
+import {
+    CollectionNodeStyleState,
+    NodeStyleSchema,
+    NodeStyleState,
+    SubgraphNodeStyleState,
+    VariableNodeStyleState
+} from "./style";
 import {
     AVAILABLE_NODE_TYPES,
     COLLECTION_NODE_TYPE,
     CollectionNodeType,
+    SUBGRAPH_NODE_TYPE,
+    SubgraphNodeType,
     VARIABLE_NODE_TYPE,
     VariableNodeType
 } from "./type";
@@ -36,8 +44,9 @@ export interface AbstractNode<T, F extends NodeFunctionState, S extends NodeStyl
 
 export type VariableNode = AbstractNode<VariableNodeType, VariableNodeFunctionState, VariableNodeStyleState>;
 export type CollectionNode = AbstractNode<CollectionNodeType, EmptyNodeFunctionState, CollectionNodeStyleState>;
+export type SugraphNode = AbstractNode<SubgraphNodeType, EmptyNodeFunctionState, SubgraphNodeStyleState>;
 
-export type Node = VariableNode | CollectionNode;
+export type Node = VariableNode | CollectionNode | SugraphNode;
 
 export const NodeVisualizationSchema: Schema = {
     type: "object",
@@ -73,7 +82,7 @@ export const NodeSchema: Schema = {
         },
         {
             if: {
-                properties: { type: { const: COLLECTION_NODE_TYPE } }
+                properties: { type: { enum: [COLLECTION_NODE_TYPE, SUBGRAPH_NODE_TYPE] } }
             },
             then: {
                 properties: {

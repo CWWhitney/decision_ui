@@ -7,19 +7,22 @@
         NODE_EDIT_STYLE_TAB,
         useDialogsNodeEditStore
     } from "@/state/dialogs";
-    import { useFlowGraphStore } from "@/state/graph";
+    import { useEditorStore } from "@/state/editor";
+    import { useGraphStore } from "@/state/graph";
 
-    import { CUSTOM_STYLE_TYPE, VARIABLE_NODE_TYPE } from "@decision-support-ui/common";
+    import * as common from "@decision-support-ui/common";
 
     import { Position, Handle, useVueFlow } from "@vue-flow/core";
     import type { NodeProps } from "@vue-flow/core";
     import { NodeResizer } from "@vue-flow/node-resizer";
     import { NodeToolbar } from "@vue-flow/node-toolbar";
+
     import { computed } from "vue";
 
     const { getSelectedNodes, removeNodes } = useVueFlow();
     const nodeEditDialog = useDialogsNodeEditStore();
-    const graph = useFlowGraphStore();
+    const graph = useGraphStore();
+    const editor = useEditorStore();
 
     defineEmits<{
         (e: "updateNodeInternals"): void;
@@ -27,7 +30,7 @@
 
     const flowNodeProps = defineProps<NodeProps>();
 
-    const node = computed(() => graph.getComputedNode(flowNodeProps.id).value);
+    const node = computed(() => graph.getComputedNode(flowNodeProps.id));
     const showToolbar = computed(
         () => getSelectedNodes.value.length == 1 && getSelectedNodes.value[0]?.id == flowNodeProps.id
     );
@@ -63,7 +66,7 @@
                 </template>
             </v-tooltip>
             <v-tooltip
-                v-if="flowNodeProps.data.nodeType == VARIABLE_NODE_TYPE"
+                v-if="flowNodeProps.data.nodeType == common.VARIABLE_NODE_TYPE"
                 location="top"
                 text="function definition"
                 open-delay="500"
@@ -77,7 +80,7 @@
                 </template>
             </v-tooltip>
             <v-tooltip
-                v-if="flowNodeProps.data.nodeType == VARIABLE_NODE_TYPE"
+                v-if="flowNodeProps.data.nodeType == common.VARIABLE_NODE_TYPE"
                 location="top"
                 text="data visualization"
                 open-delay="500"
@@ -87,6 +90,20 @@
                         v-bind="props"
                         icon="mdi-chart-histogram"
                         @click="nodeEditDialog.openDialog(flowNodeProps.id, NODE_EDIT_DATA_TAB)"
+                    ></v-btn>
+                </template>
+            </v-tooltip>
+            <v-tooltip
+                v-if="flowNodeProps.data.nodeType == common.SUBGRAPH_NODE_TYPE"
+                location="top"
+                text="open subgraph"
+                open-delay="500"
+            >
+                <template #activator="{ props }">
+                    <v-btn
+                        v-bind="props"
+                        icon="mdi-sitemap-outline mdi-rotate-90"
+                        @click="editor.switchToSubgraph(node.id)"
                     ></v-btn>
                 </template>
             </v-tooltip>
@@ -111,7 +128,7 @@
         :node-type="node.type"
         :function-type="node.function.type"
         :style-type="node.visualization.style.type"
-        :custom-style="node.visualization.style.type == CUSTOM_STYLE_TYPE ? node.visualization.style : null"
+        :custom-style="node.visualization.style.type == common.CUSTOM_STYLE_TYPE ? node.visualization.style : null"
     >
         {{ node.visualization.title }}
     </FlowNodeBox>

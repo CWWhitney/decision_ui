@@ -100,7 +100,7 @@ export const getProbabilisticSeriesBoxPlotDataFromTensor = async (tensor: tf.Ten
             }) as BoxPlotPoint
     );
 
-    console.log(`series box plot data in ${+new Date() - started}ms`);
+    console.log(`calculated box plot data in ${+new Date() - started}ms`);
 
     return values;
 };

@@ -1,6 +1,7 @@
 <script setup lang="ts">
     import DebouncedTextInput from "@/components/form/DebouncedTextInput.vue";
     import {
+        COLLECTION_NODE_TYPE,
         ESTIMATE_FUNCTION_TYPE,
         generateVariableName,
         VARIABLE_NODE_TYPE,
@@ -18,6 +19,11 @@
             }
         }
     };
+
+    const NODE_TYPE_ITEMS = [
+        { title: "Variable", value: VARIABLE_NODE_TYPE },
+        { title: "Collection", value: COLLECTION_NODE_TYPE }
+    ];
 </script>
 
 <template>
@@ -43,7 +49,7 @@
 
         <HelpHintWrapper to="/help/user-interface/model-editor">
             <template #default>
-                <v-text-field v-model="node.type" label="Type" hide-details disabled />
+                <v-select v-model="node.type" label="Type" :items="NODE_TYPE_ITEMS" hide-details disabled />
             </template>
             <template #tooltip>
                 The type of this node can not be edited. It depends on which node was added to the diagram. There are

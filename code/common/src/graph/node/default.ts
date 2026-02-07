@@ -35,11 +35,12 @@ import {
     RISK_STYLE_TYPE,
     RiskStyleType
 } from "./style";
-import { COLLECTION_NODE_TYPE, NodeType, VARIABLE_NODE_TYPE } from "./type";
+import { COLLECTION_NODE_TYPE, NodeType, SUBGRAPH_NODE_TYPE, VARIABLE_NODE_TYPE } from "./type";
 
 export const getDefaultNodeSize = (nodeType: NodeType): Size => {
     switch (nodeType) {
         case VARIABLE_NODE_TYPE:
+        case SUBGRAPH_NODE_TYPE:
             return { width: 200, height: 50 };
         case COLLECTION_NODE_TYPE:
             return { width: 500, height: 400 };

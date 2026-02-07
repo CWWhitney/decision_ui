@@ -1,5 +1,5 @@
 import { Schema } from "jsonschema";
-import { DISTRIBUTION_TYPES, DistributionFunctionType } from "../../compute";
+import { DISTRIBUTION_TYPES, DistributionType } from "../../compute";
 
 export const ESTIMATE_FUNCTION_TYPE = "estimate";
 export const OPERATION_FUNCTION_TYPE = "operation";
@@ -38,7 +38,7 @@ export interface AbstractVariableNodeFunctionState<T extends NodeFunctionType> e
 }
 
 export interface EstimateNodeFunctionState extends AbstractVariableNodeFunctionState<EstimateFunctionType> {
-    distribution: DistributionFunctionType;
+    distribution: DistributionType;
     lower: number;
     upper: number;
     comment: string;

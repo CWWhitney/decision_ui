@@ -21,8 +21,6 @@ export const drawProbabilisticSeriesBoxPlotChart = (
 
     if (chart) chart.destroy();
 
-    console.log(`draw boxplot with data ${JSON.stringify(values)}`);
-
     const indexes = Array.from(Array(values.length).keys()).map(i => `${i + 1}`);
 
     return new Chart<"boxplot">(ctx, {

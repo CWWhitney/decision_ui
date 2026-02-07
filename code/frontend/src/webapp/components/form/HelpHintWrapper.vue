@@ -67,5 +67,21 @@
         :deep(li) {
             margin-left: 0.5em;
         }
+
+        :deep(a) {
+            color: white;
+        }
+
+        :deep(p) {
+            margin: 0.5em 0;
+
+            &:first-child {
+                margin-top: 0;
+            }
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
     }
 </style>

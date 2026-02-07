@@ -8,13 +8,13 @@ import {
     validateJson
 } from "@decision-support-ui/common";
 
-import { useFlowGraphStore } from "./graph";
-import { useEditorSettingsStore } from "./settings";
-import { useComputationSettingsStore } from "./settings";
+import { useGraphStore } from "./graph";
+import { useEditorStore } from "./editor";
+import { useComputationStore } from "./computation";
 import { useMetadataStore } from "./metadata";
 
 const getGraphState = (): Graph => {
-    const graph = useFlowGraphStore();
+    const graph = useGraphStore();
 
     return {
         nodes: graph.state.nodes,
@@ -22,14 +22,14 @@ const getGraphState = (): Graph => {
     };
 };
 
-const getEditorSettingsState = (): EditorSettings => {
-    const editorSettings = useEditorSettingsStore();
+const getEditorFileState = (): EditorSettings => {
+    const editor = useEditorStore();
 
     return {
-        background: editorSettings.background,
-        edgeStyle: editorSettings.edgeStyle,
-        locked: editorSettings.locked,
-        snapToGrid: editorSettings.snapToGrid
+        background: editor.background,
+        edgeStyle: editor.edgeStyle,
+        locked: editor.locked,
+        snapToGrid: editor.snapToGrid
     };
 };
 
@@ -45,11 +45,11 @@ const getMetadataState = (): ModelMetadata => {
 };
 
 const getComputationSettingsState = (): ComputationSettings => {
-    const computationSettings = useComputationSettingsStore();
+    const computation = useComputationStore();
 
     return {
-        mcRuns: computationSettings.mcRuns,
-        histogramBins: computationSettings.histogramBins
+        mcRuns: computation.mcRuns,
+        histogramBins: computation.histogramBins
     };
 };
 
@@ -62,16 +62,16 @@ export const getModelFileFromState = (): ModelFile => {
         graph: getGraphState(),
         metadata: getMetadataState(),
         settings: {
-            editor: getEditorSettingsState(),
+            editor: getEditorFileState(),
             computation: getComputationSettingsState()
         }
     };
 };
 
 export const loadModelFileToState = (file: ModelFile): void => {
-    const graph = useFlowGraphStore();
-    const editorSettings = useEditorSettingsStore();
-    const computationSettings = useComputationSettingsStore();
+    const graph = useGraphStore();
+    const editorSettings = useEditorStore();
+    const computationSettings = useComputationStore();
     const metadata = useMetadataStore();
 
     graph.reset();

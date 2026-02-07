@@ -10,8 +10,8 @@
         useDialogsNodeEditStore
     } from "@/state/dialogs";
 
-    import { VARIABLE_NODE_TYPE } from "@decision-support-ui/common";
-    import { useFlowGraphStore } from "@/state/graph";
+    import * as common from "@decision-support-ui/common";
+    import { useGraphStore } from "@/state/graph";
 
     import NodeEditGeneralTab from "../../../components/editor/dialogs/NodeEditGeneralTab.vue";
     import NodeEditFunctionTab from "./NodeEditFunctionTab.vue";
@@ -20,12 +20,12 @@
     import NodeEditStyleTab from "../../../components/editor/dialogs/NodeEditStyleTab.vue";
 
     const store = useDialogsNodeEditStore();
-    const graph = useFlowGraphStore();
+    const graph = useGraphStore();
 
     const node = computed(() => {
         const nodeId = store.nodeId;
         if (nodeId) {
-            return graph.getComputedNode(nodeId).value;
+            return graph.getComputedNode(nodeId);
         }
         return null;
     });
@@ -94,20 +94,20 @@
                 <v-tabs v-model="store.tab" color="primary" direction="vertical">
                     <v-tab prepend-icon="mdi-information-outline" text="General" :value="NODE_EDIT_GENERAL_TAB"></v-tab>
                     <v-tab
-                        v-if="node.type == VARIABLE_NODE_TYPE"
+                        v-if="node.type == common.VARIABLE_NODE_TYPE"
                         prepend-icon="mdi-function"
                         text="Function"
                         :value="NODE_EDIT_FUNCTION_TAB"
                     ></v-tab>
                     <v-tab
-                        v-if="node.type == VARIABLE_NODE_TYPE"
+                        v-if="node.type == common.VARIABLE_NODE_TYPE"
                         prepend-icon="mdi-chart-histogram"
                         text="Data"
                         :value="NODE_EDIT_DATA_TAB"
                     ></v-tab>
                     <v-tab prepend-icon="mdi-palette-outline" text="Style" :value="NODE_EDIT_STYLE_TAB"></v-tab>
                     <v-tab
-                        v-if="node.type == VARIABLE_NODE_TYPE"
+                        v-if="node.type == common.VARIABLE_NODE_TYPE"
                         prepend-icon="mdi-bug-outline"
                         text="Debug"
                         :value="NODE_EDIT_DEBUG_TAB"

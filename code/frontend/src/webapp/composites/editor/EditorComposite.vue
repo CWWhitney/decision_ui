@@ -3,19 +3,22 @@
     import { Background } from "@vue-flow/background";
     import { MiniMap } from "@vue-flow/minimap";
 
-    import { useFlowGraphStore } from "@/state/graph";
-    import { useDialogsNodeEditStore } from "@/state/dialogs";
+    import * as common from "@decision-support-ui/common";
+
+    import { useGraphStore } from "@/state/graph";
+    import { NODE_EDIT_FUNCTION_TAB, useDialogsNodeEditStore } from "@/state/dialogs";
     import { ref, watch } from "vue";
-    import { useEditorSettingsStore } from "@/state/settings";
+    import { useEditorStore } from "@/state/editor";
 
     import FlowNode from "./graph/FlowNode.vue";
     import FlowEdge from "./graph/FlowEdge.vue";
     import NodeEditDialog from "./dialogs/NodeEditDialog.vue";
     import EditorToolbar from "./EditorToolbar.vue";
     import FlowShortcuts from "./EditorShortcuts.vue";
+    import EditorSubgraphIndicator from "./EditorSubgraphIndicator.vue";
 
-    const graphStore = useFlowGraphStore();
-    const editorSettings = useEditorSettingsStore();
+    const graph = useGraphStore();
+    const editor = useEditorStore();
     const nodeEditStore = useDialogsNodeEditStore();
 
     const {
@@ -34,19 +37,19 @@
 
     // disable history while moving
     onNodeDragStart(() => {
-        graphStore.history.pause();
+        graph.history.pause();
     });
 
     onNodeDragStop(() => {
-        graphStore.history.resume();
-        graphStore.history.commit();
+        graph.history.resume();
+        graph.history.commit();
     });
 
     // edge events
     onEdgesChange(changes => {
         for (const change of changes) {
             if (change.type == "remove" && change.id) {
-                graphStore.removeEdgeAction(change.id);
+                graph.removeEdgeAction(change.id);
             }
         }
         applyEdgeChanges(changes);
@@ -57,33 +60,40 @@
         const additionalNodeChanges: NodeChange[] = [];
         for (const change of changes) {
             if (change.type == "remove" && change.id) {
-                for (const node of graphStore.getComputedDescendantNodes(change.id).value) {
+                for (const node of graph.getComputedDescendantNodes(change.id)) {
                     additionalNodeChanges.push({
                         type: "remove",
                         id: node.id
                     } as NodeRemoveChange);
                 }
-                graphStore.removeNodeAction(change.id);
+                graph.removeNodeAction(change.id);
             }
             if (change.type == "position" && change.id && change.position) {
-                graphStore.updateNodePositionAction(change.id, change.position);
+                graph.updateNodePositionAction(change.id, change.position);
             }
             if (change.type == "dimensions" && change.id && change.dimensions) {
-                graphStore.updateNodeSizeAction(change.id, change.dimensions);
+                graph.updateNodeSizeAction(change.id, change.dimensions);
             }
         }
         applyNodeChanges([...changes, ...additionalNodeChanges]);
     });
 
-    onConnect(connection => graphStore.addEdgeFromVueFlowConnectionAction(connection));
+    onConnect(connection => graph.addEdgeFromVueFlowConnectionAction(connection));
 
     onNodeDoubleClick(event => {
-        if (!editorSettings.locked) {
-            nodeEditStore.openDialog(event.node.id);
+        if (!editor.locked) {
+            const node = graph.getComputedNode(event.node.id);
+            if (node.type == common.VARIABLE_NODE_TYPE) {
+                nodeEditStore.openDialog(event.node.id, NODE_EDIT_FUNCTION_TAB);
+            } else if (node.type == common.COLLECTION_NODE_TYPE) {
+                nodeEditStore.openDialog(event.node.id);
+            } else if (node.type == common.SUBGRAPH_NODE_TYPE) {
+                editor.switchToSubgraph(node.id);
+            }
         }
     });
 
-    watch(editorSettings, options => {
+    watch(editor, options => {
         if (options.locked) {
             removeSelectedNodes(getSelectedNodes.value);
             setInteractive(false);
@@ -99,33 +109,37 @@
     <div class="container">
         <EditorToolbar />
         <FlowShortcuts :focused="focused" />
-        <VueFlow
-            :nodes="graphStore.getComputedVueFlowNodes().value"
-            :edges="graphStore.getComputedVueFlowEdges().value"
-            :connection-mode="ConnectionMode.Loose"
-            :snap-to-grid="editorSettings.snapToGrid"
-            :snap-grid="[10, 10]"
-            :apply-default="false"
-            :zoom-on-double-click="false"
-            :min-zoom="0.4"
-            elevate-edges-on-select
-            tabindex="0"
-            @focus="focused = true"
-            @blur="focused = false"
-        >
-            <!-- bind your custom node type to a component by using slots, slot names are always `node-<type>` -->
-            <template #node-custom="nodeProps">
-                <FlowNode v-bind="nodeProps" />
-            </template>
 
-            <!-- bind your custom edge type to a component by using slots, slot names are always `edge-<type>` -->
-            <template #edge-custom="edgeProps">
-                <FlowEdge v-bind="edgeProps" />
-            </template>
+        <div class="vueFlowContainer">
+            <VueFlow
+                :nodes="editor.computedVueFlowNodes"
+                :edges="editor.computedVueFlowEdges"
+                :connection-mode="ConnectionMode.Loose"
+                :snap-to-grid="editor.snapToGrid"
+                :snap-grid="[10, 10]"
+                :apply-default="false"
+                :zoom-on-double-click="false"
+                :min-zoom="0.4"
+                elevate-edges-on-select
+                tabindex="0"
+                @focus="focused = true"
+                @blur="focused = false"
+            >
+                <!-- bind your custom node type to a component by using slots, slot names are always `node-<type>` -->
+                <template #node-custom="nodeProps">
+                    <FlowNode v-bind="nodeProps" />
+                </template>
 
-            <MiniMap v-if="false" pannable zoomable position="top-right" />
-            <Background v-if="editorSettings.background != 'none'" :variant="editorSettings.background" />
-        </VueFlow>
+                <!-- bind your custom edge type to a component by using slots, slot names are always `edge-<type>` -->
+                <template #edge-custom="edgeProps">
+                    <FlowEdge v-bind="edgeProps" />
+                </template>
+
+                <MiniMap v-if="false" pannable zoomable position="top-right" />
+                <Background v-if="editor.background != 'none'" :variant="editor.background" />
+            </VueFlow>
+            <EditorSubgraphIndicator />
+        </div>
     </div>
     <NodeEditDialog />
 </template>
@@ -156,6 +170,15 @@
     .container {
         display: flex;
         flex-direction: column;
+        height: 100%;
+        width: 100%;
+    }
+
+    .vueFlowContainer {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
         height: 100%;
         width: 100%;
     }
