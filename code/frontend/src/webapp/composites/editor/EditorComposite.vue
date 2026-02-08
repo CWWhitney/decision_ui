@@ -16,7 +16,7 @@
     import * as common from "@decision-support-ui/common";
 
     import { useGraphStore } from "@/state/graph";
-    import { NODE_EDIT_FUNCTION_TAB, useDialogsNodeEditStore } from "@/state/dialogs";
+    import { NODE_EDIT_FUNCTION_TAB, useNodeEditDialogStore } from "@/state/dialogs";
     import { ref, watch } from "vue";
     import { useEditorStore } from "@/state/editor";
 
@@ -29,7 +29,7 @@
 
     const graph = useGraphStore();
     const editor = useEditorStore();
-    const nodeEditStore = useDialogsNodeEditStore();
+    const nodeEditStore = useNodeEditDialogStore();
 
     const { applyNodeChanges, applyEdgeChanges, setInteractive, removeSelectedNodes, getSelectedNodes, setViewport } =
         useVueFlow("editor");

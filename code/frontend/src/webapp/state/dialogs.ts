@@ -31,7 +31,7 @@ export const AVAILABLE_NODE_EDIT_TABS = [
 
 const DIALOGS_NODE_EDIT_STORE_ID = "dialogs.nodeEdit";
 
-export const useDialogsNodeEditStore = defineStore(DIALOGS_NODE_EDIT_STORE_ID, () => {
+export const useNodeEditDialogStore = defineStore(DIALOGS_NODE_EDIT_STORE_ID, () => {
     const isOpen = ref(false);
     const nodeId = ref<NodeId | null>(null);
     const tab = ref<AvailableNodeEditTabs>(NODE_EDIT_GENERAL_TAB);

@@ -7,7 +7,7 @@
         NODE_EDIT_FUNCTION_TAB,
         NODE_EDIT_GENERAL_TAB,
         NODE_EDIT_STYLE_TAB,
-        useDialogsNodeEditStore
+        useNodeEditDialogStore
     } from "@/state/dialogs";
 
     import * as common from "@decision-support-ui/common";
@@ -19,13 +19,18 @@
     import NodeEditDataTab from "./NodeEditDataTab.vue";
     import NodeEditStyleTab from "../../../components/editor/dialogs/NodeEditStyleTab.vue";
 
-    const store = useDialogsNodeEditStore();
+    const nodeEditDialog = useNodeEditDialogStore();
     const graph = useGraphStore();
 
     const node = computed(() => {
-        const nodeId = store.nodeId;
+        const nodeId = nodeEditDialog.nodeId;
         if (nodeId) {
-            return graph.getComputedNode(nodeId);
+            try {
+                return graph.getComputedNode(nodeId);
+            } catch {
+                // node might not exist any more, e.g. when deleting node via undo while viewing it
+                nodeEditDialog.closeDialog();
+            }
         }
         return null;
     });
@@ -40,11 +45,11 @@
 <template>
     <v-dialog
         v-if="node"
-        v-model="store.isOpen"
+        v-model="nodeEditDialog.isOpen"
         :width="maximized ? '90%' : 'auto'"
         :height="maximized ? '90%' : 'auto'"
         :class="`nodeEditDialog ${maximized ? 'maximized' : ''}`"
-        @click:outside="store.closeDialog()"
+        @click:outside="nodeEditDialog.closeDialog()"
     >
         <v-card>
             <v-toolbar>
@@ -86,12 +91,12 @@
                         </template>
                     </v-tooltip>
 
-                    <v-btn icon="mdi-close" @click="store.closeDialog()"></v-btn>
+                    <v-btn icon="mdi-close" @click="nodeEditDialog.closeDialog()"></v-btn>
                 </v-toolbar-items>
             </v-toolbar>
 
             <v-card-text class="tabCard">
-                <v-tabs v-model="store.tab" color="primary" direction="vertical">
+                <v-tabs v-model="nodeEditDialog.tab" color="primary" direction="vertical">
                     <v-tab prepend-icon="mdi-information-outline" text="General" :value="NODE_EDIT_GENERAL_TAB"></v-tab>
                     <v-tab
                         v-if="node.type == common.VARIABLE_NODE_TYPE"
@@ -113,27 +118,27 @@
                         :value="NODE_EDIT_DEBUG_TAB"
                     ></v-tab>
                 </v-tabs>
-                <v-tabs-window v-model="store.tab">
+                <v-tabs-window v-model="nodeEditDialog.tab">
                     <v-tabs-window-item :value="NODE_EDIT_GENERAL_TAB">
-                        <NodeEditGeneralTab v-if="store.tab == NODE_EDIT_GENERAL_TAB" v-model="node" />
+                        <NodeEditGeneralTab v-if="nodeEditDialog.tab == NODE_EDIT_GENERAL_TAB" v-model="node" />
                     </v-tabs-window-item>
                     <v-tabs-window-item :value="NODE_EDIT_FUNCTION_TAB">
-                        <NodeEditFunctionTab v-if="store.tab == NODE_EDIT_FUNCTION_TAB" v-model="node" />
+                        <NodeEditFunctionTab v-if="nodeEditDialog.tab == NODE_EDIT_FUNCTION_TAB" v-model="node" />
                     </v-tabs-window-item>
                     <v-tabs-window-item :value="NODE_EDIT_DATA_TAB">
-                        <NodeEditDataTab v-if="store.tab == NODE_EDIT_DATA_TAB" v-model="node" />
+                        <NodeEditDataTab v-if="nodeEditDialog.tab == NODE_EDIT_DATA_TAB" v-model="node" />
                     </v-tabs-window-item>
                     <v-tabs-window-item :value="NODE_EDIT_STYLE_TAB">
-                        <NodeEditStyleTab v-if="store.tab == NODE_EDIT_STYLE_TAB" v-model="node" />
+                        <NodeEditStyleTab v-if="nodeEditDialog.tab == NODE_EDIT_STYLE_TAB" v-model="node" />
                     </v-tabs-window-item>
                     <v-tabs-window-item :value="NODE_EDIT_DEBUG_TAB">
-                        <NodeEditDebugTab v-if="store.tab == NODE_EDIT_DEBUG_TAB" v-model="node" />
+                        <NodeEditDebugTab v-if="nodeEditDialog.tab == NODE_EDIT_DEBUG_TAB" v-model="node" />
                     </v-tabs-window-item>
                 </v-tabs-window>
             </v-card-text>
 
             <v-card-actions>
-                <v-btn color="primary" variant="text" @click="store.closeDialog()">done</v-btn>
+                <v-btn color="primary" variant="text" @click="nodeEditDialog.closeDialog()">done</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>

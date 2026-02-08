@@ -5,7 +5,7 @@
         NODE_EDIT_FUNCTION_TAB,
         NODE_EDIT_GENERAL_TAB,
         NODE_EDIT_STYLE_TAB,
-        useDialogsNodeEditStore
+        useNodeEditDialogStore
     } from "@/state/dialogs";
     import { useEditorStore } from "@/state/editor";
     import { useGraphStore } from "@/state/graph";
@@ -20,7 +20,7 @@
     import { computed } from "vue";
 
     const { getSelectedNodes, removeNodes } = useVueFlow();
-    const nodeEditDialog = useDialogsNodeEditStore();
+    const nodeEditDialog = useNodeEditDialogStore();
     const graph = useGraphStore();
     const editor = useEditorStore();
 
