@@ -124,7 +124,12 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
 
     const computedSubgraphTitle = computed(() => {
         if (subgraphId.value != null) {
-            return graphStore.getComputedNode(subgraphId.value).visualization.title;
+            try {
+                return graphStore.getComputedNode(subgraphId.value).visualization.title;
+            } catch {
+                // subgraph node might not exist (e.g. when undoing creating a subgraph while viewing it)
+                subgraphId.value = null;
+            }
         }
         return null;
     });
