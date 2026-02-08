@@ -87,12 +87,6 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
             graphStore.getComputedNodeIdFromVariableName
         );
 
-        const computationEdgesIdSet = new Set(computationEdges.map(e => e.id));
-
-        const manualEdges = autoAddComputationEdges.value
-            ? graphStore.state.edges.filter(e => !computationEdgesIdSet.has(e.id))
-            : graphStore.state.edges;
-
         const projectedComputationEdges = common.projectEdgesToSubgraph(
             computationEdges,
             subgraphId.value,
@@ -100,23 +94,36 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
             graphStore.getComputedSubgraphAncestors
         );
 
+        const projectedComputationEdgesIdSet = new Set(projectedComputationEdges.map(e => e.id));
+
+        const autoConnectNodeIdSet = new Set(
+            graphStore.state.nodes.filter(n => n.visualization.autoConnect).map(n => n.id)
+        );
+
+        const filteredComputationEdges = autoAddComputationEdges.value
+            ? projectedComputationEdges.filter(
+                  e => autoConnectNodeIdSet.has(e.source) && autoConnectNodeIdSet.has(e.target)
+              )
+            : [];
+
+        const filteredComputationEdgesIdSet = new Set(filteredComputationEdges.map(e => e.id));
+
         const projectedManualEdges = common.projectEdgesToSubgraph(
-            manualEdges,
+            graphStore.state.edges,
             subgraphId.value,
             graphStore.getComputedNode,
             graphStore.getComputedSubgraphAncestors
         );
 
-        return [
-            // computed edges
-            ...(autoAddComputationEdges.value
-                ? projectedComputationEdges.map(e => _getVueFlowEdge(e, graphStore.getComputedNodePosition))
-                : []),
-            // manual edges
-            ...projectedManualEdges.map(e =>
-                _getVueFlowEdge(e, graphStore.getComputedNodePosition, { strokeDasharray: 5 })
-            )
-        ];
+        const filteredManualEdges = projectedManualEdges.filter(e => !filteredComputationEdgesIdSet.has(e.id));
+
+        const allEdges = [...filteredComputationEdges, ...filteredManualEdges];
+
+        return allEdges.map(e =>
+            _getVueFlowEdge(e, graphStore.getComputedNodePosition, {
+                ...(!projectedComputationEdgesIdSet.has(e.id) && { strokeDasharray: 5 })
+            })
+        );
     });
 
     const computedSubgraphTitle = computed(() => {

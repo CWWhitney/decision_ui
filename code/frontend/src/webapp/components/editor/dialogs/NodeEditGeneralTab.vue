@@ -4,6 +4,7 @@
         COLLECTION_NODE_TYPE,
         ESTIMATE_FUNCTION_TYPE,
         generateVariableName,
+        SUBGRAPH_NODE_TYPE,
         VARIABLE_NODE_TYPE,
         type Node
     } from "@decision-support-ui/common";
@@ -22,7 +23,8 @@
 
     const NODE_TYPE_ITEMS = [
         { title: "Variable", value: VARIABLE_NODE_TYPE },
-        { title: "Collection", value: COLLECTION_NODE_TYPE }
+        { title: "Collection", value: COLLECTION_NODE_TYPE },
+        { title: "Subgraph", value: SUBGRAPH_NODE_TYPE }
     ];
 </script>
 
@@ -71,6 +73,24 @@
                 </template>
                 <template #tooltip>
                     The comment that is included in the Estimates CSV table for this estimate.
+                </template>
+            </HelpHintWrapper>
+        </div>
+        <div>
+            <HelpHintWrapper to="/help/user-interface/model-editor">
+                <template #default>
+                    <v-switch
+                        v-model="node.visualization.autoConnect"
+                        label="Automatically draw edges based on computation"
+                        color="primary"
+                        hide-details
+                        inset
+                    ></v-switch>
+                </template>
+                <template #tooltip>
+                    Whenever another node references this node's variable as part of its variable definition, an edge
+                    can be automatically drawn in the diagram highlighting this relationship. Sometimes, e.g., when too
+                    many edges would make the diagram difficult to read, it can be helpful to disable this feature.
                 </template>
             </HelpHintWrapper>
         </div>

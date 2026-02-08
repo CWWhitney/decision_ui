@@ -41,6 +41,7 @@ export interface AbstractNode<T, F extends NodeFunctionState, S extends NodeStyl
         position: Position;
         size: Size;
         style: S;
+        autoConnect: boolean;
     };
 }
 
@@ -56,9 +57,10 @@ export const NodeVisualizationSchema: Schema = {
         title: { type: "string" },
         position: PositionSchema,
         size: SizeSchema,
-        style: NodeStyleSchema
+        style: NodeStyleSchema,
+        autoConnect: { type: "boolean" }
     },
-    required: ["title", "position", "size", "style"]
+    required: ["title", "position", "size", "style", "autoConnect"]
 };
 
 export const NodeSchema: Schema = {

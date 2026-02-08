@@ -36,7 +36,26 @@ export type SubgraphNodeStyleType =
 
 export type NodeStyleType = VariableNodeStyleType | CollectionNodeStyleType | SubgraphNodeStyleType;
 
-export const AVAILABLE_VARIABLE_NODE_STYLE_TYPES: VariableNodeStyleType[] = [
+export const NODE_STYLE_TYPES: NodeStyleType[] = [
+    COST_STYLE_TYPE,
+    BENEFIT_STYLE_TYPE,
+    RISK_STYLE_TYPE,
+    RESULT_STYLE_TYPE,
+    GENERIC_STYLE_TYPE,
+    COLLECTION_STYLE_TYPE,
+    CUSTOM_STYLE_TYPE
+];
+
+export const PRESET_STYLE_TYPES: NodeStyleType[] = [
+    COST_STYLE_TYPE,
+    BENEFIT_STYLE_TYPE,
+    RISK_STYLE_TYPE,
+    RESULT_STYLE_TYPE,
+    GENERIC_STYLE_TYPE,
+    COLLECTION_STYLE_TYPE
+];
+
+export const VARIABLE_NODE_STYLE_TYPES: VariableNodeStyleType[] = [
     COST_STYLE_TYPE,
     BENEFIT_STYLE_TYPE,
     RISK_STYLE_TYPE,
@@ -45,12 +64,9 @@ export const AVAILABLE_VARIABLE_NODE_STYLE_TYPES: VariableNodeStyleType[] = [
     CUSTOM_STYLE_TYPE
 ];
 
-export const AVAILABLE_COLLECTION_NODE_STYLE_TYPES: CollectionNodeStyleType[] = [
-    COLLECTION_STYLE_TYPE,
-    CUSTOM_STYLE_TYPE
-];
+export const COLLECTION_NODE_STYLE_TYPES: CollectionNodeStyleType[] = [COLLECTION_STYLE_TYPE, CUSTOM_STYLE_TYPE];
 
-export const AVAILABLE_SUBGRAPH_NODE_STYLE_TYPES: SubgraphNodeStyleType[] = [
+export const SUBGRAPH_NODE_STYLE_TYPES: SubgraphNodeStyleType[] = [
     COST_STYLE_TYPE,
     BENEFIT_STYLE_TYPE,
     RISK_STYLE_TYPE,
@@ -118,24 +134,30 @@ export type NodeStyleState = VariableNodeStyleState | CollectionNodeStyleState |
 
 export const NodeStyleSchema: Schema = {
     type: "object",
-    oneOf: [
+    properties: {
+        type: { enum: NODE_STYLE_TYPES }
+    },
+    required: ["type"],
+    allOf: [
         {
-            properties: {
-                type: {
-                    enum: [COST_STYLE_TYPE, RISK_STYLE_TYPE, BENEFIT_STYLE_TYPE, RESULT_STYLE_TYPE, GENERIC_STYLE_TYPE]
-                }
+            if: {
+                properties: { type: { enum: PRESET_STYLE_TYPES } }
             },
-            required: ["type"]
+            then: {}
         },
         {
-            properties: {
-                type: { const: CUSTOM_STYLE_TYPE },
-                shape: { enum: [NODE_STYLE_BOX_SHAPE, NODE_STYLE_ROUNDED_BOX_SHAPE, NODE_STYLE_ELLIPSE_SHAPE] },
-                backgroundColor: { type: "string" },
-                borderWidth: { type: "number" },
-                border: { enum: [NODE_STYLE_BORDER_SOLID, NODE_STYLE_BORDER_DASHED, NODE_STYLE_BORDER_DOTTED] }
+            if: {
+                properties: { type: { const: CUSTOM_STYLE_TYPE } }
             },
-            required: ["type", "shape", "backgroundColor", "borderWidth", "border"]
+            then: {
+                properties: {
+                    shape: { enum: [NODE_STYLE_BOX_SHAPE, NODE_STYLE_ROUNDED_BOX_SHAPE, NODE_STYLE_ELLIPSE_SHAPE] },
+                    backgroundColor: { type: "string" },
+                    borderWidth: { type: "number" },
+                    border: { enum: [NODE_STYLE_BORDER_SOLID, NODE_STYLE_BORDER_DASHED, NODE_STYLE_BORDER_DOTTED] }
+                },
+                required: ["shape", "backgroundColor", "borderWidth", "border"]
+            }
         }
     ]
 };

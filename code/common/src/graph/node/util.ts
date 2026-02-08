@@ -112,7 +112,8 @@ export const getNewNode = (
             title: nodeTitle,
             position: options?.position ?? { x: 0, y: 0 },
             size: options?.size ?? getDefaultNodeSize(nodeType),
-            style: getDefaultNodeStyleState(styleType)
+            style: getDefaultNodeStyleState(styleType),
+            autoConnect: true
         }
     } as Node;
 };

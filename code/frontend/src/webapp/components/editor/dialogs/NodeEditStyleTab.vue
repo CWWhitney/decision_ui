@@ -19,11 +19,11 @@
 
     const selectableStyles = computed(() => {
         if (node.value.type == common.VARIABLE_NODE_TYPE) {
-            return common.AVAILABLE_VARIABLE_NODE_STYLE_TYPES;
+            return common.VARIABLE_NODE_STYLE_TYPES;
         } else if (node.value.type == common.COLLECTION_NODE_TYPE) {
-            return common.AVAILABLE_COLLECTION_NODE_STYLE_TYPES;
+            return common.COLLECTION_NODE_STYLE_TYPES;
         } else if (node.value.type == common.SUBGRAPH_NODE_TYPE) {
-            return common.AVAILABLE_SUBGRAPH_NODE_STYLE_TYPES;
+            return common.SUBGRAPH_NODE_STYLE_TYPES;
         }
         return [];
     });
@@ -110,6 +110,10 @@
         display: flex;
         justify-content: center;
         margin: 1;
+
+        :deep(.flow-node-box .content) {
+            padding: 0.75em 1.25em;
+        }
     }
 
     .v-slider {
