@@ -3,6 +3,7 @@
     import { useEditorStore } from "@/state/editor";
     import { useGraphStore } from "@/state/graph";
     import { useVueFlow } from "@vue-flow/core";
+    import { computed } from "vue";
     import { useRoute } from "vue-router";
 
     const {
@@ -29,6 +30,8 @@
     const selectAllNodes = () => {
         addSelectedNodes(getNodes.value);
     };
+
+    const nothingIsSelected = computed(() => getSelectedNodes.value.length == 0 && getSelectedEdges.value.length == 0);
 </script>
 
 <template>
@@ -56,7 +59,7 @@
             <TopMenuItem
                 title="Unselect All"
                 shortcut="CTRL + ALT + A"
-                :disabled="!isEditorRoute"
+                :disabled="!isEditorRoute || nothingIsSelected"
                 @click="removeSelectedElements"
             />
             <v-divider />
@@ -69,7 +72,7 @@
             <TopMenuItem
                 title="Remove"
                 shortcut="BACKSPACE"
-                :disabled="!isEditorRoute || editor.state.locked"
+                :disabled="!isEditorRoute || nothingIsSelected || editor.state.locked"
                 @click="removeNodesOrEdges"
             />
         </v-list>
