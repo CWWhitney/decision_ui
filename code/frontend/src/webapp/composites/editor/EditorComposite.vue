@@ -7,8 +7,7 @@
         type NodeChange,
         type Connection,
         type EdgeChange,
-        type NodeMouseEvent,
-        type ViewportTransform
+        type NodeMouseEvent
     } from "@vue-flow/core";
     import { Background } from "@vue-flow/background";
     import { MiniMap } from "@vue-flow/minimap";
@@ -31,7 +30,7 @@
     const editor = useEditorStore();
     const nodeEditStore = useNodeEditDialogStore();
 
-    const { applyNodeChanges, applyEdgeChanges, setInteractive, removeSelectedNodes, getSelectedNodes, setViewport } =
+    const { applyNodeChanges, applyEdgeChanges, setInteractive, removeSelectedNodes, getSelectedNodes, fitView } =
         useVueFlow("editor");
 
     // disable history while moving
@@ -92,21 +91,42 @@
         }
     };
 
-    const onViewportChangeEnd = (viewportChange: ViewportTransform) => {
-        editor.updateViewport(viewportChange);
+    watch(
+        () => editor.locked,
+        locked => {
+            if (locked) {
+                removeSelectedNodes(getSelectedNodes.value);
+                setInteractive(false);
+            } else {
+                setInteractive(true);
+            }
+        }
+    );
+
+    const shouldFitOnNextUpdate = ref<boolean>(false);
+    watch(
+        () => editor.subgraphId,
+        async (newSubgraphId, oldSubgraphId) => {
+            console.log(`subgraphId has changed from ${oldSubgraphId} to ${newSubgraphId}`);
+            if (newSubgraphId != oldSubgraphId && editor.computedVueFlowNodes.length > 0) {
+                shouldFitOnNextUpdate.value = true;
+            }
+        },
+        { flush: "post" }
+    );
+
+    const onInit = () => {
+        console.log(`onInit`);
+        fitView({ maxZoom: 1 });
     };
 
-    watch(editor, options => {
-        if (options.locked) {
-            removeSelectedNodes(getSelectedNodes.value);
-            setInteractive(false);
-        } else {
-            setInteractive(true);
+    const onNodesInitialized = () => {
+        console.log(`onNodesInitialized`);
+        if (shouldFitOnNextUpdate.value) {
+            shouldFitOnNextUpdate.value = false;
+            fitView({ maxZoom: 1 });
         }
-
-        // update viewport from state
-        setViewport(editor.computedViewportState);
-    });
+    };
 
     const focused = ref<boolean>(false);
 </script>
@@ -128,13 +148,14 @@
                 :min-zoom="0.1"
                 elevate-edges-on-select
                 tabindex="0"
+                @init="onInit"
+                @nodes-initialized="onNodesInitialized"
                 @connect="onConnect"
                 @node-drag-start="onNodeDragStart"
                 @node-drag-stop="onNodeDragStop"
                 @edges-change="onEdgesChange"
                 @nodes-change="onNodesChange"
                 @node-double-click="onNodeDoubleClick"
-                @viewport-change-end="onViewportChangeEnd"
                 @focus="focused = true"
                 @blur="focused = false"
             >

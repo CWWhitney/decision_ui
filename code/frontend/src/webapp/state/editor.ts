@@ -5,8 +5,7 @@ import {
     type Node as VueFlowNode,
     type Edge as VueFlowEdge,
     type Styles as VueFlowSyles,
-    MarkerType,
-    type ViewportTransform
+    MarkerType
 } from "@vue-flow/core";
 
 import * as common from "@decision-support-ui/common";
@@ -26,8 +25,6 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
     const edgeStyle = ref<common.EdgeStyleType>(common.SMOOTH_STEP_EDGE_STYLE_TYPE);
     const background = ref<common.EditorBackground>(common.DOTS_EDITOR_BACKGROUND);
     const autoAddComputationEdges = ref<boolean>(true);
-    const viewport = ref<common.EditorViewportState>({ x: 0, y: 0, zoom: 1.0 });
-    const subgraphViewports = ref<{ [key in common.SubgraphId]: common.EditorViewportState }>({});
 
     // computed
 
@@ -134,33 +131,7 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
         return null;
     });
 
-    const computedViewportState = computed(() => {
-        if (subgraphId.value == null) {
-            return viewport.value;
-        } else {
-            if (!(subgraphId.value in subgraphViewports.value)) {
-                updateViewport({
-                    x: 0,
-                    y: 0,
-                    zoom: 1.0
-                } as common.EditorViewportState);
-            }
-            return subgraphViewports.value[subgraphId.value]!;
-        }
-    });
-
     // actions
-
-    const updateViewport = (newViewport: ViewportTransform) => {
-        if (subgraphId.value == null) {
-            viewport.value = { ...newViewport };
-        } else {
-            subgraphViewports.value = {
-                ...subgraphViewports.value,
-                [subgraphId.value]: { ...newViewport } as common.EditorViewportState
-            };
-        }
-    };
 
     const switchToSubgraph = (nodeId: common.NodeId) => {
         subgraphId.value = nodeId;
@@ -195,8 +166,6 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
 
     const reset = () => {
         subgraphId.value = null;
-        viewport.value = { x: 0, y: 0, zoom: 1 };
-        subgraphViewports.value = {};
         autoAddComputationEdges.value = true;
         locked.value = false;
         snapToGrid.value = true;
@@ -215,8 +184,6 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
         computedVueFlowNodes,
         computedVueFlowEdges,
         computedSubgraphTitle,
-        computedViewportState,
-        updateViewport,
         toggleLocked,
         toggleSnapToGrid,
         switchEdgeStyle,
