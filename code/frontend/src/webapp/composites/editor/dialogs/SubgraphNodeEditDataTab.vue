@@ -36,8 +36,8 @@
         () => {
             const childNodeIdSet = new Set<NodeId>(childVariableNodes.value.map(n => n.id));
             if (
-                selectedChildNodeId.value == null ||
-                (childNodeIdSet.size > 0 && !childNodeIdSet.has(selectedChildNodeId.value))
+                childNodeIdSet.size > 0 &&
+                (selectedChildNodeId.value == null || !childNodeIdSet.has(selectedChildNodeId.value))
             ) {
                 selectedChildNodeId.value = childVariableNodes.value[0]!.id;
             }
@@ -91,11 +91,15 @@
         </template>
         <template v-else>
             <div
-                v-if="computedTypedTensorResult && computedTypedTensorResult.type == COMPUTED_RESULT_SUCCESS_TYPE"
+                v-if="
+                    selectedChildNode &&
+                    computedTypedTensorResult &&
+                    computedTypedTensorResult.type == COMPUTED_RESULT_SUCCESS_TYPE
+                "
                 class="visualization"
             >
                 <TypedTensorVisualization
-                    :node-title="node.visualization.title"
+                    :node-title="selectedChildNode.visualization.title"
                     :tt="computedTypedTensorResult.value"
                     :bins="computation.state.histogramBins"
                 />
