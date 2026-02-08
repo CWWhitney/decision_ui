@@ -125,7 +125,7 @@
                 :snap-grid="[10, 10]"
                 :apply-default="false"
                 :zoom-on-double-click="false"
-                :min-zoom="0.4"
+                :min-zoom="0.1"
                 elevate-edges-on-select
                 tabindex="0"
                 @connect="onConnect"

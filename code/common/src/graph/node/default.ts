@@ -1,7 +1,7 @@
 // default state helper
 
 import { NORMAL_DISTRIBUTION_TYPE } from "../../compute";
-import { Size } from "../../draw";
+import { Size } from "../../editor/layout";
 import {
     EMPTY_FUNCTION_TYPE,
     EmptyNodeFunctionState,

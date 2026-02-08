@@ -1,6 +1,6 @@
 import { Schema } from "jsonschema";
 import { Node, NodeId } from "./node";
-import { projectNodeToSubgraph } from "../editor";
+import { projectNodeToSubgraph } from "./subgraph";
 
 export type EdgeId = string;
 

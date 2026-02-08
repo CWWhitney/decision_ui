@@ -43,6 +43,37 @@
         graph.history.resume();
         graph.history.commit();
     };
+
+    const extractSubgraph = (subgraphNodeId: common.NodeId) => {
+        const subgraphNode = graph.getComputedNode(subgraphNodeId);
+        const subgraphChildren = graph.getComputedSubgraphChildren(subgraphNodeId);
+        const rootChildren = subgraphChildren.filter(n => n.nodeParentId == null);
+        const centerPosition = common.getCenterPosition(rootChildren.map(n => n.visualization.position));
+        const subgraphRootPosition = graph.getComputedNodeAncestors(subgraphNodeId).reduce(
+            (p, n) => ({
+                x: p.x + n.visualization.position.x,
+                y: p.y + n.visualization.position.y
+            }),
+            { x: subgraphNode.visualization.position.x, y: subgraphNode.visualization.position.y } as common.Position
+        );
+
+        // move subgraph children
+        for (const node of rootChildren) {
+            node.visualization.position = {
+                x: subgraphRootPosition.x + (node.visualization.position.x - centerPosition.x),
+                y: subgraphRootPosition.y + (node.visualization.position.y - centerPosition.y)
+            };
+            node.nodeParentId = subgraphNode.nodeParentId;
+        }
+
+        // assign nodes to current subgraph
+        for (const node of subgraphChildren) {
+            node.subgraphParentId = editor.subgraphId;
+        }
+
+        // delete subgraph node
+        graph.removeNodeAction(subgraphNodeId);
+    };
 </script>
 
 <template>
@@ -100,11 +131,17 @@
                 open-delay="500"
             >
                 <template #activator="{ props }">
-                    <v-btn
-                        v-bind="props"
-                        icon="mdi-sitemap-outline mdi-rotate-90"
-                        @click="editor.switchToSubgraph(node.id)"
-                    ></v-btn>
+                    <v-btn v-bind="props" icon="mdi-exit-to-app" @click="editor.switchToSubgraph(node.id)"></v-btn>
+                </template>
+            </v-tooltip>
+            <v-tooltip
+                v-if="flowNodeProps.data.nodeType == common.SUBGRAPH_NODE_TYPE"
+                location="top"
+                text="extract subgraph"
+                open-delay="500"
+            >
+                <template #activator="{ props }">
+                    <v-btn v-bind="props" icon="mdi-call-split" @click="extractSubgraph(node.id)"></v-btn>
                 </template>
             </v-tooltip>
             <v-tooltip location="top" text="node style options" open-delay="500">

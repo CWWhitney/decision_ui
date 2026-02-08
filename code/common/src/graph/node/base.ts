@@ -1,6 +1,6 @@
 import { Schema } from "jsonschema";
 
-import { Position, PositionSchema, Size, SizeSchema } from "../../draw";
+import { Position, PositionSchema, Size, SizeSchema } from "../../editor/layout";
 import {
     EmptyNodeFunctionSchema,
     EmptyNodeFunctionState,

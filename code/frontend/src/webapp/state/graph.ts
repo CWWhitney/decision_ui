@@ -82,6 +82,8 @@ export const useGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
             )
     );
 
+    const getComputedSubgraphChildren = (nodeId: common.NodeId) => _subgraphChildrenByParentId.value.get(nodeId) ?? [];
+
     const getComputedSubgraphAncestors: (nodeId: common.NodeId) => common.Node[] = makeSafeComputedGetterByKey(
         (nodeId: common.NodeId) =>
             common.getSubgraphAncestorsRecursion(
@@ -205,9 +207,10 @@ export const useGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         functionType: common.NodeFunctionType,
         styleType: common.NodeStyleType,
         options?: common.NewNodeOptions
-    ) => {
+    ): common.Node => {
         const newNode = common.getNewNode(title, nodeType, functionType, styleType, state.value.nodes, options);
         state.value.nodes = [...state.value.nodes, newNode];
+        return newNode;
     };
 
     const removeNodeAction = (nodeId: common.NodeId) => {
@@ -242,6 +245,7 @@ export const useGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         getComputedTypedTensor,
         getComputedNodeAncestors,
         getComputedNodeDescendants,
+        getComputedSubgraphChildren,
         getComputedSubgraphAncestors,
         getComputedSubgraphDescendants,
         getComputedAnyAncestors,

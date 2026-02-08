@@ -1,5 +1,5 @@
 import { generateVariableName } from "../../compute";
-import { Position, Size } from "../../draw";
+import { Position, Size } from "../../editor/layout";
 import { Node, NodeId, SubgraphId } from "./base";
 import { getDefaultFunctionState, getDefaultNodeSize, getDefaultNodeStyleState } from "./default";
 import { NodeFunctionType } from "./function";

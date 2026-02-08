@@ -126,6 +126,36 @@
             subgraphParentId: editor.subgraphId
         });
     };
+
+    const createSubgraphFromSelection = () => {
+        const selectedNodeIds = getSelectedNodes.value.map(n => n.id);
+        const centerPosition = common.getCenterPosition(
+            getSelectedNodes.value.filter(n => !n.parentNode).map(n => n.position)
+        );
+
+        // create new subgraph node at the center of all selcted nodes
+        const newSubgraphNode = graph.addNewNodeAction(
+            "Subgraph",
+            common.SUBGRAPH_NODE_TYPE,
+            common.EMPTY_FUNCTION_TYPE,
+            common.GENERIC_STYLE_TYPE,
+            {
+                position: centerPosition,
+                size: common.getDefaultNodeSize(common.SUBGRAPH_NODE_TYPE),
+                subgraphParentId: editor.subgraphId
+            }
+        );
+
+        // move all selected nodes to new subgraph
+        for (const nodeId of selectedNodeIds) {
+            const node = graph.getComputedNode(nodeId);
+            node.subgraphParentId = newSubgraphNode.id;
+            if (node.nodeParentId && !selectedNodeIds.includes(node.nodeParentId)) {
+                // reset parent node id if parent was not selected to be moved to the subgraph
+                node.nodeParentId = null;
+            }
+        }
+    };
 </script>
 
 <template>
@@ -176,6 +206,18 @@
                         variant="outlined"
                         size="small"
                         @click="() => zoomTo(1.0)"
+                    ></v-btn>
+                </template>
+            </v-tooltip>
+            <v-tooltip location="bottom" text="create subgraph from selection" open-delay="500">
+                <template #activator="{ props }">
+                    <v-btn
+                        v-bind="props"
+                        icon="mdi-sitemap-outline mdi-rotate-90"
+                        variant="outlined"
+                        size="small"
+                        :disabled="getSelectedNodes.length == 0"
+                        @click="createSubgraphFromSelection"
                     ></v-btn>
                 </template>
             </v-tooltip>

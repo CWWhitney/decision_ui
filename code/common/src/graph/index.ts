@@ -4,6 +4,7 @@ import { Node, NodeSchema } from "./node";
 
 export * from "./node";
 export * from "./edge";
+export * from "./subgraph";
 
 export interface Graph {
     nodes: Node[];
