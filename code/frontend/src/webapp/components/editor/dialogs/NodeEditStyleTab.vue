@@ -3,34 +3,40 @@
 
     import FlowNodeBox from "../graph/FlowNodeBox.vue";
 
-    import {
-        BENEFIT_STYLE_TYPE,
-        COLLECTION_NODE_TYPE,
-        COLLECTION_STYLE_TYPE,
-        COST_STYLE_TYPE,
-        CUSTOM_STYLE_TYPE,
-        GENERIC_STYLE_TYPE,
-        getDefaultNodeStyleState,
-        type Node,
-        NODE_STYLE_BORDER_VARIANTS,
-        NODE_STYLE_SHAPE_VARIANTS,
-        type NodeStyleType,
-        RESULT_STYLE_TYPE,
-        RISK_STYLE_TYPE,
-        VARIABLE_NODE_TYPE
-    } from "@decision-support-ui/common";
+    import * as common from "@decision-support-ui/common";
     import { computed } from "vue";
 
-    const node = defineModel<Node>({ required: true });
+    const node = defineModel<common.Node>({ required: true });
 
     const styleType = computed({
         get: () => {
             return node.value.visualization.style.type;
         },
-        set: (value: NodeStyleType) => {
-            node.value.visualization.style = getDefaultNodeStyleState(value);
+        set: (value: common.NodeStyleType) => {
+            node.value.visualization.style = common.getDefaultNodeStyleState(value);
         }
     });
+
+    const selectableStyles = computed(() => {
+        if (node.value.type == common.VARIABLE_NODE_TYPE) {
+            return common.AVAILABLE_VARIABLE_NODE_STYLE_TYPES;
+        } else if (node.value.type == common.COLLECTION_NODE_TYPE) {
+            return common.AVAILABLE_COLLECTION_NODE_STYLE_TYPES;
+        } else if (node.value.type == common.SUBGRAPH_NODE_TYPE) {
+            return common.AVAILABLE_SUBGRAPH_NODE_STYLE_TYPES;
+        }
+        return [];
+    });
+
+    const STYLE_TYPE_LABELS: { [key in common.NodeStyleType]: string } = {
+        [common.COST_STYLE_TYPE]: "Cost",
+        [common.BENEFIT_STYLE_TYPE]: "Benefit",
+        [common.RISK_STYLE_TYPE]: "Risk",
+        [common.RESULT_STYLE_TYPE]: "Result",
+        [common.GENERIC_STYLE_TYPE]: "Generic",
+        [common.COLLECTION_STYLE_TYPE]: "Collection",
+        [common.CUSTOM_STYLE_TYPE]: "Custom"
+    };
 </script>
 
 <template>
@@ -43,7 +49,9 @@
                 :node-type="node.type"
                 :function-type="node.function.type"
                 :style-type="node.visualization.style.type"
-                :custom-style="node.visualization.style.type == CUSTOM_STYLE_TYPE ? node.visualization.style : null"
+                :custom-style="
+                    node.visualization.style.type == common.CUSTOM_STYLE_TYPE ? node.visualization.style : null
+                "
             >
                 {{ node.visualization.title }}
             </FlowNodeBox>
@@ -52,22 +60,16 @@
         <h4>Preset</h4>
         <div>
             <v-btn-toggle v-model="styleType" divided border variant="text" color="primary">
-                <v-btn v-if="node.type == VARIABLE_NODE_TYPE" text="Cost" :value="COST_STYLE_TYPE" />
-                <v-btn v-if="node.type == VARIABLE_NODE_TYPE" text="Benefit" :value="BENEFIT_STYLE_TYPE" />
-                <v-btn v-if="node.type == VARIABLE_NODE_TYPE" text="Risk" :value="RISK_STYLE_TYPE" />
-                <v-btn v-if="node.type == VARIABLE_NODE_TYPE" text="Generic" :value="GENERIC_STYLE_TYPE" />
-                <v-btn v-if="node.type == VARIABLE_NODE_TYPE" text="Result" :value="RESULT_STYLE_TYPE" />
-                <v-btn v-if="node.type == COLLECTION_NODE_TYPE" text="Collection" :value="COLLECTION_STYLE_TYPE" />
-                <v-btn text="Custom" :value="CUSTOM_STYLE_TYPE" />
+                <v-btn v-for="item in selectableStyles" :key="item" :text="STYLE_TYPE_LABELS[item]" :value="item" />
             </v-btn-toggle>
         </div>
 
-        <template v-if="node.visualization.style.type == CUSTOM_STYLE_TYPE">
+        <template v-if="node.visualization.style.type == common.CUSTOM_STYLE_TYPE">
             <h4>Options</h4>
             <v-combobox
                 v-model="node.visualization.style.shape"
                 label="Shape"
-                :items="NODE_STYLE_SHAPE_VARIANTS"
+                :items="common.NODE_STYLE_SHAPE_VARIANTS"
             ></v-combobox>
 
             <VColorInput
@@ -79,7 +81,7 @@
             <v-combobox
                 v-model="node.visualization.style.border"
                 label="Border"
-                :items="NODE_STYLE_BORDER_VARIANTS"
+                :items="common.NODE_STYLE_BORDER_VARIANTS"
             ></v-combobox>
 
             <v-slider
