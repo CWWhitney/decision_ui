@@ -5,7 +5,7 @@
 
     const { fitView, zoomTo, zoomIn, zoomOut } = useVueFlow("editor");
 
-    const editorSettings = useEditorStore();
+    const editor = useEditorStore();
 </script>
 
 <template>
@@ -16,17 +16,21 @@
             <TopMenuItem title="Zoom to Fit" shortcut="CTRL + ." @click="fitView" />
             <TopMenuItem title="Reset Zoom" shortcut="CTRL + #" @click="() => zoomTo(1.0)" />
             <v-divider />
+            <TopMenuItem :title="editor.state.locked ? 'Unlock Graph' : 'Lock Graph'" @click="editor.toggleLocked" />
             <TopMenuItem
-                :title="editorSettings.state.locked ? 'Unlock Graph' : 'Lock Graph'"
-                @click="editorSettings.toggleLocked"
-            />
-            <TopMenuItem
-                :title="editorSettings.state.snapToGrid ? 'Switch to Free Movement' : 'Switch to Snap to Grid'"
-                @click="editorSettings.toggleSnapToGrid"
+                :title="editor.state.snapToGrid ? 'Enable Free Movement' : 'Enable Snap to Grid'"
+                @click="editor.toggleSnapToGrid"
             />
             <v-divider />
-            <TopMenuItem title="Change Edge Style" @click="editorSettings.switchEdgeStyle" />
-            <TopMenuItem title="Change Background" @click="editorSettings.switchBackground" />
+            <TopMenuItem title="Change Edge Style" @click="editor.switchEdgeStyle" />
+            <TopMenuItem title="Change Background" @click="editor.switchBackground" />
+            <v-divider />
+            <TopMenuItem
+                :title="
+                    editor.state.autoAddComputationEdges ? 'Disable Auto-Connect Nodes' : 'Enable Auto-Connect Nodes'
+                "
+                @click="editor.toggleAutoAddComputationEdges"
+            />
         </v-list>
     </v-card>
 </template>

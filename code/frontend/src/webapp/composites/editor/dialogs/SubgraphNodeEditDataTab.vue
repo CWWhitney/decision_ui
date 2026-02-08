@@ -18,7 +18,6 @@
     const node = defineModel<Node>({ required: true });
     const graphStore = useGraphStore();
     const computation = useComputationStore();
-    const selectedChildNodeId = ref<NodeId | null>(null);
 
     const childVariableNodes = computed(() =>
         graphStore.getComputedSubgraphChildren(node.value.id).filter(n => n.type == VARIABLE_NODE_TYPE)
@@ -30,6 +29,8 @@
             value: n.id
         }))
     );
+
+    const selectedChildNodeId = ref<NodeId | null>(null);
 
     watch(
         childVariableNodes,
@@ -56,10 +57,10 @@
 
     const computedTypedTensorResult = computedAsync(
         async () => {
-            const childNode = selectedChildNode.value;
-            if (childNode) {
+            const _selectedChildNode = selectedChildNode.value;
+            if (_selectedChildNode) {
                 await sleep(UI_REFRESH_SLEEP_TIMEOUT);
-                return catchForComputedResult(() => graphStore.getComputedTypedTensor(childNode.id));
+                return catchForComputedResult(() => graphStore.getComputedTypedTensor(_selectedChildNode.id));
             }
         },
         null,
@@ -69,7 +70,7 @@
 
 <template>
     <div class="subgraphDataTabContainer">
-        <p>Select a node from the subgraph to show a visualization of the node's data:</p>
+        <p>Select a node from this subgraph to visualize the data of its variable:</p>
         <HelpHintWrapper>
             <template #default
                 ><v-select
@@ -84,6 +85,9 @@
                 immediate children are available, though. Nodes nested in further subgraphs are not listed.</template
             >
         </HelpHintWrapper>
+        <p v-if="selectedChildNode != null">
+            The value of node "{{ selectedChildNode.visualization.title }}" is evaluated to the data depicted below:
+        </p>
         <template v-if="computedTypeTensorLoading">
             <div class="loading">
                 <v-progress-circular indeterminate></v-progress-circular>

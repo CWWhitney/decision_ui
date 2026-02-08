@@ -57,8 +57,9 @@
                 The type of this node can not be edited. It depends on which node was added to the diagram. There are
                 currently two types of nodes:
                 <ul>
-                    <li>"variable" nodes define how model calculations are done</li>
-                    <li>"collection" nodes visually group a set of nodes</li>
+                    <li>"Variable" nodes define how model calculations are done</li>
+                    <li>"Subgraph" nodes group nodes together by hiding them in a separate subgraph</li>
+                    <li>"Collection" nodes visually group a set of nodes without hiding them</li>
                 </ul>
             </template>
         </HelpHintWrapper>
@@ -81,16 +82,22 @@
                 <template #default>
                     <v-switch
                         v-model="node.visualization.autoConnect"
-                        label="Automatically draw edges based on computation"
+                        label="Automatically draw edges based on computation dependencies"
                         color="primary"
                         hide-details
                         inset
                     ></v-switch>
                 </template>
                 <template #tooltip>
-                    Whenever another node references this node's variable as part of its variable definition, an edge
-                    can be automatically drawn in the diagram highlighting this relationship. Sometimes, e.g., when too
-                    many edges would make the diagram difficult to read, it can be helpful to disable this feature.
+                    <p>
+                        Whenever another node references this node's variable as part of its own variable definition, an
+                        edge between these two nodes can be automatically drawn in the diagram, highlighting this
+                        relationship.
+                    </p>
+                    <p>
+                        Sometimes, e.g., when too many edges would make the diagram difficult to read, it can be helpful
+                        to disable this feature.
+                    </p>
                 </template>
             </HelpHintWrapper>
         </div>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
     import TopMenuItem from "@/components/menu/TopMenuItem.vue";
+    import { useEditorStore } from "@/state/editor";
     import { useGraphStore } from "@/state/graph";
     import { useVueFlow } from "@vue-flow/core";
     import { useRoute } from "vue-router";
@@ -15,6 +16,7 @@
     } = useVueFlow("editor");
 
     const graph = useGraphStore();
+    const editor = useEditorStore();
 
     const route = useRoute();
     const isEditorRoute = route.name == "editor";
@@ -35,13 +37,13 @@
             <TopMenuItem
                 title="Undo"
                 shortcut="CTRL + Z"
-                :disabled="!graph.history.canUndo"
+                :disabled="!graph.history.canUndo || editor.state.locked"
                 @click="graph.history.undo"
             />
             <TopMenuItem
                 title="Redo"
                 shortcut="CTRL + SHIFT + Z"
-                :disabled="!graph.history.canRedo"
+                :disabled="!graph.history.canRedo || editor.state.locked"
                 @click="graph.history.redo"
             />
             <v-divider />
@@ -64,7 +66,12 @@
             <TopMenuItem title="Copy" shortcut="CTRL + C" disabled @click="console.log('copy click')" />
             <TopMenuItem title="Paste" shortcut="CTRL + V" disabled @click="console.log('paste click')" />
             <v-divider />
-            <TopMenuItem title="Remove" shortcut="BACKSPACE" :disabled="!isEditorRoute" @click="removeNodesOrEdges" />
+            <TopMenuItem
+                title="Remove"
+                shortcut="BACKSPACE"
+                :disabled="!isEditorRoute || editor.state.locked"
+                @click="removeNodesOrEdges"
+            />
         </v-list>
     </v-card>
 </template>

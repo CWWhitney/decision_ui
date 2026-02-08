@@ -179,6 +179,10 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
         state.value.snapToGrid = !state.value.snapToGrid;
     };
 
+    const toggleAutoAddComputationEdges = () => {
+        state.value.autoAddComputationEdges = !state.value.autoAddComputationEdges;
+    };
+
     const reset = () => {
         state.value = getDefaultEditorState();
     };
@@ -192,6 +196,7 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
         computedSubgraphTitle,
         toggleLocked,
         toggleSnapToGrid,
+        toggleAutoAddComputationEdges,
         switchEdgeStyle,
         switchBackground,
         reset

@@ -43,12 +43,6 @@
             styleType: common.GENERIC_STYLE_TYPE
         },
         {
-            title: "Result",
-            nodeType: common.VARIABLE_NODE_TYPE,
-            functionType: common.RESULT_FUNCTION_TYPE,
-            styleType: common.RESULT_STYLE_TYPE
-        },
-        {
             title: "Subgraph",
             nodeType: common.SUBGRAPH_NODE_TYPE,
             functionType: common.EMPTY_FUNCTION_TYPE,
@@ -59,6 +53,12 @@
             nodeType: common.COLLECTION_NODE_TYPE,
             functionType: common.EMPTY_FUNCTION_TYPE,
             styleType: common.COLLECTION_STYLE_TYPE
+        },
+        {
+            title: "Result",
+            nodeType: common.VARIABLE_NODE_TYPE,
+            functionType: common.RESULT_FUNCTION_TYPE,
+            styleType: common.RESULT_STYLE_TYPE
         }
     ];
 
@@ -89,6 +89,10 @@
         functionType: common.NodeFunctionType,
         styleType: common.NodeStyleType
     ) => {
+        if (editor.state.locked) {
+            return;
+        }
+
         const topleft = screenToFlowCoordinate({
             x: event.clientX,
             y: event.clientY
@@ -122,8 +126,18 @@
         functionType: common.NodeFunctionType,
         styleType: common.NodeStyleType
     ) => {
+        if (editor.state.locked) {
+            return;
+        }
+
+        const position = screenToFlowCoordinate({
+            x: window.innerWidth / 2.0,
+            y: window.innerHeight / 2.0
+        });
+
         graph.addNewNodeAction(title, nodeType, functionType, styleType, {
-            subgraphParentId: editor.state.subgraphId
+            subgraphParentId: editor.state.subgraphId,
+            position
         });
     };
 
@@ -178,7 +192,7 @@
                         icon="mdi-undo"
                         variant="outlined"
                         size="small"
-                        :disabled="!graph.history.canUndo"
+                        :disabled="!graph.history.canUndo || editor.state.locked"
                         @click="graph.history.undo"
                     ></v-btn>
                 </template>
@@ -190,7 +204,7 @@
                         icon="mdi-redo"
                         variant="outlined"
                         size="small"
-                        :disabled="!graph.history.canRedo"
+                        :disabled="!graph.history.canRedo || editor.state.locked"
                         @click="graph.history.redo"
                     ></v-btn>
                 </template>
@@ -239,7 +253,7 @@
                 :node-type="node.nodeType"
                 :function-type="node.functionType"
                 :style-type="node.styleType"
-                :draggable="true"
+                :draggable="!editor.state.locked"
                 width="auto"
                 @click="() => onNodeClick(node.title, node.nodeType, node.functionType, node.styleType)"
                 @dragend="
@@ -250,6 +264,17 @@
             >
         </div>
         <div class="options">
+            <v-tooltip location="bottom" :text="editor.state.locked ? 'unlock graph' : 'lock graph'" open-delay="500">
+                <template #activator="{ props }">
+                    <v-btn
+                        v-bind="props"
+                        :icon="editor.state.locked ? 'mdi-lock-outline' : 'mdi-lock-open-variant-outline'"
+                        variant="outlined"
+                        size="small"
+                        @click="editor.toggleLocked"
+                    ></v-btn>
+                </template>
+            </v-tooltip>
             <v-tooltip
                 location="bottom"
                 :text="editor.state.snapToGrid ? 'snap to grid' : 'free movement'"
@@ -262,18 +287,6 @@
                         variant="outlined"
                         size="small"
                         @click="editor.toggleSnapToGrid"
-                    ></v-btn>
-                </template>
-            </v-tooltip>
-
-            <v-tooltip location="bottom" :text="editor.state.locked ? 'unlock graph' : 'lock graph'" open-delay="500">
-                <template #activator="{ props }">
-                    <v-btn
-                        v-bind="props"
-                        :icon="editor.state.locked ? 'mdi-lock-outline' : 'mdi-lock-open-variant-outline'"
-                        variant="outlined"
-                        size="small"
-                        @click="editor.toggleLocked"
                     ></v-btn>
                 </template>
             </v-tooltip>
