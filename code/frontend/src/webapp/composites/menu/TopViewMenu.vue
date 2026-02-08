@@ -17,11 +17,11 @@
             <TopMenuItem title="Reset Zoom" shortcut="CTRL + #" @click="() => zoomTo(1.0)" />
             <v-divider />
             <TopMenuItem
-                :title="editorSettings.locked ? 'Unlock Graph' : 'Lock Graph'"
+                :title="editorSettings.state.locked ? 'Unlock Graph' : 'Lock Graph'"
                 @click="editorSettings.toggleLocked"
             />
             <TopMenuItem
-                :title="editorSettings.snapToGrid ? 'Switch to Free Movement' : 'Switch to Snap to Grid'"
+                :title="editorSettings.state.snapToGrid ? 'Switch to Free Movement' : 'Switch to Snap to Grid'"
                 @click="editorSettings.toggleSnapToGrid"
             />
             <v-divider />

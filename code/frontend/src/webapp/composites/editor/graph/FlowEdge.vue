@@ -15,17 +15,17 @@
 
 <template>
     <SmoothStepEdge
-        v-if="editorSettings.edgeStyle == common.SMOOTH_STEP_EDGE_STYLE_TYPE"
+        v-if="editorSettings.state.edgeStyle == common.SMOOTH_STEP_EDGE_STYLE_TYPE"
         v-bind="props"
         :marker-end="`url('#${MarkerType.Arrow}')`"
     />
     <BezierEdge
-        v-if="editorSettings.edgeStyle == common.BEZIER_EDGE_STYLE_TYPE"
+        v-if="editorSettings.state.edgeStyle == common.BEZIER_EDGE_STYLE_TYPE"
         v-bind="props"
         :marker-end="`url('#${MarkerType.Arrow}')`"
     />
     <StraightEdge
-        v-if="editorSettings.edgeStyle == common.STRAIGHT_EDGE_STYLE_TYPE"
+        v-if="editorSettings.state.edgeStyle == common.STRAIGHT_EDGE_STYLE_TYPE"
         v-bind="props"
         :marker-end="`url('#${MarkerType.Arrow}')`"
     />

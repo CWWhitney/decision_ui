@@ -13,7 +13,7 @@ import { makeSafeComputedGetterByKey } from "@/common/computed";
 export const FLOW_GRAPH_STORE_ID = "graph";
 
 export const useGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
-    const projectSettings = useComputationStore();
+    const computationStore = useComputationStore();
     const evaluateExpressionForVariableDependencies = common.getExpressionEvaluatorForVariableDependencies();
     const evaluateExpressionMatch = common.getExpressionMatchEvaluator();
 
@@ -30,7 +30,7 @@ export const useGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
     const computedComputationContext = computed(
         () =>
             ({
-                mcRuns: projectSettings.mcRuns
+                mcRuns: computationStore.state.mcRuns
             }) as common.ComputationContext
     );
 

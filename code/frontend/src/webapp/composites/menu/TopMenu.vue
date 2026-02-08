@@ -39,7 +39,7 @@
                     </v-btn-group>
                 </div>
             </div>
-            <div>{{ metadata.name }}</div>
+            <div>{{ metadata.state.name }}</div>
             <div>
                 <v-btn-group divided>
                     <v-btn prepend-icon="mdi-help-circle-outline" :to="{ name: 'help' }" text="Help"></v-btn>

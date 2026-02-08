@@ -1,19 +1,25 @@
+import { useSessionStorage } from "@vueuse/core";
 import { defineStore } from "pinia";
-import { ref } from "vue";
 
-export const COMPUTATION_STORE_ID = "settings.computation";
+export const COMPUTATION_STORE_ID = "computation";
 
 export const DEFAULT_MC_RUNS = 10000;
 export const DEFAULT_HISTOGRAM_BINS = 40;
 
+const getDefaultComputationState = () => {
+    return {
+        mcRuns: 10000,
+        histogramBins: 40
+    };
+};
+
 export const useComputationStore = defineStore(COMPUTATION_STORE_ID, () => {
-    const mcRuns = ref(DEFAULT_MC_RUNS as number);
-    const histogramBins = ref(DEFAULT_HISTOGRAM_BINS as number);
+    // --- persisted state
+    const state = useSessionStorage(COMPUTATION_STORE_ID, getDefaultComputationState());
 
     const reset = () => {
-        mcRuns.value = DEFAULT_MC_RUNS;
-        histogramBins.value = DEFAULT_HISTOGRAM_BINS;
+        state.value = getDefaultComputationState();
     };
 
-    return { mcRuns, histogramBins, reset };
+    return { state, reset };
 });

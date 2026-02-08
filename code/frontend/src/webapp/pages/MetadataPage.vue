@@ -15,10 +15,10 @@
                 <v-card color="white" elevation="1" rounded>
                     <v-card-title>Metadata</v-card-title>
                     <v-card-text>
-                        <DebouncedTextInput v-model="metadata.name" label="Model Name" />
-                        <v-textarea v-model="metadata.description" label="Description"></v-textarea>
-                        <v-text-field v-model="metadata.creationDate" label="Creation Date" disabled />
-                        <v-text-field v-model="metadata.lastModified" label="Last Modified" disabled />
+                        <DebouncedTextInput v-model="metadata.state.name" label="Model Name" />
+                        <v-textarea v-model="metadata.state.description" label="Description"></v-textarea>
+                        <v-text-field v-model="metadata.state.creationDate" label="Creation Date" disabled />
+                        <v-text-field v-model="metadata.state.lastModified" label="Last Modified" disabled />
                     </v-card-text>
                 </v-card>
             </WorkspaceCards>

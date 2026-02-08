@@ -1,11 +1,11 @@
 import { Schema } from "jsonschema";
 
-export interface ComputationSettings {
+export interface ComputationFileState {
     mcRuns: number;
     histogramBins: number;
 }
 
-export const ComputationSettingsSchema: Schema = {
+export const ComputationFileSchema: Schema = {
     type: "object",
     properties: {
         mcRuns: { type: "number" },

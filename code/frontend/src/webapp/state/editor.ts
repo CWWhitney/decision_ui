@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { computed, ref } from "vue";
+import { computed } from "vue";
 
 import {
     type Node as VueFlowNode,
@@ -11,25 +11,32 @@ import {
 import * as common from "@decision-support-ui/common";
 import { useGraphStore } from "./graph";
 import { getHandlePositions } from "@/common/layout";
+import { useSessionStorage } from "@vueuse/core";
 
 export const EDITOR_STORE_ID = "editor";
+
+const getDefaultEditorState = (): common.EditorStoreState => {
+    return {
+        subgraphId: null,
+        locked: false,
+        snapToGrid: true,
+        edgeStyle: common.SMOOTH_STEP_EDGE_STYLE_TYPE,
+        background: common.DOTS_EDITOR_BACKGROUND,
+        autoAddComputationEdges: true
+    };
+};
 
 export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
     const graphStore = useGraphStore();
 
-    // state
+    // --- state
 
-    const subgraphId = ref<common.SubgraphId | null>(null);
-    const locked = ref(false);
-    const snapToGrid = ref(true);
-    const edgeStyle = ref<common.EdgeStyleType>(common.SMOOTH_STEP_EDGE_STYLE_TYPE);
-    const background = ref<common.EditorBackground>(common.DOTS_EDITOR_BACKGROUND);
-    const autoAddComputationEdges = ref<boolean>(true);
+    const state = useSessionStorage(EDITOR_STORE_ID, getDefaultEditorState());
 
     // computed
 
     const computedVisibleNodes = computed(() =>
-        common.filterNodesVisibleInSubgraph(subgraphId.value, graphStore.state.nodes)
+        common.filterNodesVisibleInSubgraph(state.value.subgraphId, graphStore.state.nodes)
     );
 
     const computedVueFlowNodes = computed(() => {
@@ -89,7 +96,7 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
 
         const projectedComputationEdges = common.projectEdgesToSubgraph(
             computationEdges,
-            subgraphId.value,
+            state.value.subgraphId,
             graphStore.getComputedNode,
             graphStore.getComputedSubgraphAncestors
         );
@@ -100,7 +107,7 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
             graphStore.state.nodes.filter(n => n.visualization.autoConnect).map(n => n.id)
         );
 
-        const filteredComputationEdges = autoAddComputationEdges.value
+        const filteredComputationEdges = state.value.autoAddComputationEdges
             ? projectedComputationEdges.filter(
                   e => autoConnectNodeIdSet.has(e.source) && autoConnectNodeIdSet.has(e.target)
               )
@@ -110,7 +117,7 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
 
         const projectedManualEdges = common.projectEdgesToSubgraph(
             graphStore.state.edges,
-            subgraphId.value,
+            state.value.subgraphId,
             graphStore.getComputedNode,
             graphStore.getComputedSubgraphAncestors
         );
@@ -127,12 +134,12 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
     });
 
     const computedSubgraphTitle = computed(() => {
-        if (subgraphId.value != null) {
+        if (state.value.subgraphId != null) {
             try {
-                return graphStore.getComputedNode(subgraphId.value).visualization.title;
+                return graphStore.getComputedNode(state.value.subgraphId).visualization.title;
             } catch {
                 // subgraph node might not exist (e.g. when undoing creating a subgraph while viewing it)
-                subgraphId.value = null;
+                state.value.subgraphId = null;
             }
         }
         return null;
@@ -141,51 +148,43 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
     // actions
 
     const switchToSubgraph = (nodeId: common.NodeId) => {
-        subgraphId.value = nodeId;
+        state.value.subgraphId = nodeId;
     };
 
     const switchToParentSubgraph = () => {
-        if (subgraphId.value) {
-            subgraphId.value = graphStore.getComputedNode(subgraphId.value).subgraphParentId;
+        if (state.value.subgraphId) {
+            state.value.subgraphId = graphStore.getComputedNode(state.value.subgraphId).subgraphParentId;
         }
     };
 
     const switchEdgeStyle = () => {
         const nextIdx =
-            (common.AVAILABLE_EDGE_STYLE_TYPES.indexOf(edgeStyle.value) + 1) % common.AVAILABLE_EDGE_STYLE_TYPES.length;
-        edgeStyle.value = common.AVAILABLE_EDGE_STYLE_TYPES[nextIdx] ?? common.SMOOTH_STEP_EDGE_STYLE_TYPE;
+            (common.AVAILABLE_EDGE_STYLE_TYPES.indexOf(state.value.edgeStyle) + 1) %
+            common.AVAILABLE_EDGE_STYLE_TYPES.length;
+        state.value.edgeStyle = common.AVAILABLE_EDGE_STYLE_TYPES[nextIdx] ?? common.SMOOTH_STEP_EDGE_STYLE_TYPE;
     };
 
     const switchBackground = () => {
         const nextIdx =
-            (common.AVAILABLE_EDITOR_BACKGROUNDS.indexOf(background.value) + 1) %
+            (common.AVAILABLE_EDITOR_BACKGROUNDS.indexOf(state.value.background) + 1) %
             common.AVAILABLE_EDITOR_BACKGROUNDS.length;
-        background.value = common.AVAILABLE_EDITOR_BACKGROUNDS[nextIdx] ?? common.DOTS_EDITOR_BACKGROUND;
+        state.value.background = common.AVAILABLE_EDITOR_BACKGROUNDS[nextIdx] ?? common.DOTS_EDITOR_BACKGROUND;
     };
 
     const toggleLocked = () => {
-        locked.value = !locked.value;
+        state.value.locked = !state.value.locked;
     };
 
     const toggleSnapToGrid = () => {
-        snapToGrid.value = !snapToGrid.value;
+        state.value.snapToGrid = !state.value.snapToGrid;
     };
 
     const reset = () => {
-        subgraphId.value = null;
-        autoAddComputationEdges.value = true;
-        locked.value = false;
-        snapToGrid.value = true;
-        edgeStyle.value = common.SMOOTH_STEP_EDGE_STYLE_TYPE;
-        background.value = common.DOTS_EDITOR_BACKGROUND;
+        state.value = getDefaultEditorState();
     };
 
     return {
-        subgraphId,
-        locked,
-        snapToGrid,
-        edgeStyle,
-        background,
+        state,
         switchToSubgraph,
         switchToParentSubgraph,
         computedVueFlowNodes,

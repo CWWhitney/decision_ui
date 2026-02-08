@@ -79,7 +79,7 @@
     const onConnect = (connection: Connection) => graph.addEdgeFromVueFlowConnectionAction(connection);
 
     const onNodeDoubleClick = (event: NodeMouseEvent) => {
-        if (!editor.locked) {
+        if (!editor.state.locked) {
             const node = graph.getComputedNode(event.node.id);
             if (node.type == common.VARIABLE_NODE_TYPE) {
                 nodeEditStore.openDialog(event.node.id, NODE_EDIT_FUNCTION_TAB);
@@ -92,7 +92,7 @@
     };
 
     watch(
-        () => editor.locked,
+        () => editor.state.locked,
         locked => {
             if (locked) {
                 removeSelectedNodes(getSelectedNodes.value);
@@ -105,7 +105,7 @@
 
     const shouldFitOnNextUpdate = ref<boolean>(false);
     watch(
-        () => editor.subgraphId,
+        () => editor.state.subgraphId,
         async (newSubgraphId, oldSubgraphId) => {
             console.log(`subgraphId has changed from ${oldSubgraphId} to ${newSubgraphId}`);
             if (newSubgraphId != oldSubgraphId && editor.computedVueFlowNodes.length > 0) {
@@ -141,7 +141,7 @@
                 :nodes="editor.computedVueFlowNodes"
                 :edges="editor.computedVueFlowEdges"
                 :connection-mode="ConnectionMode.Loose"
-                :snap-to-grid="editor.snapToGrid"
+                :snap-to-grid="editor.state.snapToGrid"
                 :snap-grid="[10, 10]"
                 :apply-default="false"
                 :zoom-on-double-click="false"
@@ -170,7 +170,7 @@
                 </template>
 
                 <MiniMap v-if="false" pannable zoomable position="top-right" />
-                <Background v-if="editor.background != 'none'" :variant="editor.background" />
+                <Background v-if="editor.state.background != 'none'" :variant="editor.state.background" />
             </VueFlow>
             <EditorSubgraphIndicator />
         </div>

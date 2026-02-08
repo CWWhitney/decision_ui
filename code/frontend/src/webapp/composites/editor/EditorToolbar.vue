@@ -110,7 +110,7 @@
             position: newNodePosition,
             size: newNodeSize,
             nodeParentId: parentNode ? parentNode.id : null,
-            subgraphParentId: editor.subgraphId
+            subgraphParentId: editor.state.subgraphId
         });
 
         removeSelectedNodes(getSelectedNodes.value);
@@ -123,7 +123,7 @@
         styleType: common.NodeStyleType
     ) => {
         graph.addNewNodeAction(title, nodeType, functionType, styleType, {
-            subgraphParentId: editor.subgraphId
+            subgraphParentId: editor.state.subgraphId
         });
     };
 
@@ -150,7 +150,7 @@
             {
                 position: centerPosition,
                 size: common.getDefaultNodeSize(common.SUBGRAPH_NODE_TYPE),
-                subgraphParentId: editor.subgraphId
+                subgraphParentId: editor.state.subgraphId
             }
         );
 
@@ -250,11 +250,15 @@
             >
         </div>
         <div class="options">
-            <v-tooltip location="bottom" :text="editor.snapToGrid ? 'snap to grid' : 'free movement'" open-delay="500">
+            <v-tooltip
+                location="bottom"
+                :text="editor.state.snapToGrid ? 'snap to grid' : 'free movement'"
+                open-delay="500"
+            >
                 <template #activator="{ props }">
                     <v-btn
                         v-bind="props"
-                        :icon="editor.snapToGrid ? 'mdi-grid' : 'mdi-cursor-move'"
+                        :icon="editor.state.snapToGrid ? 'mdi-grid' : 'mdi-cursor-move'"
                         variant="outlined"
                         size="small"
                         @click="editor.toggleSnapToGrid"
@@ -262,11 +266,11 @@
                 </template>
             </v-tooltip>
 
-            <v-tooltip location="bottom" :text="editor.locked ? 'unlock graph' : 'lock graph'" open-delay="500">
+            <v-tooltip location="bottom" :text="editor.state.locked ? 'unlock graph' : 'lock graph'" open-delay="500">
                 <template #activator="{ props }">
                     <v-btn
                         v-bind="props"
-                        :icon="editor.locked ? 'mdi-lock-outline' : 'mdi-lock-open-variant-outline'"
+                        :icon="editor.state.locked ? 'mdi-lock-outline' : 'mdi-lock-open-variant-outline'"
                         variant="outlined"
                         size="small"
                         @click="editor.toggleLocked"
@@ -278,9 +282,9 @@
                     <v-btn
                         v-bind="props"
                         :icon="
-                            editor.edgeStyle == common.STRAIGHT_EDGE_STYLE_TYPE
+                            editor.state.edgeStyle == common.STRAIGHT_EDGE_STYLE_TYPE
                                 ? 'mdi-vector-polyline'
-                                : editor.edgeStyle == common.BEZIER_EDGE_STYLE_TYPE
+                                : editor.state.edgeStyle == common.BEZIER_EDGE_STYLE_TYPE
                                   ? 'mdi-vector-bezier'
                                   : 'mdi-square-wave'
                         "
@@ -295,9 +299,9 @@
                     <v-btn
                         v-bind="props"
                         :icon="
-                            editor.background == common.DOTS_EDITOR_BACKGROUND
+                            editor.state.background == common.DOTS_EDITOR_BACKGROUND
                                 ? 'mdi-dots-grid'
-                                : editor.background == common.LINES_EDITOR_BACKGROUND
+                                : editor.state.background == common.LINES_EDITOR_BACKGROUND
                                   ? 'mdi-grid'
                                   : ''
                         "

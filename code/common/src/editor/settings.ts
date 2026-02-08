@@ -1,5 +1,3 @@
-import { Schema } from "jsonschema";
-
 export const SMOOTH_STEP_EDGE_STYLE_TYPE = "smooth-step";
 export const BEZIER_EDGE_STYLE_TYPE = "bezier";
 export const STRAIGHT_EDGE_STYLE_TYPE = "straight";
@@ -21,21 +19,3 @@ export const AVAILABLE_EDITOR_BACKGROUNDS = [
     LINES_EDITOR_BACKGROUND,
     NO_EDITOR_BACKGROUND
 ] as EditorBackground[];
-
-export interface EditorSettings {
-    edgeStyle: EdgeStyleType;
-    background: EditorBackground;
-    locked: boolean;
-    snapToGrid: boolean;
-}
-
-export const EditorSettingsSchema: Schema = {
-    type: "object",
-    properties: {
-        edgeStyle: { enum: AVAILABLE_EDGE_STYLE_TYPES },
-        background: { enum: AVAILABLE_EDITOR_BACKGROUNDS },
-        locked: { type: "boolean" },
-        snapToGrid: { type: "boolean" }
-    },
-    required: ["edgeStyle", "background", "locked", "snapToGrid"]
-};

@@ -1,74 +1,29 @@
-import {
-    type ComputationSettings,
-    type EditorSettings,
-    type ModelFile,
-    type Graph,
-    type ModelMetadata,
-    ModelFileSchema,
-    validateJson
-} from "@decision-support-ui/common";
+import { type ModelFileState, ModelFileSchema, validateJson } from "@decision-support-ui/common";
 
 import { useGraphStore } from "./graph";
 import { useEditorStore } from "./editor";
 import { useComputationStore } from "./computation";
 import { useMetadataStore } from "./metadata";
 
-const getGraphState = (): Graph => {
+export const getModelFileFromState = (): ModelFileState => {
     const graph = useGraphStore();
-
-    return {
-        nodes: graph.state.nodes,
-        edges: graph.state.edges
-    };
-};
-
-const getEditorFileState = (): EditorSettings => {
+    const metadata = useMetadataStore();
+    const computation = useComputationStore();
     const editor = useEditorStore();
 
-    return {
-        background: editor.background,
-        edgeStyle: editor.edgeStyle,
-        locked: editor.locked,
-        snapToGrid: editor.snapToGrid
-    };
-};
-
-const getMetadataState = (): ModelMetadata => {
-    const metadata = useMetadataStore();
-
-    return {
-        name: metadata.name,
-        description: metadata.description,
-        creationDate: metadata.creationDate,
-        lastModified: metadata.lastModified
-    };
-};
-
-const getComputationSettingsState = (): ComputationSettings => {
-    const computation = useComputationStore();
-
-    return {
-        mcRuns: computation.mcRuns,
-        histogramBins: computation.histogramBins
-    };
-};
-
-export const getModelFileFromState = (): ModelFile => {
     return {
         _schema: {
             name: "de.uni-bonn.decision-model/file",
             version: 1
         },
-        graph: getGraphState(),
-        metadata: getMetadataState(),
-        settings: {
-            editor: getEditorFileState(),
-            computation: getComputationSettingsState()
-        }
+        graph: { ...graph.state },
+        metadata: { ...metadata.state },
+        computation: { ...computation.state },
+        editor: { ...editor.state }
     };
 };
 
-export const loadModelFileToState = (file: ModelFile): void => {
+export const loadModelFileToState = (file: ModelFileState): void => {
     const graph = useGraphStore();
     const editorSettings = useEditorStore();
     const computationSettings = useComputationStore();
@@ -80,13 +35,13 @@ export const loadModelFileToState = (file: ModelFile): void => {
     graph.history.clear();
 
     editorSettings.reset();
-    editorSettings.$patch(file.settings.editor);
+    editorSettings.$patch({ state: file.editor });
 
     computationSettings.reset();
-    computationSettings.$patch(file.settings.computation);
+    computationSettings.$patch({ state: file.computation });
 
     metadata.reset();
-    metadata.$patch(file.metadata);
+    metadata.$patch({ state: file.metadata });
 };
 
 export const downloadModelFile = () => {
@@ -98,7 +53,7 @@ export const downloadModelFile = () => {
 
 export const uploadModelFile = async () => {
     const text = await uploadFile();
-    const state = JSON.parse(text) as ModelFile;
+    const state = JSON.parse(text) as ModelFileState;
     const validationErrors = validateJson(state, ModelFileSchema);
     if (!validationErrors) {
         loadModelFileToState(state);

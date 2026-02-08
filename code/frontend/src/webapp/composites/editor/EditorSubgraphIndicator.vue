@@ -5,7 +5,7 @@
 </script>
 
 <template>
-    <div v-if="editor.subgraphId != null" class="subgraphIndicatorContainer">
+    <div v-if="editor.state.subgraphId != null" class="subgraphIndicatorContainer">
         <span class="subgraphTitle">
             {{ editor.computedSubgraphTitle }}
         </span>

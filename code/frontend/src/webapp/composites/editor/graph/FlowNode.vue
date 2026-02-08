@@ -68,7 +68,7 @@
 
         // assign nodes to current subgraph
         for (const node of subgraphChildren) {
-            node.subgraphParentId = editor.subgraphId;
+            node.subgraphParentId = editor.state.subgraphId;
         }
 
         // delete subgraph node

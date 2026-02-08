@@ -1,11 +1,11 @@
-export interface ModelMetadata {
+export interface MetadataFileState {
     name: string;
     description: string;
     creationDate: string;
     lastModified: string;
 }
 
-export const ModelMetadataSchema = {
+export const MetadataFileSchema = {
     type: "object",
     properties: {
         name: { type: "string" },

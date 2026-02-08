@@ -15,7 +15,7 @@
 
     const node = defineModel<Node>({ required: true });
     const graphStore = useGraphStore();
-    const computationSettings = useComputationStore();
+    const computation = useComputationStore();
 
     const computedTypeTensorLoading = ref<boolean>(false);
 
@@ -44,7 +44,7 @@
             <TypedTensorVisualization
                 :node-title="node.visualization.title"
                 :tt="computedTypedTensorResult.value"
-                :bins="computationSettings.histogramBins"
+                :bins="computation.state.histogramBins"
             />
         </div>
         <div v-if="computedTypedTensorResult && computedTypedTensorResult.type == COMPUTED_RESULT_ERROR_TYPE">
