@@ -149,10 +149,13 @@
         // move all selected nodes to new subgraph
         for (const nodeId of selectedNodeIds) {
             const node = graph.getComputedNode(nodeId);
-            node.subgraphParentId = newSubgraphNode.id;
-            if (node.nodeParentId && !selectedNodeIds.includes(node.nodeParentId)) {
-                // reset parent node id if parent was not selected to be moved to the subgraph
-                node.nodeParentId = null;
+            const childrenNodes = graph.getComputedNodeDescendants(nodeId);
+            for (const n of [...childrenNodes, node]) {
+                n.subgraphParentId = newSubgraphNode.id;
+                if (n.nodeParentId && !selectedNodeIds.includes(n.nodeParentId)) {
+                    // reset parent node id if parent was not selected to be moved to the subgraph
+                    n.nodeParentId = null;
+                }
             }
         }
     };
