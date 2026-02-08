@@ -103,7 +103,8 @@
         }
     );
 
-    const shouldFitOnNextUpdate = ref<boolean>(false);
+    // what for subgraph switches and remember that subgraphs were switched
+    const shouldFitOnNextUpdate = ref<boolean>(true);
     watch(
         () => editor.state.subgraphId,
         async (newSubgraphId, oldSubgraphId) => {
@@ -115,13 +116,8 @@
         { flush: "post" }
     );
 
-    const onInit = () => {
-        console.log(`onInit`);
-        fitView({ maxZoom: 1 });
-    };
-
     const onNodesInitialized = () => {
-        console.log(`onNodesInitialized`);
+        // fit view to subgraph if it was changed (or on initial load)
         if (shouldFitOnNextUpdate.value) {
             shouldFitOnNextUpdate.value = false;
             fitView({ maxZoom: 1 });
@@ -145,10 +141,9 @@
                 :snap-grid="[10, 10]"
                 :apply-default="false"
                 :zoom-on-double-click="false"
-                :min-zoom="0.1"
+                :min-zoom="0.25"
                 elevate-edges-on-select
                 tabindex="0"
-                @init="onInit"
                 @nodes-initialized="onNodesInitialized"
                 @connect="onConnect"
                 @node-drag-start="onNodeDragStart"
