@@ -5,11 +5,11 @@
 </script>
 
 <template>
-    <div v-if="editor.subgraphNodeId != null" class="subgraphIndicatorContainer">
+    <div v-if="editor.subgraphId != null" class="subgraphIndicatorContainer">
         <span class="subgraphTitle">
             {{ editor.computedSubgraphTitle }}
         </span>
-        <v-tooltip location="bottom" text="return to main graph" open-delay="500">
+        <v-tooltip location="bottom" text="switch to parent subgraph" open-delay="500">
             <template #activator="{ props }">
                 <v-btn
                     v-bind="props"
@@ -17,7 +17,7 @@
                     variant="flat"
                     class="subgraphCloseButton"
                     size="small"
-                    @click="editor.switchToMainGraph"
+                    @click="editor.switchToParentSubgraph"
                 />
             </template>
         </v-tooltip>

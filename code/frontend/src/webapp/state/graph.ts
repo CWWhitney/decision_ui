@@ -35,7 +35,8 @@ export const useGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
     );
 
     const _nodesByIdMap = computed(() => common.getNodeByIdMap(state.value.nodes));
-    const _childrenByParentIdMap = computed(() => common.getNodeChildrenByParentIdMap(state.value.nodes));
+    const _nodeChildrenByParentId = computed(() => common.getNodeChildrenByParentIdMap(state.value.nodes));
+    const _subgraphChildrenByParentId = computed(() => common.getSubgraphChildrenByParentIdMap(state.value.nodes));
     const _nodeIdByVariableMap = computed(() => {
         return new Map(
             state.value.nodes.filter(n => n.type == common.VARIABLE_NODE_TYPE).map(n => [n.function.variable, n.id])
@@ -59,28 +60,62 @@ export const useGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
             common.getNodePositionRecursion(
                 nodeId,
                 (nodeId: common.NodeId) => getComputedNode(nodeId),
-                (nodeId: common.NodeId, _getNode: (nodeId: common.NodeId) => common.Node) =>
-                    getComputedNodePosition(nodeId)
+                (nodeId: common.NodeId) => getComputedNodePosition(nodeId)
             )
     );
 
-    const getComputedAncestorNodes: (nodeId: common.NodeId) => common.Node[] = makeSafeComputedGetterByKey(
+    const getComputedNodeAncestors: (nodeId: common.NodeId) => common.Node[] = makeSafeComputedGetterByKey(
         (nodeId: common.NodeId) =>
-            common.getAncestorNodesRecursion(
+            common.getNodeAncestorsRecursion(
                 getComputedNode(nodeId),
                 (nodeId: common.NodeId) => getComputedNode(nodeId),
-                (node: common.Node, _getNode: (nodeId: common.NodeId) => common.Node) =>
-                    getComputedAncestorNodes(node.id)
+                (node: common.Node) => getComputedNodeAncestors(node.id)
             )
     );
 
-    const getComputedDescendantNodes: (nodeId: common.NodeId) => common.Node[] = makeSafeComputedGetterByKey(
+    const getComputedNodeDescendants: (nodeId: common.NodeId) => common.Node[] = makeSafeComputedGetterByKey(
         (nodeId: common.NodeId) =>
-            common.getDescendantNodesRecursion(
+            common.getNodeDescendantsRecursion(
                 getComputedNode(nodeId),
-                _childrenByParentIdMap.value,
-                (node: common.Node, _childrenByParentIdMap: Map<common.NodeId, common.Node[]>) =>
-                    getComputedDescendantNodes(node.id)
+                _nodeChildrenByParentId.value,
+                (node: common.Node) => getComputedNodeDescendants(node.id)
+            )
+    );
+
+    const getComputedSubgraphAncestors: (nodeId: common.NodeId) => common.Node[] = makeSafeComputedGetterByKey(
+        (nodeId: common.NodeId) =>
+            common.getSubgraphAncestorsRecursion(
+                getComputedNode(nodeId),
+                (nodeId: common.NodeId) => getComputedNode(nodeId),
+                (node: common.Node) => getComputedSubgraphAncestors(node.id)
+            )
+    );
+
+    const getComputedSubgraphDescendants: (nodeId: common.NodeId) => common.Node[] = makeSafeComputedGetterByKey(
+        (nodeId: common.NodeId) =>
+            common.getSubgraphDescendantsRecursion(
+                getComputedNode(nodeId),
+                _subgraphChildrenByParentId.value,
+                (node: common.Node) => getComputedSubgraphDescendants(node.id)
+            )
+    );
+
+    const getComputedAnyAncestors: (nodeId: common.NodeId) => common.Node[] = makeSafeComputedGetterByKey(
+        (nodeId: common.NodeId) =>
+            common.getAnyAncestorsRecursion(
+                getComputedNode(nodeId),
+                (nodeId: common.NodeId) => getComputedNode(nodeId),
+                (node: common.Node) => getComputedAnyAncestors(node.id)
+            )
+    );
+
+    const getComputedAnyDescendants: (nodeId: common.NodeId) => common.Node[] = makeSafeComputedGetterByKey(
+        (nodeId: common.NodeId) =>
+            common.getAnyDescendantsRecursion(
+                getComputedNode(nodeId),
+                _subgraphChildrenByParentId.value,
+                _nodeChildrenByParentId.value,
+                (node: common.Node) => getComputedAnyDescendants(node.id)
             )
     );
 
@@ -177,7 +212,7 @@ export const useGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
 
     const removeNodeAction = (nodeId: common.NodeId) => {
         const node = getComputedNode(nodeId);
-        const descendantNodes = getComputedDescendantNodes(node.id);
+        const descendantNodes = getComputedAnyDescendants(node.id);
         const removeNodeIds = [nodeId, ...descendantNodes.map(n => n.id)];
         const removeEdgeIds = state.value.edges
             .filter(e => removeNodeIds.includes(e.source) || removeNodeIds.includes(e.target))
@@ -205,8 +240,12 @@ export const useGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         getComputedNodePosition,
         getComputedNode,
         getComputedTypedTensor,
-        getComputedAncestorNodes,
-        getComputedDescendantNodes,
+        getComputedNodeAncestors,
+        getComputedNodeDescendants,
+        getComputedSubgraphAncestors,
+        getComputedSubgraphDescendants,
+        getComputedAnyAncestors,
+        getComputedAnyDescendants,
         getComputedVariableDependencies,
         addEdgeFromVueFlowConnectionAction,
         removeEdgeAction,

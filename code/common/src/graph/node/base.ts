@@ -26,11 +26,13 @@ import {
 } from "./type";
 
 export type NodeId = string;
+export type SubgraphId = NodeId;
 
 export interface AbstractNode<T, F extends NodeFunctionState, S extends NodeStyleState> {
     id: NodeId;
     type: T;
-    parentNodeId: NodeId | null;
+    nodeParentId: NodeId | null;
+    subgraphParentId: SubgraphId | null;
 
     function: F;
 
@@ -64,10 +66,11 @@ export const NodeSchema: Schema = {
     properties: {
         id: { type: "string" },
         type: { enum: AVAILABLE_NODE_TYPES },
-        parentNodeId: { type: ["string", "null"] },
+        nodeParentId: { type: ["string", "null"] },
+        subgraphParentId: { type: ["string", "null"] },
         visualization: NodeVisualizationSchema
     },
-    required: ["id", "type", "parentNodeId", "visualization"],
+    required: ["id", "type", "nodeParentId", "subgraphParentId", "visualization"],
     allOf: [
         {
             if: {

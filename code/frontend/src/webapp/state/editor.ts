@@ -5,13 +5,13 @@ import {
     type Node as VueFlowNode,
     type Edge as VueFlowEdge,
     type Styles as VueFlowSyles,
-    MarkerType
+    MarkerType,
+    type ViewportTransform
 } from "@vue-flow/core";
 
 import * as common from "@decision-support-ui/common";
 import { useGraphStore } from "./graph";
 import { getHandlePositions } from "@/common/layout";
-import { makeSafeComputedGetterByKey } from "@/common/computed";
 
 export const EDITOR_STORE_ID = "editor";
 
@@ -20,46 +20,45 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
 
     // state
 
-    const subgraphNodeId = ref<common.NodeId | null>(null);
+    const subgraphId = ref<common.SubgraphId | null>(null);
     const locked = ref(false);
     const snapToGrid = ref(true);
     const edgeStyle = ref<common.EdgeStyleType>(common.SMOOTH_STEP_EDGE_STYLE_TYPE);
     const background = ref<common.EditorBackground>(common.DOTS_EDITOR_BACKGROUND);
     const autoAddComputationEdges = ref<boolean>(true);
+    const viewport = ref<common.EditorViewportState>({ x: 0, y: 0, zoom: 1.0 });
+    const subgraphViewports = ref<{ [key in common.SubgraphId]: common.EditorViewportState }>({});
 
     // computed
 
     const computedVisibleNodes = computed(() =>
-        common.filterNodesVisibleInSubgraph(subgraphNodeId.value, graphStore.state.nodes, n =>
-            graphStore.getComputedAncestorNodes(n.id)
-        )
+        common.filterNodesVisibleInSubgraph(subgraphId.value, graphStore.state.nodes)
     );
 
     const computedVueFlowNodes = computed(() => {
-        return computedVisibleNodes.value.map(
-            node =>
-                ({
-                    id: node.id,
-                    position: { ...node.visualization.position },
-                    type: "custom",
-                    class:
-                        `${node.type}-type ` +
-                        `${node.function.type}-function-type ` +
-                        `${node.visualization.style.type}-style-type`,
-                    width: node.visualization.size.width,
-                    height: node.visualization.size.height,
-                    parentNode: node.parentNodeId == subgraphNodeId.value ? null : node.parentNodeId,
-                    extent: "parent",
-                    expandParent: true,
-                    data: {
-                        label: node.visualization.title,
-                        nodeType: node.type,
-                        ...(node.visualization.style.type == common.CUSTOM_STYLE_TYPE && {
-                            border: node.visualization.style.border
-                        })
-                    }
-                }) as VueFlowNode
-        );
+        return computedVisibleNodes.value.map(node => {
+            return {
+                id: node.id,
+                position: { ...node.visualization.position },
+                type: "custom",
+                class:
+                    `${node.type}-type ` +
+                    `${node.function.type}-function-type ` +
+                    `${node.visualization.style.type}-style-type`,
+                width: node.visualization.size.width,
+                height: node.visualization.size.height,
+                parentNode: node.nodeParentId ? node.nodeParentId : undefined,
+                extent: node.nodeParentId ? "parent" : undefined,
+                expandParent: node.nodeParentId ? false : undefined,
+                data: {
+                    label: node.visualization.title,
+                    nodeType: node.type,
+                    ...(node.visualization.style.type == common.CUSTOM_STYLE_TYPE && {
+                        border: node.visualization.style.border
+                    })
+                }
+            } as VueFlowNode;
+        });
     });
 
     const _getVueFlowEdge = (
@@ -99,16 +98,16 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
 
         const projectedComputationEdges = common.projectEdgesToSubgraph(
             computationEdges,
-            subgraphNodeId.value,
+            subgraphId.value,
             graphStore.getComputedNode,
-            n => graphStore.getComputedAncestorNodes(n.id)
+            graphStore.getComputedSubgraphAncestors
         );
 
         const projectedManualEdges = common.projectEdgesToSubgraph(
             manualEdges,
-            subgraphNodeId.value,
+            subgraphId.value,
             graphStore.getComputedNode,
-            n => graphStore.getComputedAncestorNodes(n.id)
+            graphStore.getComputedSubgraphAncestors
         );
 
         return [
@@ -124,27 +123,48 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
     });
 
     const computedSubgraphTitle = computed(() => {
-        if (subgraphNodeId.value != null) {
-            return graphStore.getComputedNode(subgraphNodeId.value).visualization.title;
+        if (subgraphId.value != null) {
+            return graphStore.getComputedNode(subgraphId.value).visualization.title;
         }
         return null;
     });
 
-    const getComputedVisibleAncestorNodes: (nodeId: common.NodeId) => common.Node[] = makeSafeComputedGetterByKey(
-        (nodeId: common.NodeId) =>
-            common.filterNodesVisibleInSubgraph(subgraphNodeId.value, graphStore.getComputedAncestorNodes(nodeId), n =>
-                graphStore.getComputedAncestorNodes(n.id)
-            )
-    );
+    const computedViewportState = computed(() => {
+        if (subgraphId.value == null) {
+            return viewport.value;
+        } else {
+            if (!(subgraphId.value in subgraphViewports.value)) {
+                updateViewport({
+                    x: 0,
+                    y: 0,
+                    zoom: 1.0
+                } as common.EditorViewportState);
+            }
+            return subgraphViewports.value[subgraphId.value]!;
+        }
+    });
 
     // actions
 
-    const switchToSubgraph = (nodeId: common.NodeId) => {
-        subgraphNodeId.value = nodeId;
+    const updateViewport = (newViewport: ViewportTransform) => {
+        if (subgraphId.value == null) {
+            viewport.value = { ...newViewport };
+        } else {
+            subgraphViewports.value = {
+                ...subgraphViewports.value,
+                [subgraphId.value]: { ...newViewport } as common.EditorViewportState
+            };
+        }
     };
 
-    const switchToMainGraph = () => {
-        subgraphNodeId.value = null;
+    const switchToSubgraph = (nodeId: common.NodeId) => {
+        subgraphId.value = nodeId;
+    };
+
+    const switchToParentSubgraph = () => {
+        if (subgraphId.value) {
+            subgraphId.value = graphStore.getComputedNode(subgraphId.value).subgraphParentId;
+        }
     };
 
     const switchEdgeStyle = () => {
@@ -169,6 +189,10 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
     };
 
     const reset = () => {
+        subgraphId.value = null;
+        viewport.value = { x: 0, y: 0, zoom: 1 };
+        subgraphViewports.value = {};
+        autoAddComputationEdges.value = true;
         locked.value = false;
         snapToGrid.value = true;
         edgeStyle.value = common.SMOOTH_STEP_EDGE_STYLE_TYPE;
@@ -176,17 +200,18 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
     };
 
     return {
-        subgraphNodeId,
+        subgraphId,
         locked,
         snapToGrid,
         edgeStyle,
         background,
         switchToSubgraph,
-        switchToMainGraph,
+        switchToParentSubgraph,
         computedVueFlowNodes,
         computedVueFlowEdges,
         computedSubgraphTitle,
-        getComputedVisibleAncestorNodes,
+        computedViewportState,
+        updateViewport,
         toggleLocked,
         toggleSnapToGrid,
         switchEdgeStyle,

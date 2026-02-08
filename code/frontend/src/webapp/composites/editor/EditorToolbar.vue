@@ -66,15 +66,17 @@
         // determine which node could be the best parent node based on cursor position
         // (there might be multiple in case of nested nodes or overlapping nodes)
         const intersectingGraphNodes = getIntersectingNodes({ ...position, width: 1, height: 1 } as Rect, false);
-        const intersectingNodes = intersectingGraphNodes.map(n => graph.getComputedNode(n.id));
+        const intersectingCollectionNodes = intersectingGraphNodes
+            .map(n => graph.getComputedNode(n.id))
+            .filter(n => n.type == common.COLLECTION_NODE_TYPE);
 
         // remove any ancestor nodes from the list of intersecting nodes
-        const ancestorsNodeIds = intersectingNodes
-            .reduce((p, n) => [...p, ...editor.getComputedVisibleAncestorNodes(n.id)], [] as common.Node[])
+        const ancestorsNodeIds = intersectingCollectionNodes
+            .reduce((p, n) => [...p, ...graph.getComputedNodeAncestors(n.id)], [] as common.Node[])
             .map(n => n.id);
 
         // consider only child nodes (remove any ancestor nodes)
-        const candidateParentNodes = intersectingNodes.filter(n => !ancestorsNodeIds.includes(n.id));
+        const candidateParentNodes = intersectingCollectionNodes.filter(n => !ancestorsNodeIds.includes(n.id));
 
         // pick the first one (even though there still might be more than one)
         return candidateParentNodes.length > 0 ? candidateParentNodes[0] : null;
@@ -93,7 +95,7 @@
         });
 
         const parentNode = determineParentNode(topleft);
-        const ancestorNodes = parentNode ? editor.getComputedVisibleAncestorNodes(parentNode.id) : [];
+        const ancestorNodes = parentNode ? graph.getComputedNodeAncestors(parentNode.id) : [];
         const ancestorOffset = [parentNode, ...ancestorNodes].reduce(
             (p, n) => ({ x: p.x + (n?.visualization.position.x ?? 0), y: p.y + (n?.visualization.position.y ?? 0) }),
             { x: 0, y: 0 } as XYPosition
@@ -107,7 +109,8 @@
         graph.addNewNodeAction(title, nodeType, functionType, styleType, {
             position: newNodePosition,
             size: newNodeSize,
-            parentNodeId: parentNode ? parentNode.id : editor.subgraphNodeId
+            nodeParentId: parentNode ? parentNode.id : null,
+            subgraphParentId: editor.subgraphId
         });
 
         removeSelectedNodes(getSelectedNodes.value);
@@ -119,7 +122,9 @@
         functionType: common.NodeFunctionType,
         styleType: common.NodeStyleType
     ) => {
-        graph.addNewNodeAction(title, nodeType, functionType, styleType);
+        graph.addNewNodeAction(title, nodeType, functionType, styleType, {
+            subgraphParentId: editor.subgraphId
+        });
     };
 </script>
 

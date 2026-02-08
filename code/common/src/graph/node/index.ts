@@ -4,4 +4,3 @@ export * from "./type";
 export * from "./base";
 export * from "./default";
 export * from "./util";
-export * from "./project";

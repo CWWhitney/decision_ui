@@ -1,5 +1,15 @@
 <script setup lang="ts">
-    import { VueFlow, useVueFlow, ConnectionMode, type NodeRemoveChange, type NodeChange } from "@vue-flow/core";
+    import {
+        VueFlow,
+        useVueFlow,
+        ConnectionMode,
+        type NodeRemoveChange,
+        type NodeChange,
+        type Connection,
+        type EdgeChange,
+        type NodeMouseEvent,
+        type ViewportTransform
+    } from "@vue-flow/core";
     import { Background } from "@vue-flow/background";
     import { MiniMap } from "@vue-flow/minimap";
 
@@ -21,46 +31,35 @@
     const editor = useEditorStore();
     const nodeEditStore = useDialogsNodeEditStore();
 
-    const {
-        onConnect,
-        onEdgesChange,
-        onNodesChange,
-        onNodeDoubleClick,
-        applyNodeChanges,
-        applyEdgeChanges,
-        setInteractive,
-        removeSelectedNodes,
-        getSelectedNodes,
-        onNodeDragStart,
-        onNodeDragStop
-    } = useVueFlow("editor");
+    const { applyNodeChanges, applyEdgeChanges, setInteractive, removeSelectedNodes, getSelectedNodes, setViewport } =
+        useVueFlow("editor");
 
     // disable history while moving
-    onNodeDragStart(() => {
+    const onNodeDragStart = () => {
         graph.history.pause();
-    });
+    };
 
-    onNodeDragStop(() => {
+    const onNodeDragStop = () => {
         graph.history.resume();
         graph.history.commit();
-    });
+    };
 
     // edge events
-    onEdgesChange(changes => {
+    const onEdgesChange = (changes: EdgeChange[]) => {
         for (const change of changes) {
             if (change.type == "remove" && change.id) {
                 graph.removeEdgeAction(change.id);
             }
         }
         applyEdgeChanges(changes);
-    });
+    };
 
     // node events
-    onNodesChange(changes => {
+    const onNodesChange = (changes: NodeChange[]) => {
         const additionalNodeChanges: NodeChange[] = [];
         for (const change of changes) {
             if (change.type == "remove" && change.id) {
-                for (const node of graph.getComputedDescendantNodes(change.id)) {
+                for (const node of graph.getComputedNodeDescendants(change.id)) {
                     additionalNodeChanges.push({
                         type: "remove",
                         id: node.id
@@ -76,11 +75,11 @@
             }
         }
         applyNodeChanges([...changes, ...additionalNodeChanges]);
-    });
+    };
 
-    onConnect(connection => graph.addEdgeFromVueFlowConnectionAction(connection));
+    const onConnect = (connection: Connection) => graph.addEdgeFromVueFlowConnectionAction(connection);
 
-    onNodeDoubleClick(event => {
+    const onNodeDoubleClick = (event: NodeMouseEvent) => {
         if (!editor.locked) {
             const node = graph.getComputedNode(event.node.id);
             if (node.type == common.VARIABLE_NODE_TYPE) {
@@ -91,7 +90,11 @@
                 editor.switchToSubgraph(node.id);
             }
         }
-    });
+    };
+
+    const onViewportChangeEnd = (viewportChange: ViewportTransform) => {
+        editor.updateViewport(viewportChange);
+    };
 
     watch(editor, options => {
         if (options.locked) {
@@ -100,6 +103,9 @@
         } else {
             setInteractive(true);
         }
+
+        // update viewport from state
+        setViewport(editor.computedViewportState);
     });
 
     const focused = ref<boolean>(false);
@@ -122,6 +128,13 @@
                 :min-zoom="0.4"
                 elevate-edges-on-select
                 tabindex="0"
+                @connect="onConnect"
+                @node-drag-start="onNodeDragStart"
+                @node-drag-stop="onNodeDragStop"
+                @edges-change="onEdgesChange"
+                @nodes-change="onNodesChange"
+                @node-double-click="onNodeDoubleClick"
+                @viewport-change-end="onViewportChangeEnd"
                 @focus="focused = true"
                 @blur="focused = false"
             >

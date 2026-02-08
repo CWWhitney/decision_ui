@@ -1,6 +1,6 @@
 import { Schema } from "jsonschema";
 import { Node, NodeId } from "./node";
-import { projectNodeToSubgraph } from "./node/project";
+import { projectNodeToSubgraph } from "../editor";
 
 export type EdgeId = string;
 
@@ -56,13 +56,13 @@ export const projectEdgesToSubgraph = (
     edges: Edge[],
     subgraphNodeId: NodeId | null,
     getNode: (nodeId: NodeId) => Node,
-    getAncestorNodes: (node: Node) => Node[]
+    getSubgraphAncestors: (nodeId: NodeId) => Node[]
 ): Edge[] => {
     // project
     const projectedEdges = edges.map(e => {
         // console.log(`projecting edge ${e.id}`);
-        const projectedSourceNode = projectNodeToSubgraph(getNode(e.source), subgraphNodeId, getAncestorNodes);
-        const projectedTargetNode = projectNodeToSubgraph(getNode(e.target), subgraphNodeId, getAncestorNodes);
+        const projectedSourceNode = projectNodeToSubgraph(getNode(e.source), subgraphNodeId, getSubgraphAncestors);
+        const projectedTargetNode = projectNodeToSubgraph(getNode(e.target), subgraphNodeId, getSubgraphAncestors);
 
         if (projectedSourceNode && projectedTargetNode && projectedSourceNode.id != projectedTargetNode.id) {
             const newEdgeId = getEdgeIdForNodes(projectedSourceNode.id, projectedTargetNode.id);
