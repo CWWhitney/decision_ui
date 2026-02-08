@@ -268,7 +268,7 @@ export const getTypedTensorForLoopOperationNode = (
 
         return {
             tensor: tf.stack(
-                tensorList.map(t => t.tensor),
+                tensorList.map(t => t.tensor.toFloat()),
                 -1
             ),
             isProbabilistic: isAnyProbabilistic,
