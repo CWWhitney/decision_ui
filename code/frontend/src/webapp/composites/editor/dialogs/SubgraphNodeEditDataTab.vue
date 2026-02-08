@@ -1,0 +1,145 @@
+<script setup lang="ts">
+    import { useGraphStore } from "@/state/graph";
+    import { VARIABLE_NODE_TYPE, type Node, type NodeId } from "@decision-support-ui/common";
+    import TypedTensorVisualization from "@/components/editor/dialogs/TypedTensorVisualization.vue";
+    import { useComputationStore } from "@/state/computation";
+    import { computedAsync } from "@vueuse/core";
+    import { sleep } from "@/common/async";
+    import { UI_REFRESH_SLEEP_TIMEOUT } from "@/common/constants";
+    import { computed, ref } from "vue";
+    import {
+        catchForComputedResult,
+        COMPUTED_RESULT_ERROR_TYPE,
+        COMPUTED_RESULT_SUCCESS_TYPE
+    } from "@/common/computed";
+    import { watch } from "vue";
+    import HelpHintWrapper from "@/components/form/HelpHintWrapper.vue";
+
+    const node = defineModel<Node>({ required: true });
+    const graphStore = useGraphStore();
+    const computation = useComputationStore();
+    const selectedChildNodeId = ref<NodeId | null>(null);
+
+    const childVariableNodes = computed(() =>
+        graphStore.getComputedSubgraphChildren(node.value.id).filter(n => n.type == VARIABLE_NODE_TYPE)
+    );
+
+    const childNodeSelectItems = computed(() =>
+        childVariableNodes.value.map(n => ({
+            title: n.visualization.title,
+            value: n.id
+        }))
+    );
+
+    watch(
+        childVariableNodes,
+        () => {
+            const childNodeIdSet = new Set<NodeId>(childVariableNodes.value.map(n => n.id));
+            if (
+                selectedChildNodeId.value == null ||
+                (childNodeIdSet.size > 0 && !childNodeIdSet.has(selectedChildNodeId.value))
+            ) {
+                selectedChildNodeId.value = childVariableNodes.value[0]!.id;
+            }
+        },
+        { immediate: true }
+    );
+
+    const selectedChildNode = computed(() => {
+        if (selectedChildNodeId.value) {
+            return graphStore.getComputedNode(selectedChildNodeId.value);
+        }
+        return null;
+    });
+
+    const computedTypeTensorLoading = ref<boolean>(false);
+
+    const computedTypedTensorResult = computedAsync(
+        async () => {
+            const childNode = selectedChildNode.value;
+            if (childNode) {
+                await sleep(UI_REFRESH_SLEEP_TIMEOUT);
+                return catchForComputedResult(() => graphStore.getComputedTypedTensor(childNode.id));
+            }
+        },
+        null,
+        computedTypeTensorLoading
+    );
+</script>
+
+<template>
+    <div class="subgraphDataTabContainer">
+        <p>Select a node from the subgraph to show a visualization of the node's data:</p>
+        <HelpHintWrapper>
+            <template #default
+                ><v-select
+                    v-model="selectedChildNodeId"
+                    :items="childNodeSelectItems"
+                    label="Subgraph Node"
+                    :disabled="childNodeSelectItems.length == 0"
+                    hide-details
+            /></template>
+            <template #tooltip
+                >Select one of the subgraph's direct child nodes that define variables to view their data. Only the
+                immediate children are available, though. Nodes nested in further subgraphs are not listed.</template
+            >
+        </HelpHintWrapper>
+        <template v-if="computedTypeTensorLoading">
+            <div class="loading">
+                <v-progress-circular indeterminate></v-progress-circular>
+            </div>
+        </template>
+        <template v-else>
+            <div
+                v-if="computedTypedTensorResult && computedTypedTensorResult.type == COMPUTED_RESULT_SUCCESS_TYPE"
+                class="visualization"
+            >
+                <TypedTensorVisualization
+                    :node-title="node.visualization.title"
+                    :tt="computedTypedTensorResult.value"
+                    :bins="computation.state.histogramBins"
+                />
+            </div>
+            <div v-if="computedTypedTensorResult && computedTypedTensorResult.type == COMPUTED_RESULT_ERROR_TYPE">
+                <v-alert
+                    type="error"
+                    variant="outlined"
+                    :text="`Computation Error: ${computedTypedTensorResult.message}`"
+                />
+            </div>
+        </template>
+    </div>
+</template>
+
+<style scoped lang="scss">
+    .subgraphDataTabContainer {
+        flex-grow: 1;
+        display: flex;
+        width: 100%;
+        height: 100%;
+        flex-direction: column;
+        gap: 1em;
+
+        :deep(p) {
+            margin: 0;
+        }
+    }
+
+    .loading {
+        flex-grow: 1;
+        display: flex;
+        width: 100%;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
+        min-height: 20em;
+    }
+
+    .visualization {
+        display: flex;
+        flex-grow: 1;
+        flex-direction: column;
+        width: 100%;
+        min-height: 20em;
+    }
+</style>

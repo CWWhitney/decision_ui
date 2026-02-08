@@ -111,7 +111,10 @@
                 </template>
             </v-tooltip>
             <v-tooltip
-                v-if="flowNodeProps.data.nodeType == common.VARIABLE_NODE_TYPE"
+                v-if="
+                    flowNodeProps.data.nodeType == common.VARIABLE_NODE_TYPE ||
+                    flowNodeProps.data.nodeType == common.SUBGRAPH_NODE_TYPE
+                "
                 location="top"
                 text="data visualization"
                 open-delay="500"

@@ -105,7 +105,7 @@
                         :value="NODE_EDIT_FUNCTION_TAB"
                     ></v-tab>
                     <v-tab
-                        v-if="node.type == common.VARIABLE_NODE_TYPE"
+                        v-if="node.type == common.VARIABLE_NODE_TYPE || node.type == common.SUBGRAPH_NODE_TYPE"
                         prepend-icon="mdi-chart-histogram"
                         text="Data"
                         :value="NODE_EDIT_DATA_TAB"
