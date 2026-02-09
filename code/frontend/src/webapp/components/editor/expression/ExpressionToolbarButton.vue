@@ -14,7 +14,7 @@
 
 <template>
     <v-tooltip
-        location="bottom"
+        location="top"
         :open-delay="TOOLTIP_OPEN_DELAY"
         :close-delay="TOOLTIP_CLOSE_DELAY"
         interactive

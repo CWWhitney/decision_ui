@@ -425,6 +425,7 @@
                         :icon="item.icon"
                         :label="item.label"
                         :tooltip="item.tooltip"
+                        :syntax="item.expression"
                         :size="item.size"
                         :click="() => (item.expression ? appendToExpression(item.expression) : null)"
                     />
@@ -433,6 +434,7 @@
                 <ExpressionToolbarButton
                     label="NA"
                     tooltip="unavailable function argument"
+                    syntax="NA"
                     size="small"
                     :click="() => appendToExpression('NA')"
                 />

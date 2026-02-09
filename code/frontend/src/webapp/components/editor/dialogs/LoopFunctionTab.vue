@@ -21,7 +21,16 @@
                     :filled-label="`Iterations =`"
                 />
             </template>
-            <template #tooltip>Test</template>
+            <template #tooltip
+                ><p>
+                    This expression defines the length of the time series and controls how often this loop is evaluated.
+                    Usually, this corresponds, e.g., to a certain number of years, months or days.
+                </p>
+                <p>
+                    This expression needs to evaluate to a deterministic integer value, meaning, a constant number.
+                    Fractions or probabilistic values are not allowed.
+                </p>
+            </template>
         </HelpHintWrapper>
         <HelpHintWrapper>
             <template #default>
@@ -31,7 +40,17 @@
                     :filled-label="`${node.function.variable}[0] = `"
                 />
             </template>
-            <template #tooltip>Test</template>
+            <template #tooltip>
+                <p>
+                    The initial expression defines the value of this variable at time step 1 (or index = 0). It is
+                    evaluated only once.
+                </p>
+                <p>
+                    This expression supports the loop index variable <code>i</code>, which is replace with the value 0.
+                    In addition, other time series variables defined in other loop nodes can be accessed using the index
+                    notations <code>other[i]</code>.
+                </p>
+            </template>
         </HelpHintWrapper>
         <HelpHintWrapper>
             <template #default>
@@ -41,7 +60,30 @@
                     :filled-label="`${node.function.variable}[i] = `"
                 />
             </template>
-            <template #tooltip>Test</template>
+            <template #tooltip>
+                <p>
+                    The iteration expression is evaluated for every time step larger than 1 (or index > 0). It is
+                    evaluated multiple times and defines the value of this variable for indexes
+                    <code>i = 1,2,3 ... (iterations-1)</code>.
+                </p>
+                <p>This expression supports two addtional variables:</p>
+                <ul>
+                    <li><code>i</code> is replaced with the current index value 1,2,3 ...</li>
+                    <li>
+                        <code>previous</code> is replaced with the value of the previous time step (otherwise known as
+                        <code>variable[i-1]</code>)
+                    </li>
+                </ul>
+                <p>
+                    In addition, other time series variables defined in other loop nodes can be accessed using the index
+                    notations <code>other[i]</code> and <code>other[i-1]</code>
+                </p>
+                <p>
+                    This expression may only evaluate to deterministic or probabilistic data, but not a time series
+                    itself. For example, using the "vv" (value varier) function would lead to 2-dimensional data, which
+                    is not supported.
+                </p>
+            </template>
         </HelpHintWrapper>
     </div>
 </template>
