@@ -1,12 +1,14 @@
 <script setup lang="ts">
+    import { useEditorStore } from "@/state/editor";
     import { useGraphStore } from "@/state/graph";
     import { useVueFlow } from "@vue-flow/core";
     import { onMounted, onUnmounted } from "vue";
 
-    const { addSelectedNodes, getNodes, removeSelectedElements, zoomIn, zoomOut, zoomTo, fitView } =
+    const { addSelectedNodes, getNodes, removeSelectedElements, zoomIn, zoomOut, zoomTo, fitView, getSelectedNodes } =
         useVueFlow("editor");
 
     const graph = useGraphStore();
+    const editor = useEditorStore();
 
     const props = defineProps<{ focused: boolean }>();
 
@@ -37,10 +39,16 @@
             selectAllNodes();
         }
 
-        // unselect all (ctrl + alt + a)
-        if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === "a") {
+        // unselect all (ctrl + shift + a)
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "A") {
             e.preventDefault();
             removeSelectedElements();
+        }
+
+        // create subgraph from selection (ctrl + g)
+        if ((e.ctrlKey || e.metaKey) && e.key === "g") {
+            e.preventDefault();
+            editor.createSubgraphFromSelection(getSelectedNodes.value.map(n => n.id));
         }
 
         // zoom in (ctrl + +)

@@ -22,7 +22,8 @@ const getDefaultEditorState = (): common.EditorStoreState => {
         snapToGrid: true,
         edgeStyle: common.SMOOTH_STEP_EDGE_STYLE_TYPE,
         background: common.DOTS_EDITOR_BACKGROUND,
-        autoAddComputationEdges: true
+        autoAddComputationEdges: true,
+        shouldFitOnNextUpdate: false
     };
 };
 
@@ -147,13 +148,67 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
 
     // actions
 
+    const loadFromFile = (newState: common.EditorFileState) => {
+        reset();
+        state.value = {
+            ...newState,
+            shouldFitOnNextUpdate: true,
+            subgraphId: null
+        };
+    };
+
+    const createSubgraphFromSelection = (selectedNodeIds: common.NodeId[]) => {
+        if (selectedNodeIds.length == 0) {
+            return;
+        }
+
+        const selectedNodes = selectedNodeIds.map(n => graphStore.getComputedNode(n));
+        const centerPosition = common.getCenterPosition(
+            selectedNodes.filter(n => n.nodeParentId == null).map(n => n.visualization.position)
+        );
+        const selectedNodeStyleTypeSet = new Set(
+            selectedNodes
+                .map(n => n.visualization.style.type)
+                .filter(s => s != common.CUSTOM_STYLE_TYPE && s != common.COLLECTION_STYLE_TYPE)
+        );
+        const subgraphNodeStyle =
+            selectedNodeStyleTypeSet.size == 1 ? [...selectedNodeStyleTypeSet][0]! : common.GENERIC_STYLE_TYPE;
+
+        // create new subgraph node at the center of all selcted nodes
+        const newSubgraphNode = graphStore.addNewNodeAction(
+            "Subgraph",
+            common.SUBGRAPH_NODE_TYPE,
+            common.EMPTY_FUNCTION_TYPE,
+            subgraphNodeStyle,
+            {
+                position: centerPosition,
+                size: common.getDefaultNodeSize(common.SUBGRAPH_NODE_TYPE),
+                subgraphParentId: state.value.subgraphId
+            }
+        );
+
+        // move all selected nodes to new subgraph
+        for (const node of selectedNodes) {
+            const childrenNodes = graphStore.getComputedNodeDescendants(node.id);
+            for (const n of [...childrenNodes, node]) {
+                n.subgraphParentId = newSubgraphNode.id;
+                if (n.nodeParentId && !selectedNodeIds.includes(n.nodeParentId)) {
+                    // reset parent node id if parent was not selected to be moved to the subgraph
+                    n.nodeParentId = null;
+                }
+            }
+        }
+    };
+
     const switchToSubgraph = (nodeId: common.NodeId) => {
         state.value.subgraphId = nodeId;
+        state.value.shouldFitOnNextUpdate = true;
     };
 
     const switchToParentSubgraph = () => {
         if (state.value.subgraphId) {
             state.value.subgraphId = graphStore.getComputedNode(state.value.subgraphId).subgraphParentId;
+            state.value.shouldFitOnNextUpdate = true;
         }
     };
 
@@ -189,6 +244,8 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
 
     return {
         state,
+        loadFromFile,
+        createSubgraphFromSelection,
         switchToSubgraph,
         switchToParentSubgraph,
         computedVueFlowNodes,

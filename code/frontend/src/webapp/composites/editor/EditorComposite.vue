@@ -23,7 +23,7 @@
     import FlowEdge from "./graph/FlowEdge.vue";
     import NodeEditDialog from "./dialogs/NodeEditDialog.vue";
     import EditorToolbar from "./EditorToolbar.vue";
-    import FlowShortcuts from "./EditorShortcuts.vue";
+    import EditorShortcuts from "./EditorShortcuts.vue";
     import EditorSubgraphIndicator from "./EditorSubgraphIndicator.vue";
 
     const graph = useGraphStore();
@@ -103,23 +103,14 @@
         }
     );
 
-    // what for subgraph switches and remember that subgraphs were switched
-    const shouldFitOnNextUpdate = ref<boolean>(true);
-    watch(
-        () => editor.state.subgraphId,
-        async (newSubgraphId, oldSubgraphId) => {
-            console.log(`subgraphId has changed from ${oldSubgraphId} to ${newSubgraphId}`);
-            if (newSubgraphId != oldSubgraphId && editor.computedVueFlowNodes.length > 0) {
-                shouldFitOnNextUpdate.value = true;
-            }
-        },
-        { flush: "post" }
-    );
+    const onInit = () => {
+        fitView({ maxZoom: 1 });
+    };
 
     const onNodesInitialized = () => {
         // fit view to subgraph if it was changed (or on initial load)
-        if (shouldFitOnNextUpdate.value) {
-            shouldFitOnNextUpdate.value = false;
+        if (editor.state.shouldFitOnNextUpdate) {
+            editor.state.shouldFitOnNextUpdate = false;
             fitView({ maxZoom: 1 });
         }
     };
@@ -130,7 +121,7 @@
 <template>
     <div class="container">
         <EditorToolbar />
-        <FlowShortcuts :focused="focused" />
+        <EditorShortcuts :focused="focused" />
 
         <div class="vueFlowContainer">
             <VueFlow
@@ -144,6 +135,7 @@
                 :min-zoom="0.25"
                 elevate-edges-on-select
                 tabindex="0"
+                @init="onInit"
                 @nodes-initialized="onNodesInitialized"
                 @connect="onConnect"
                 @node-drag-start="onNodeDragStart"
@@ -151,8 +143,8 @@
                 @edges-change="onEdgesChange"
                 @nodes-change="onNodesChange"
                 @node-double-click="onNodeDoubleClick"
-                @focus="focused = true"
-                @blur="focused = false"
+                @focusin="focused = true"
+                @focusout="focused = false"
             >
                 <!-- bind your custom node type to a component by using slots, slot names are always `node-<type>` -->
                 <template #node-custom="nodeProps">

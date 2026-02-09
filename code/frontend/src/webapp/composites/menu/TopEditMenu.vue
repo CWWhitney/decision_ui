@@ -58,9 +58,16 @@
             />
             <TopMenuItem
                 title="Unselect All"
-                shortcut="CTRL + ALT + A"
+                shortcut="CTRL + SHIFT + A"
                 :disabled="!isEditorRoute || nothingIsSelected"
                 @click="removeSelectedElements"
+            />
+            <v-divider />
+            <TopMenuItem
+                title="Create Subgraph from Selection"
+                shortcut="CTRL + G"
+                :disabled="!isEditorRoute || getSelectedNodes.length == 0"
+                @click="editor.createSubgraphFromSelection(getSelectedNodes.map(n => n.id))"
             />
             <v-divider />
 

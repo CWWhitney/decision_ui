@@ -25,8 +25,8 @@ export const getModelFileFromState = (): ModelFileState => {
 
 export const loadModelFileToState = (file: ModelFileState): void => {
     const graph = useGraphStore();
-    const editorSettings = useEditorStore();
-    const computationSettings = useComputationStore();
+    const editor = useEditorStore();
+    const computation = useComputationStore();
     const metadata = useMetadataStore();
 
     graph.reset();
@@ -34,11 +34,10 @@ export const loadModelFileToState = (file: ModelFileState): void => {
     graph.history.commit();
     graph.history.clear();
 
-    editorSettings.reset();
-    editorSettings.$patch({ state: file.editor });
+    editor.loadFromFile(file.editor);
 
-    computationSettings.reset();
-    computationSettings.$patch({ state: file.computation });
+    computation.reset();
+    computation.$patch({ state: file.computation });
 
     metadata.reset();
     metadata.$patch({ state: file.metadata });

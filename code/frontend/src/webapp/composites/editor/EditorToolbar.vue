@@ -140,46 +140,6 @@
             position
         });
     };
-
-    const createSubgraphFromSelection = () => {
-        const selectedNodeIds = getSelectedNodes.value.map(n => n.id);
-        const selectedNodes = selectedNodeIds.map(n => graph.getComputedNode(n));
-        const centerPosition = common.getCenterPosition(
-            selectedNodes.filter(n => n.nodeParentId == null).map(n => n.visualization.position)
-        );
-        const selectedNodeStyleTypeSet = new Set(
-            selectedNodes
-                .map(n => n.visualization.style.type)
-                .filter(s => s != common.CUSTOM_STYLE_TYPE && s != common.COLLECTION_STYLE_TYPE)
-        );
-        const subgraphNodeStyle =
-            selectedNodeStyleTypeSet.size == 1 ? [...selectedNodeStyleTypeSet][0]! : common.GENERIC_STYLE_TYPE;
-
-        // create new subgraph node at the center of all selcted nodes
-        const newSubgraphNode = graph.addNewNodeAction(
-            "Subgraph",
-            common.SUBGRAPH_NODE_TYPE,
-            common.EMPTY_FUNCTION_TYPE,
-            subgraphNodeStyle,
-            {
-                position: centerPosition,
-                size: common.getDefaultNodeSize(common.SUBGRAPH_NODE_TYPE),
-                subgraphParentId: editor.state.subgraphId
-            }
-        );
-
-        // move all selected nodes to new subgraph
-        for (const node of selectedNodes) {
-            const childrenNodes = graph.getComputedNodeDescendants(node.id);
-            for (const n of [...childrenNodes, node]) {
-                n.subgraphParentId = newSubgraphNode.id;
-                if (n.nodeParentId && !selectedNodeIds.includes(n.nodeParentId)) {
-                    // reset parent node id if parent was not selected to be moved to the subgraph
-                    n.nodeParentId = null;
-                }
-            }
-        }
-    };
 </script>
 
 <template>
@@ -241,7 +201,7 @@
                         variant="outlined"
                         size="small"
                         :disabled="getSelectedNodes.length == 0"
-                        @click="createSubgraphFromSelection"
+                        @click="editor.createSubgraphFromSelection(getSelectedNodes.map(n => n.id))"
                     ></v-btn>
                 </template>
             </v-tooltip>
