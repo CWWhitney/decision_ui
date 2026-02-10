@@ -7,3 +7,5 @@ export const TOOLTIP_CLOSE_DELAY = 250;
 export const CHART_DOWNLOAD_DPR = 3.0;
 
 export const UI_REFRESH_SLEEP_TIMEOUT = 1;
+
+export const EDITOR_GRID_DISTANCE = 10;

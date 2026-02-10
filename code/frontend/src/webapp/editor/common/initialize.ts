@@ -28,7 +28,7 @@ import { useModelStore } from "../../state/old/model";
 import { TypeConstraintNode } from "../nodes/TypeConstraintNode";
 import { ChanceEventNode } from "../nodes/ChanceEventNode";
 import { validateGraph } from "./validate";
-import { debounce } from "../../common/throttle";
+import { debounce } from "@decision-support-ui/common";
 
 export interface GlobalCalculationData {
     mcRuns: number;

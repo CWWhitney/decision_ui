@@ -93,26 +93,14 @@
             return;
         }
 
-        const topleft = screenToFlowCoordinate({
+        const mousePosition = screenToFlowCoordinate({
             x: event.clientX,
             y: event.clientY
         });
-
-        const parentNode = determineParentNode(topleft);
-        const ancestorNodes = parentNode ? graph.getComputedNodeAncestors(parentNode.id) : [];
-        const ancestorOffset = [parentNode, ...ancestorNodes].reduce(
-            (p, n) => ({ x: p.x + (n?.visualization.position.x ?? 0), y: p.y + (n?.visualization.position.y ?? 0) }),
-            { x: 0, y: 0 } as XYPosition
-        );
-        const newNodeSize = common.getDefaultNodeSize(nodeType);
-        const newNodePosition = {
-            x: topleft.x - newNodeSize.width / 2 - ancestorOffset.x,
-            y: topleft.y - newNodeSize.height / 2 - ancestorOffset.y
-        };
-
+        const parentNode = determineParentNode(mousePosition);
         graph.addNewNodeAction(title, nodeType, functionType, styleType, {
-            position: newNodePosition,
-            size: newNodeSize,
+            position: mousePosition,
+            size: common.getDefaultNodeSize(nodeType),
             nodeParentId: parentNode ? parentNode.id : null,
             subgraphParentId: editor.state.subgraphId
         });

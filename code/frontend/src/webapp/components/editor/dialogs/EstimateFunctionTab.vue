@@ -3,7 +3,6 @@
      * Functions Tab of the Node Edit Dialog for Nodes with Loop Function Type
      */
     import { USER_INPUT_DEBOUNCE_TIME } from "@/common/constants";
-    import { debounce } from "@/common/throttle";
     import {
         type AbstractNode,
         type EstimateNodeFunctionState,
@@ -11,7 +10,8 @@
         DETERMINISTIC_DISTRIBUTION_TYPE,
         NORMAL_DISTRIBUTION_TYPE,
         POSNORM_DISTRIBUTION_TYPE,
-        TNORM01_DISTRIBUTION_TYPE
+        TNORM01_DISTRIBUTION_TYPE,
+        debounce
     } from "@decision-support-ui/common";
     import { computed, ref, watch } from "vue";
     import HelpHintWrapper from "../../form/HelpHintWrapper.vue";

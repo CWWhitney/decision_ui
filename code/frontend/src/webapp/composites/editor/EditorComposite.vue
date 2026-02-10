@@ -25,13 +25,21 @@
     import EditorToolbar from "./EditorToolbar.vue";
     import EditorShortcuts from "./EditorShortcuts.vue";
     import EditorSubgraphIndicator from "./EditorSubgraphIndicator.vue";
+    import { EDITOR_GRID_DISTANCE } from "@/common/constants";
 
     const graph = useGraphStore();
     const editor = useEditorStore();
     const nodeEditStore = useNodeEditDialogStore();
 
-    const { applyNodeChanges, applyEdgeChanges, setInteractive, removeSelectedNodes, getSelectedNodes, fitView } =
-        useVueFlow("editor");
+    const {
+        applyNodeChanges,
+        applyEdgeChanges,
+        setInteractive,
+        removeSelectedNodes,
+        getSelectedNodes,
+        fitView,
+        screenToFlowCoordinate
+    } = useVueFlow("editor");
 
     // disable history while moving
     const onNodeDragStart = () => {
@@ -116,12 +124,17 @@
     };
 
     const focused = ref<boolean>(false);
+    const lastMouseFlowPosition = ref<common.Position>({ x: 0, y: 0 });
+
+    const onMouseMove = common.throttle((e: MouseEvent) => {
+        lastMouseFlowPosition.value = screenToFlowCoordinate({ x: e.clientX, y: e.clientY });
+    }, 100);
 </script>
 
 <template>
     <div class="container">
         <EditorToolbar />
-        <EditorShortcuts :focused="focused" />
+        <EditorShortcuts :focused="focused" :last-mouse-flow-position="lastMouseFlowPosition" />
 
         <div class="vueFlowContainer">
             <VueFlow
@@ -129,7 +142,7 @@
                 :edges="editor.computedVueFlowEdges"
                 :connection-mode="ConnectionMode.Loose"
                 :snap-to-grid="editor.state.snapToGrid"
-                :snap-grid="[10, 10]"
+                :snap-grid="[EDITOR_GRID_DISTANCE, EDITOR_GRID_DISTANCE]"
                 :apply-default="false"
                 :zoom-on-double-click="false"
                 :min-zoom="0.25"
@@ -145,6 +158,7 @@
                 @node-double-click="onNodeDoubleClick"
                 @focusin="focused = true"
                 @focusout="focused = false"
+                @pane-mouse-move="onMouseMove"
             >
                 <!-- bind your custom node type to a component by using slots, slot names are always `node-<type>` -->
                 <template #node-custom="nodeProps">

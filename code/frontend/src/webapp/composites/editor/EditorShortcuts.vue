@@ -1,16 +1,27 @@
 <script setup lang="ts">
     import { useEditorStore } from "@/state/editor";
     import { useGraphStore } from "@/state/graph";
+    import { insertGraphFromClipboard, saveGraphFileToClipboard } from "@/state/io";
+    import type { Position } from "@decision-support-ui/common";
     import { useVueFlow } from "@vue-flow/core";
     import { onMounted, onUnmounted } from "vue";
 
-    const { addSelectedNodes, getNodes, removeSelectedElements, zoomIn, zoomOut, zoomTo, fitView, getSelectedNodes } =
-        useVueFlow("editor");
+    const {
+        addSelectedNodes,
+        getNodes,
+        removeSelectedElements,
+        zoomIn,
+        zoomOut,
+        zoomTo,
+        fitView,
+        getSelectedNodes,
+        multiSelectionActive
+    } = useVueFlow("editor");
 
     const graph = useGraphStore();
     const editor = useEditorStore();
 
-    const props = defineProps<{ focused: boolean }>();
+    const props = defineProps<{ focused: boolean; lastMouseFlowPosition: Position }>();
 
     const selectAllNodes = () => {
         addSelectedNodes(getNodes.value);
@@ -49,6 +60,26 @@
         if ((e.ctrlKey || e.metaKey) && e.key === "g") {
             e.preventDefault();
             editor.createSubgraphFromSelection(getSelectedNodes.value.map(n => n.id));
+        }
+
+        // cut (ctrl + x)
+        if ((e.ctrlKey || e.metaKey) && e.key === "x") {
+            e.preventDefault();
+            console.log("ctrl + x");
+        }
+
+        // copy (ctrl + c)
+        if ((e.ctrlKey || e.metaKey) && e.key === "c") {
+            e.preventDefault();
+            saveGraphFileToClipboard(getSelectedNodes.value.map(n => n.id));
+        }
+
+        // copy (ctrl + v)
+        if ((e.ctrlKey || e.metaKey) && e.key === "v") {
+            e.preventDefault();
+            insertGraphFromClipboard(props.lastMouseFlowPosition);
+            // disable multi selection which gets stuck on firefox due to paste-confirm dialog
+            multiSelectionActive.value = false;
         }
 
         // zoom in (ctrl + +)

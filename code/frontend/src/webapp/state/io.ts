@@ -1,11 +1,11 @@
-import { type ModelFileState, ModelFileSchema, validateJson } from "@decision-support-ui/common";
+import * as common from "@decision-support-ui/common";
 
 import { useGraphStore } from "./graph";
 import { useEditorStore } from "./editor";
 import { useComputationStore } from "./computation";
 import { useMetadataStore } from "./metadata";
 
-export const getModelFileFromState = (): ModelFileState => {
+export const getModelFileFromState = (): common.ModelFileState => {
     const graph = useGraphStore();
     const metadata = useMetadataStore();
     const computation = useComputationStore();
@@ -13,7 +13,7 @@ export const getModelFileFromState = (): ModelFileState => {
 
     return {
         _schema: {
-            name: "de.uni-bonn.decision-model/file",
+            name: common.MODEL_FILE_SCHEMA_NAME,
             version: 1
         },
         graph: { ...graph.state },
@@ -23,7 +23,63 @@ export const getModelFileFromState = (): ModelFileState => {
     };
 };
 
-export const loadModelFileToState = (file: ModelFileState): void => {
+export const getGraphFileFromState = (selectedNodeIds: common.NodeId[]): common.GraphFileState => {
+    const graph = useGraphStore();
+    const anyDescendantsNodeIds = selectedNodeIds.reduce(
+        (p, nodeId) => [...p, ...graph.getComputedAnyDescendants(nodeId).map(n => n.id)],
+        [] as common.NodeId[]
+    );
+    const selectedNodeIdSet = new Set([...selectedNodeIds, ...anyDescendantsNodeIds]);
+
+    return {
+        _schema: {
+            name: common.GRAPH_FILE_SCHEMA_NAME,
+            version: 1
+        },
+        graph: {
+            nodes: graph.state.nodes.filter(n => selectedNodeIdSet.has(n.id)),
+            edges: graph.state.edges.filter(e => selectedNodeIdSet.has(e.source) && selectedNodeIdSet.has(e.target))
+        }
+    };
+};
+
+export const saveGraphFileToClipboard = (selectedNodeIds: common.NodeId[]) => {
+    if (selectedNodeIds.length == 0) {
+        return;
+    }
+    const json = getGraphFileFromState(selectedNodeIds);
+    navigator.clipboard.writeText(JSON.stringify(json, null, 2));
+};
+
+export const insertGraphFromClipboard = async (targetPosition: common.Position) => {
+    const jsonText = await navigator.clipboard.readText();
+    const graphFile = JSON.parse(jsonText) as common.GraphFileState;
+    const validationErrors = common.validateJson(graphFile, common.GraphFileSchema);
+    if (!validationErrors) {
+        insertGraphFileToState(graphFile, targetPosition);
+    } else {
+        console.error("validation errors", validationErrors);
+    }
+};
+
+export const insertGraphFileToState = (file: common.GraphFileState, targetPosition: common.Position): void => {
+    const graph = useGraphStore();
+    const nextNodeId = common.getNextNodeId(graph.state.nodes);
+    const centerPosition = common.getCenterPosition(file.graph.nodes.map(common.getNodeCenter));
+    const newGraph = common.moveGraph(common.makeDistinctNodeIdsInGraph(file.graph, nextNodeId), {
+        x: targetPosition.x - centerPosition.x,
+        y: targetPosition.y - centerPosition.y
+    });
+
+    graph.$patch({
+        state: {
+            nodes: [...graph.state.nodes, ...newGraph.nodes],
+            edges: [...graph.state.edges, ...newGraph.edges]
+        }
+    });
+};
+
+export const loadModelFileToState = (file: common.ModelFileState): void => {
     const graph = useGraphStore();
     const editor = useEditorStore();
     const computation = useComputationStore();
@@ -52,8 +108,8 @@ export const downloadModelFile = () => {
 
 export const uploadModelFile = async () => {
     const text = await uploadFile();
-    const state = JSON.parse(text) as ModelFileState;
-    const validationErrors = validateJson(state, ModelFileSchema);
+    const state = JSON.parse(text) as common.ModelFileState;
+    const validationErrors = common.validateJson(state, common.ModelFileSchema);
     if (!validationErrors) {
         loadModelFileToState(state);
     } else {

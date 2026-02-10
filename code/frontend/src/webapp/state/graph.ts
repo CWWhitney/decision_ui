@@ -208,7 +208,23 @@ export const useGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         styleType: common.NodeStyleType,
         options?: common.NewNodeOptions
     ): common.Node => {
-        const newNode = common.getNewNode(title, nodeType, functionType, styleType, state.value.nodes, options);
+        const parentNodeId = options?.nodeParentId ?? null;
+        const parentNode = parentNodeId ? getComputedNode(parentNodeId) : null;
+        const ancestorNodes = parentNode ? getComputedNodeAncestors(parentNode.id) : [];
+        const ancestorOffset = [parentNode, ...ancestorNodes].reduce(
+            (p, n) => ({ x: p.x + (n?.visualization.position.x ?? 0), y: p.y + (n?.visualization.position.y ?? 0) }),
+            { x: 0, y: 0 } as common.Position
+        );
+        const newNodeSize = common.getDefaultNodeSize(nodeType);
+        const newNodePosition = {
+            x: (options?.position?.x ?? 0) - newNodeSize.width / 2 - ancestorOffset.x,
+            y: (options?.position?.y ?? 0) - newNodeSize.height / 2 - ancestorOffset.y
+        };
+
+        const newNode = common.getNewNode(title, nodeType, functionType, styleType, state.value.nodes, {
+            ...options,
+            position: newNodePosition
+        });
         state.value.nodes = [...state.value.nodes, newNode];
         return newNode;
     };

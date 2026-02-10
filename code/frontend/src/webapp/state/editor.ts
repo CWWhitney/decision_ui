@@ -164,7 +164,7 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
 
         const selectedNodes = selectedNodeIds.map(n => graphStore.getComputedNode(n));
         const centerPosition = common.getCenterPosition(
-            selectedNodes.filter(n => n.nodeParentId == null).map(n => n.visualization.position)
+            selectedNodes.filter(n => n.nodeParentId == null).map(common.getNodeCenter)
         );
         const selectedNodeStyleTypeSet = new Set(
             selectedNodes

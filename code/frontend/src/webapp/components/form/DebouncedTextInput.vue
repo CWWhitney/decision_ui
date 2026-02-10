@@ -3,7 +3,7 @@
      * Functions Tab of the Node Edit Dialog for Nodes with Operation or Result Function Type
      */
     import { USER_INPUT_DEBOUNCE_TIME } from "@/common/constants";
-    import { debounce } from "@/common/throttle";
+    import { debounce } from "@decision-support-ui/common";
     import { ref, watch } from "vue";
 
     const model = defineModel<string>({

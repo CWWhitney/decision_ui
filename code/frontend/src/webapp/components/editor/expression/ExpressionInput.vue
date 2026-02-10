@@ -3,8 +3,7 @@
      * Functions Tab of the Node Edit Dialog for Nodes with Operation or Result Function Type
      */
     import { USER_INPUT_DEBOUNCE_TIME } from "@/common/constants";
-    import { debounce } from "@/common/throttle";
-    import { getExpressionError } from "@decision-support-ui/common";
+    import { getExpressionError, debounce } from "@decision-support-ui/common";
     import { computed, nextTick, ref, shallowRef, watch } from "vue";
     import ExpressionToolbarButton from "./ExpressionToolbarButton.vue";
     import ChanceEventExpressionDialog from "../dialogs/ChanceEventExpressionDialog.vue";

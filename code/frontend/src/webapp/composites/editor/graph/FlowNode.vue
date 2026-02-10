@@ -48,20 +48,20 @@
         const subgraphNode = graph.getComputedNode(subgraphNodeId);
         const subgraphChildren = graph.getComputedSubgraphChildren(subgraphNodeId);
         const rootChildren = subgraphChildren.filter(n => n.nodeParentId == null);
-        const centerPosition = common.getCenterPosition(rootChildren.map(n => n.visualization.position));
-        const subgraphRootPosition = graph.getComputedNodeAncestors(subgraphNodeId).reduce(
-            (p, n) => ({
-                x: p.x + n.visualization.position.x,
-                y: p.y + n.visualization.position.y
-            }),
-            { x: subgraphNode.visualization.position.x, y: subgraphNode.visualization.position.y } as common.Position
-        );
+        const centerPosition = common.getCenterPosition(rootChildren.map(common.getNodeCenter));
+        const subgraphNodePosition = common.getNodePosition(subgraphNode.id, graph.getComputedNode);
 
         // move subgraph children
         for (const node of rootChildren) {
             node.visualization.position = {
-                x: subgraphRootPosition.x + (node.visualization.position.x - centerPosition.x),
-                y: subgraphRootPosition.y + (node.visualization.position.y - centerPosition.y)
+                x:
+                    subgraphNodePosition.x +
+                    subgraphNode.visualization.size.width / 2 +
+                    (node.visualization.position.x - centerPosition.x),
+                y:
+                    subgraphNodePosition.y +
+                    subgraphNode.visualization.size.height / 2 +
+                    (node.visualization.position.y - centerPosition.y)
             };
             node.nodeParentId = subgraphNode.nodeParentId;
         }

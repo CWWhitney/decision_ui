@@ -2,6 +2,8 @@
     import TopMenuItem from "@/components/menu/TopMenuItem.vue";
     import { useEditorStore } from "@/state/editor";
     import { useGraphStore } from "@/state/graph";
+    import { insertGraphFromClipboard, saveGraphFileToClipboard } from "@/state/io";
+    import type { Position } from "@decision-support-ui/common";
     import { useVueFlow } from "@vue-flow/core";
     import { computed } from "vue";
     import { useRoute } from "vue-router";
@@ -29,6 +31,13 @@
 
     const selectAllNodes = () => {
         addSelectedNodes(getNodes.value);
+    };
+
+    const onPasteClick = () => {
+        insertGraphFromClipboard({
+            x: window.innerWidth / 2.0,
+            y: window.innerHeight / 2.0
+        } as Position);
     };
 
     const nothingIsSelected = computed(() => getSelectedNodes.value.length == 0 && getSelectedEdges.value.length == 0);
@@ -73,8 +82,13 @@
 
             <v-divider />
             <TopMenuItem title="Cut" shortcut="CTRL + X" disabled @click="console.log('cut click')" />
-            <TopMenuItem title="Copy" shortcut="CTRL + C" disabled @click="console.log('copy click')" />
-            <TopMenuItem title="Paste" shortcut="CTRL + V" disabled @click="console.log('paste click')" />
+            <TopMenuItem
+                title="Copy"
+                shortcut="CTRL + C"
+                :disabled="!isEditorRoute || getSelectedNodes.length == 0"
+                @click="saveGraphFileToClipboard(getSelectedNodes.map(n => n.id))"
+            />
+            <TopMenuItem title="Paste" shortcut="CTRL + V" :disabled="!isEditorRoute" @click="onPasteClick" />
             <v-divider />
             <TopMenuItem
                 title="Remove"
