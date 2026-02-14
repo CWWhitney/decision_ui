@@ -6,8 +6,17 @@
     import FlowNodeBox from "../../components/editor/graph/FlowNodeBox.vue";
     import { useEditorStore } from "@/state/editor";
 
-    const { fitView, screenToFlowCoordinate, getIntersectingNodes, zoomTo, removeSelectedNodes, getSelectedNodes } =
-        useVueFlow("editor");
+    const {
+        fitView,
+        screenToFlowCoordinate,
+        getIntersectingNodes,
+        zoomTo,
+        removeSelectedNodes,
+        getSelectedNodes,
+        getSelectedEdges,
+        removeEdges,
+        removeNodes
+    } = useVueFlow("editor");
 
     const graph = useGraphStore();
     const editor = useEditorStore();
@@ -128,6 +137,11 @@
             position
         });
     };
+
+    const removeNodesOrEdges = () => {
+        removeEdges(getSelectedEdges.value);
+        removeNodes(getSelectedNodes.value);
+    };
 </script>
 
 <template>
@@ -157,7 +171,49 @@
                     ></v-btn>
                 </template>
             </v-tooltip>
-
+            <v-tooltip location="bottom" text="create subgraph from selection" open-delay="500">
+                <template #activator="{ props }">
+                    <v-btn
+                        v-bind="props"
+                        icon="mdi-sitemap-outline mdi-rotate-90"
+                        variant="outlined"
+                        size="small"
+                        :disabled="getSelectedNodes.length == 0"
+                        @click="editor.createSubgraphFromSelection(getSelectedNodes.map(n => n.id))"
+                    ></v-btn>
+                </template>
+            </v-tooltip>
+            <v-tooltip location="bottom" text="remove selected nodes or edges" open-delay="500">
+                <template #activator="{ props }">
+                    <v-btn
+                        v-bind="props"
+                        icon="mdi-trash-can-outline"
+                        variant="outlined"
+                        size="small"
+                        :disabled="getSelectedNodes.length == 0 && getSelectedEdges.length == 0"
+                        @click="removeNodesOrEdges"
+                    ></v-btn>
+                </template>
+            </v-tooltip>
+        </div>
+        <div class="nodes">
+            <FlowNodeBox
+                v-for="node in TOOLBAR_NODES"
+                :key="node.title"
+                :node-type="node.nodeType"
+                :function-type="node.functionType"
+                :style-type="node.styleType"
+                :draggable="!editor.state.locked"
+                width="auto"
+                @click="() => onNodeClick(node.title, node.nodeType, node.functionType, node.styleType)"
+                @dragend="
+                    (event: DragEvent) =>
+                        onNodeDragEnd(event, node.title, node.nodeType, node.functionType, node.styleType)
+                "
+                >{{ node.title }}</FlowNodeBox
+            >
+        </div>
+        <div class="options">
             <v-tooltip location="bottom" text="auto fit view" open-delay="500">
                 <template #activator="{ props }">
                     <v-btn
@@ -181,48 +237,7 @@
                     ></v-btn>
                 </template>
             </v-tooltip>
-            <v-tooltip location="bottom" text="create subgraph from selection" open-delay="500">
-                <template #activator="{ props }">
-                    <v-btn
-                        v-bind="props"
-                        icon="mdi-sitemap-outline mdi-rotate-90"
-                        variant="outlined"
-                        size="small"
-                        :disabled="getSelectedNodes.length == 0"
-                        @click="editor.createSubgraphFromSelection(getSelectedNodes.map(n => n.id))"
-                    ></v-btn>
-                </template>
-            </v-tooltip>
-        </div>
-        <div class="nodes">
-            <FlowNodeBox
-                v-for="node in TOOLBAR_NODES"
-                :key="node.title"
-                :node-type="node.nodeType"
-                :function-type="node.functionType"
-                :style-type="node.styleType"
-                :draggable="!editor.state.locked"
-                width="auto"
-                @click="() => onNodeClick(node.title, node.nodeType, node.functionType, node.styleType)"
-                @dragend="
-                    (event: DragEvent) =>
-                        onNodeDragEnd(event, node.title, node.nodeType, node.functionType, node.styleType)
-                "
-                >{{ node.title }}</FlowNodeBox
-            >
-        </div>
-        <div class="options">
-            <v-tooltip location="bottom" :text="editor.state.locked ? 'unlock graph' : 'lock graph'" open-delay="500">
-                <template #activator="{ props }">
-                    <v-btn
-                        v-bind="props"
-                        :icon="editor.state.locked ? 'mdi-lock-outline' : 'mdi-lock-open-variant-outline'"
-                        variant="outlined"
-                        size="small"
-                        @click="editor.toggleLocked"
-                    ></v-btn>
-                </template>
-            </v-tooltip>
+
             <v-tooltip
                 location="bottom"
                 :text="editor.state.snapToGrid ? 'snap to grid' : 'free movement'"
@@ -238,37 +253,14 @@
                     ></v-btn>
                 </template>
             </v-tooltip>
-            <v-tooltip location="bottom" text="change edge style" open-delay="500">
+            <v-tooltip location="bottom" :text="editor.state.locked ? 'unlock graph' : 'lock graph'" open-delay="500">
                 <template #activator="{ props }">
                     <v-btn
                         v-bind="props"
-                        :icon="
-                            editor.state.edgeStyle == common.STRAIGHT_EDGE_STYLE_TYPE
-                                ? 'mdi-vector-polyline'
-                                : editor.state.edgeStyle == common.BEZIER_EDGE_STYLE_TYPE
-                                  ? 'mdi-vector-bezier'
-                                  : 'mdi-square-wave'
-                        "
+                        :icon="editor.state.locked ? 'mdi-lock-outline' : 'mdi-lock-open-variant-outline'"
                         variant="outlined"
                         size="small"
-                        @click="editor.switchEdgeStyle"
-                    ></v-btn>
-                </template>
-            </v-tooltip>
-            <v-tooltip location="bottom" text="change background" open-delay="500">
-                <template #activator="{ props }">
-                    <v-btn
-                        v-bind="props"
-                        :icon="
-                            editor.state.background == common.DOTS_EDITOR_BACKGROUND
-                                ? 'mdi-dots-grid'
-                                : editor.state.background == common.LINES_EDITOR_BACKGROUND
-                                  ? 'mdi-grid'
-                                  : ''
-                        "
-                        variant="outlined"
-                        size="small"
-                        @click="editor.switchBackground"
+                        @click="editor.toggleLocked"
                     ></v-btn>
                 </template>
             </v-tooltip>

@@ -83,6 +83,18 @@
                 :disabled="!isEditorRoute || nothingIsSelected"
                 @click="removeSelectedElements"
             />
+            <TopMenuItem
+                title="Select Multiple"
+                shortcut="CTRL + CLICK"
+                :disabled="true"
+                @click="console.log(`select multiple menu clicked`)"
+            />
+            <TopMenuItem
+                title="Box Selection"
+                shortcut="SHIFT + CLICK"
+                :disabled="true"
+                @click="console.log(`box selection menu clicked`)"
+            />
             <v-divider />
             <TopMenuItem
                 title="Create Subgraph from Selection"
