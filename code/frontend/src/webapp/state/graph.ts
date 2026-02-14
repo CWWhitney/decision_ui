@@ -53,6 +53,7 @@ export const useGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         (variableName: string) => `Variable "${variableName}" is not known`
     );
 
+    const isNodeIdValid = (nodeId: common.NodeId) => _nodesByIdMap.value.has(nodeId);
     const isVariableNameValid = (variableName: string) => _nodeIdByVariableMap.value.has(variableName);
 
     const getComputedNodePosition: (nodeId: common.NodeId) => common.Position = makeSafeComputedGetterByKey(
@@ -230,6 +231,10 @@ export const useGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
     };
 
     const removeNodeAction = (nodeId: common.NodeId) => {
+        if (!isNodeIdValid(nodeId)) {
+            console.warn(`skip removing node '${nodeId}', which might have already been deleted`);
+            return;
+        }
         const node = getComputedNode(nodeId);
         const descendantNodes = getComputedAnyDescendants(node.id);
         const removeNodeIds = [nodeId, ...descendantNodes.map(n => n.id)];

@@ -63,15 +63,25 @@
 
     // node events
     const onNodesChange = (changes: NodeChange[]) => {
+        // modify vueflow changes
         const additionalNodeChanges: NodeChange[] = [];
         for (const change of changes) {
             if (change.type == "remove" && change.id) {
-                for (const node of graph.getComputedNodeDescendants(change.id)) {
+                for (const node of graph.getComputedAnyDescendants(change.id)) {
                     additionalNodeChanges.push({
                         type: "remove",
                         id: node.id
                     } as NodeRemoveChange);
                 }
+            }
+        }
+
+        // apply vueflow changes
+        applyNodeChanges([...changes, ...additionalNodeChanges]);
+
+        // update graph state based on changes
+        for (const change of changes) {
+            if (change.type == "remove" && change.id) {
                 graph.removeNodeAction(change.id);
             }
             if (change.type == "position" && change.id && change.position) {
@@ -81,7 +91,6 @@
                 graph.updateNodeSizeAction(change.id, change.dimensions);
             }
         }
-        applyNodeChanges([...changes, ...additionalNodeChanges]);
     };
 
     const onConnect = (connection: Connection) => graph.addEdgeFromVueFlowConnectionAction(connection);
