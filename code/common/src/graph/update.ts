@@ -39,8 +39,8 @@ export const moveGraph = (graph: Graph, offset: Position): Graph => {
                     visualization: {
                         ...node.visualization,
                         position: {
-                            x: node.visualization.position.x + offset.x,
-                            y: node.visualization.position.y + offset.y
+                            x: node.visualization.position.x + (node.nodeParentId == null ? offset.x : 0),
+                            y: node.visualization.position.y + (node.nodeParentId == null ? offset.y : 0)
                         }
                     }
                 }) as Node

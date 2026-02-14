@@ -25,6 +25,8 @@ export const getModelFileFromState = (): common.ModelFileState => {
 
 export const getGraphFileFromState = (selectedNodeIds: common.NodeId[]): common.GraphFileState => {
     const graph = useGraphStore();
+    const editor = useEditorStore();
+    const rootSubgraphId = editor.state.subgraphId;
     const anyDescendantsNodeIds = selectedNodeIds.reduce(
         (p, nodeId) => [...p, ...graph.getComputedAnyDescendants(nodeId).map(n => n.id)],
         [] as common.NodeId[]
@@ -37,7 +39,12 @@ export const getGraphFileFromState = (selectedNodeIds: common.NodeId[]): common.
             version: 1
         },
         graph: {
-            nodes: graph.state.nodes.filter(n => selectedNodeIdSet.has(n.id)),
+            nodes: graph.state.nodes
+                .filter(n => selectedNodeIdSet.has(n.id))
+                .map(node => ({
+                    ...node,
+                    subgraphParentId: node.subgraphParentId == rootSubgraphId ? null : node.subgraphParentId
+                })),
             edges: graph.state.edges.filter(e => selectedNodeIdSet.has(e.source) && selectedNodeIdSet.has(e.target))
         }
     };
@@ -72,7 +79,9 @@ export const insertGraphFileToState = (
 ): void => {
     const graph = useGraphStore();
     const nextNodeId = common.getNextNodeId(graph.state.nodes);
-    const centerPosition = common.getCenterPosition(file.graph.nodes.map(common.getNodeCenter));
+    const centerPosition = common.getCenterPosition(
+        file.graph.nodes.filter(n => n.nodeParentId == null && n.subgraphParentId == null).map(common.getNodeCenter)
+    );
     const newGraph = common.moveGraph(common.makeDistinctNodeIdsInGraph(file.graph, nextNodeId, targetSubgraphId), {
         x: targetPosition.x - centerPosition.x,
         y: targetPosition.y - centerPosition.y
