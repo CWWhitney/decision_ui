@@ -51,22 +51,29 @@ export const saveGraphFileToClipboard = (selectedNodeIds: common.NodeId[]) => {
     navigator.clipboard.writeText(JSON.stringify(json, null, 2));
 };
 
-export const insertGraphFromClipboard = async (targetPosition: common.Position) => {
+export const insertGraphFromClipboard = async (
+    targetPosition: common.Position,
+    targetSubgraphId: common.SubgraphId | null
+) => {
     const jsonText = await navigator.clipboard.readText();
     const graphFile = JSON.parse(jsonText) as common.GraphFileState;
     const validationErrors = common.validateJson(graphFile, common.GraphFileSchema);
     if (!validationErrors) {
-        insertGraphFileToState(graphFile, targetPosition);
+        insertGraphFileToState(graphFile, targetPosition, targetSubgraphId);
     } else {
         console.error("validation errors", validationErrors);
     }
 };
 
-export const insertGraphFileToState = (file: common.GraphFileState, targetPosition: common.Position): void => {
+export const insertGraphFileToState = (
+    file: common.GraphFileState,
+    targetPosition: common.Position,
+    targetSubgraphId: common.SubgraphId | null
+): void => {
     const graph = useGraphStore();
     const nextNodeId = common.getNextNodeId(graph.state.nodes);
     const centerPosition = common.getCenterPosition(file.graph.nodes.map(common.getNodeCenter));
-    const newGraph = common.moveGraph(common.makeDistinctNodeIdsInGraph(file.graph, nextNodeId), {
+    const newGraph = common.moveGraph(common.makeDistinctNodeIdsInGraph(file.graph, nextNodeId, targetSubgraphId), {
         x: targetPosition.x - centerPosition.x,
         y: targetPosition.y - centerPosition.y
     });

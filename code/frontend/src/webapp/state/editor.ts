@@ -202,7 +202,9 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
 
     const switchToSubgraph = (nodeId: common.NodeId) => {
         state.value.subgraphId = nodeId;
-        state.value.shouldFitOnNextUpdate = true;
+        if (graphStore.getComputedSubgraphChildren(nodeId).length > 0) {
+            state.value.shouldFitOnNextUpdate = true;
+        }
     };
 
     const switchToParentSubgraph = () => {

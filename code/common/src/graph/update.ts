@@ -1,16 +1,20 @@
 import { Position } from "../editor";
 import { Graph } from "./base";
 import { Edge, getEdgeIdForNodes } from "./edge";
-import { Node } from "./node";
+import { Node, SubgraphId } from "./node";
 
-export const makeDistinctNodeIdsInGraph = (graph: Graph, minNodeId: string): Graph => {
+export const makeDistinctNodeIdsInGraph = (
+    graph: Graph,
+    minNodeId: string,
+    rootSubgraphId: SubgraphId | null = null
+): Graph => {
     const nodeIdMap = Object.fromEntries(graph.nodes.map((n, i) => [n.id, `${parseInt(minNodeId) + i}`]));
 
     const updateNode = (node: Node): Node => ({
         ...node,
         id: nodeIdMap[node.id],
         nodeParentId: node.nodeParentId ? nodeIdMap[node.nodeParentId] : null,
-        subgraphParentId: node.subgraphParentId ? nodeIdMap[node.subgraphParentId] : null
+        subgraphParentId: node.subgraphParentId ? nodeIdMap[node.subgraphParentId] : rootSubgraphId
     });
 
     const updateEdge = (edge: Edge): Edge => ({

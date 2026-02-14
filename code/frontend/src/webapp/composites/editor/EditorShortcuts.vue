@@ -14,7 +14,10 @@
         zoomOut,
         zoomTo,
         fitView,
+        removeEdges,
+        removeNodes,
         getSelectedNodes,
+        getSelectedEdges,
         multiSelectionActive
     } = useVueFlow("editor");
 
@@ -65,7 +68,9 @@
         // cut (ctrl + x)
         if ((e.ctrlKey || e.metaKey) && e.key === "x") {
             e.preventDefault();
-            console.log("ctrl + x");
+            saveGraphFileToClipboard(getSelectedNodes.value.map(n => n.id));
+            removeEdges(getSelectedEdges.value);
+            removeNodes(getSelectedNodes.value);
         }
 
         // copy (ctrl + c)
@@ -77,7 +82,7 @@
         // copy (ctrl + v)
         if ((e.ctrlKey || e.metaKey) && e.key === "v") {
             e.preventDefault();
-            insertGraphFromClipboard(props.lastMouseFlowPosition);
+            insertGraphFromClipboard(props.lastMouseFlowPosition, editor.state.subgraphId);
             // disable multi selection which gets stuck on firefox due to paste-confirm dialog
             multiSelectionActive.value = false;
         }

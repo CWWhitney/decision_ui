@@ -33,11 +33,23 @@
         addSelectedNodes(getNodes.value);
     };
 
+    const onCopyClick = () => {
+        saveGraphFileToClipboard(getSelectedNodes.value.map(n => n.id));
+    };
+
+    const onCutClick = () => {
+        saveGraphFileToClipboard(getSelectedNodes.value.map(n => n.id));
+        removeNodesOrEdges();
+    };
+
     const onPasteClick = () => {
-        insertGraphFromClipboard({
-            x: window.innerWidth / 2.0,
-            y: window.innerHeight / 2.0
-        } as Position);
+        insertGraphFromClipboard(
+            {
+                x: window.innerWidth / 2.0,
+                y: window.innerHeight / 2.0
+            } as Position,
+            editor.state.subgraphId
+        );
     };
 
     const nothingIsSelected = computed(() => getSelectedNodes.value.length == 0 && getSelectedEdges.value.length == 0);
@@ -79,14 +91,17 @@
                 @click="editor.createSubgraphFromSelection(getSelectedNodes.map(n => n.id))"
             />
             <v-divider />
-
-            <v-divider />
-            <TopMenuItem title="Cut" shortcut="CTRL + X" disabled @click="console.log('cut click')" />
+            <TopMenuItem
+                title="Cut"
+                shortcut="CTRL + X"
+                :disabled="!isEditorRoute || getSelectedNodes.length == 0"
+                @click="onCutClick"
+            />
             <TopMenuItem
                 title="Copy"
                 shortcut="CTRL + C"
                 :disabled="!isEditorRoute || getSelectedNodes.length == 0"
-                @click="saveGraphFileToClipboard(getSelectedNodes.map(n => n.id))"
+                @click="onCopyClick"
             />
             <TopMenuItem title="Paste" shortcut="CTRL + V" :disabled="!isEditorRoute" @click="onPasteClick" />
             <v-divider />
