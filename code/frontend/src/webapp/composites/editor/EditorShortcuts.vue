@@ -35,6 +35,34 @@
             return;
         }
 
+        // zoom in (ctrl + +)
+        if ((e.ctrlKey || e.metaKey) && e.key === "+") {
+            e.preventDefault();
+            zoomIn();
+        }
+
+        // zoom out (ctrl + -)
+        if ((e.ctrlKey || e.metaKey) && e.key === "-") {
+            e.preventDefault();
+            zoomOut();
+        }
+
+        // reset zoom (ctrl + #)
+        if ((e.ctrlKey || e.metaKey) && e.key === "#") {
+            e.preventDefault();
+            zoomTo(1.0);
+        }
+
+        // zoom to fit (ctrl + .)
+        if ((e.ctrlKey || e.metaKey) && e.key === ".") {
+            e.preventDefault();
+            fitView();
+        }
+
+        if (editor.state.locked) {
+            return;
+        }
+
         // undo (ctrl + z)
         if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === "z") {
             e.preventDefault();
@@ -85,30 +113,6 @@
             insertGraphFromClipboard(props.lastMouseFlowPosition, editor.state.subgraphId);
             // disable multi selection which gets stuck on firefox due to paste-confirm dialog
             multiSelectionActive.value = false;
-        }
-
-        // zoom in (ctrl + +)
-        if ((e.ctrlKey || e.metaKey) && e.key === "+") {
-            e.preventDefault();
-            zoomIn();
-        }
-
-        // zoom out (ctrl + -)
-        if ((e.ctrlKey || e.metaKey) && e.key === "-") {
-            e.preventDefault();
-            zoomOut();
-        }
-
-        // reset zoom (ctrl + #)
-        if ((e.ctrlKey || e.metaKey) && e.key === "#") {
-            e.preventDefault();
-            zoomTo(1.0);
-        }
-
-        // zoom to fit (ctrl + .)
-        if ((e.ctrlKey || e.metaKey) && e.key === ".") {
-            e.preventDefault();
-            fitView();
         }
     };
 

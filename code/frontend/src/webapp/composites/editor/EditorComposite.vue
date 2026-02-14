@@ -122,6 +122,9 @@
 
     const onInit = () => {
         fitView({ maxZoom: 1 });
+        if (editor.state.locked) {
+            setInteractive(false);
+        }
     };
 
     const onNodesInitialized = () => {

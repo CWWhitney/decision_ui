@@ -5,6 +5,7 @@
 
     import FlowNodeBox from "../../components/editor/graph/FlowNodeBox.vue";
     import { useEditorStore } from "@/state/editor";
+    import { computed } from "vue";
 
     const {
         fitView,
@@ -138,6 +139,8 @@
         });
     };
 
+    const isNothingSelected = computed(() => getSelectedNodes.value.length == 0 && getSelectedEdges.value.length == 0);
+
     const removeNodesOrEdges = () => {
         removeEdges(getSelectedEdges.value);
         removeNodes(getSelectedNodes.value);
@@ -178,7 +181,7 @@
                         icon="mdi-sitemap-outline mdi-rotate-90"
                         variant="outlined"
                         size="small"
-                        :disabled="getSelectedNodes.length == 0"
+                        :disabled="getSelectedNodes.length == 0 || editor.state.locked"
                         @click="editor.createSubgraphFromSelection(getSelectedNodes.map(n => n.id))"
                     ></v-btn>
                 </template>
@@ -190,7 +193,7 @@
                         icon="mdi-trash-can-outline"
                         variant="outlined"
                         size="small"
-                        :disabled="getSelectedNodes.length == 0 && getSelectedEdges.length == 0"
+                        :disabled="isNothingSelected || editor.state.locked"
                         @click="removeNodesOrEdges"
                     ></v-btn>
                 </template>

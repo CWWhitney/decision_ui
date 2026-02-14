@@ -74,13 +74,13 @@
             <TopMenuItem
                 title="Select All Nodes"
                 shortcut="CTRL + A"
-                :disabled="!isEditorRoute"
+                :disabled="!isEditorRoute || editor.state.locked"
                 @click="selectAllNodes"
             />
             <TopMenuItem
                 title="Unselect All"
                 shortcut="CTRL + SHIFT + A"
-                :disabled="!isEditorRoute || nothingIsSelected"
+                :disabled="!isEditorRoute || nothingIsSelected || editor.state.locked"
                 @click="removeSelectedElements"
             />
             <TopMenuItem
@@ -99,23 +99,28 @@
             <TopMenuItem
                 title="Create Subgraph from Selection"
                 shortcut="CTRL + G"
-                :disabled="!isEditorRoute || getSelectedNodes.length == 0"
+                :disabled="!isEditorRoute || getSelectedNodes.length == 0 || editor.state.locked"
                 @click="editor.createSubgraphFromSelection(getSelectedNodes.map(n => n.id))"
             />
             <v-divider />
             <TopMenuItem
                 title="Cut"
                 shortcut="CTRL + X"
-                :disabled="!isEditorRoute || getSelectedNodes.length == 0"
+                :disabled="!isEditorRoute || getSelectedNodes.length == 0 || editor.state.locked"
                 @click="onCutClick"
             />
             <TopMenuItem
                 title="Copy"
                 shortcut="CTRL + C"
-                :disabled="!isEditorRoute || getSelectedNodes.length == 0"
+                :disabled="!isEditorRoute || getSelectedNodes.length == 0 || editor.state.locked"
                 @click="onCopyClick"
             />
-            <TopMenuItem title="Paste" shortcut="CTRL + V" :disabled="!isEditorRoute" @click="onPasteClick" />
+            <TopMenuItem
+                title="Paste"
+                shortcut="CTRL + V"
+                :disabled="!isEditorRoute || editor.state.locked"
+                @click="onPasteClick"
+            />
             <v-divider />
             <TopMenuItem
                 title="Remove"

@@ -16,7 +16,7 @@
             downloadModelFile();
         }
 
-        // import from file (ctrl + e)
+        // import from file (ctrl + i)
         if ((e.ctrlKey || e.metaKey) && e.key === "i") {
             e.preventDefault();
             uploadModelFile();
