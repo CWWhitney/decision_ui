@@ -1,10 +1,8 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 
 import EditorPage from "./pages/EditorPage.vue";
-import CodeDashboard from "./components/old/CodeDashboard.vue";
 import LoginForm from "./components/old/LoginForm.vue";
 import RegistrationForm from "./components/old/RegistrationForm.vue";
-import SettingsDashboard from "./components/old/SettingsDashboard.vue";
 import HelpPage from "./pages/HelpPage.vue";
 import WelcomePage from "./pages/WelcomePage.vue";
 import MetadataPage from "./pages/MetadataPage.vue";

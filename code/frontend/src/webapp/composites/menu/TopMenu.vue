@@ -77,7 +77,7 @@
                         <TopHelpMenu />
                     </v-menu>
 
-                    <v-btn prepend-icon="mdi-account-circle" text="Account"></v-btn>
+                    <v-btn prepend-icon="mdi-account-circle" text="Account" disabled variant="plain"></v-btn>
                 </v-btn-group>
             </div>
         </div>
