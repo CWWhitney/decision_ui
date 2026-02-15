@@ -4,12 +4,18 @@
     import TopEditMenu from "./TopEditMenu.vue";
     import TopViewMenu from "./TopViewMenu.vue";
     import { useMetadataStore } from "@/state/metadata";
+    import { useRoute } from "vue-router";
+    import TopHelpMenu from "./TopHelpMenu.vue";
+    import TopRunMenu from "./TopRunMenu.vue";
 
     const metadata = useMetadataStore();
+
+    const route = useRoute();
+    const isEditorRoute = route.name == "editor";
 </script>
 
 <template>
-    <div class="container">
+    <div class="topMenuContainer">
         <div class="bar">
             <div class="menu">
                 <div class="logo">
@@ -19,22 +25,44 @@
                     <v-btn-group divided>
                         <v-menu>
                             <template #activator="{ props }">
-                                <v-btn v-bind="props" text="File"></v-btn>
+                                <v-btn v-bind="props" text="File" variant="elevated"></v-btn>
                             </template>
                             <TopFileMenu />
                         </v-menu>
                         <v-menu>
                             <template #activator="{ props }">
-                                <v-btn v-bind="props" text="Edit"></v-btn>
+                                <v-btn
+                                    v-bind="props"
+                                    text="Edit"
+                                    :disabled="!isEditorRoute"
+                                    :variant="!isEditorRoute ? 'plain' : 'elevated'"
+                                ></v-btn>
                             </template>
                             <TopEditMenu />
                         </v-menu>
 
                         <v-menu>
                             <template #activator="{ props }">
-                                <v-btn v-bind="props" text="View"></v-btn>
+                                <v-btn
+                                    v-bind="props"
+                                    text="View"
+                                    :disabled="!isEditorRoute"
+                                    :variant="!isEditorRoute ? 'plain' : 'elevated'"
+                                ></v-btn>
                             </template>
                             <TopViewMenu />
+                        </v-menu>
+
+                        <v-menu>
+                            <template #activator="{ props }">
+                                <v-btn
+                                    v-bind="props"
+                                    text="Run"
+                                    :disabled="!isEditorRoute"
+                                    :variant="!isEditorRoute ? 'plain' : 'elevated'"
+                                ></v-btn>
+                            </template>
+                            <TopRunMenu />
                         </v-menu>
                     </v-btn-group>
                 </div>
@@ -42,7 +70,13 @@
             <div>{{ metadata.state.name }}</div>
             <div>
                 <v-btn-group divided>
-                    <v-btn prepend-icon="mdi-help-circle-outline" :to="{ name: 'help' }" text="Help"></v-btn>
+                    <v-menu>
+                        <template #activator="{ props }">
+                            <v-btn v-bind="props" prepend-icon="mdi-help-circle-outline" text="Help"></v-btn>
+                        </template>
+                        <TopHelpMenu />
+                    </v-menu>
+
                     <v-btn prepend-icon="mdi-account-circle" text="Account"></v-btn>
                 </v-btn-group>
             </div>
@@ -54,7 +88,7 @@
 </template>
 
 <style lang="scss" scoped>
-    .container {
+    .topMenuContainer {
         display: flex;
         flex-direction: column;
         width: 100%;

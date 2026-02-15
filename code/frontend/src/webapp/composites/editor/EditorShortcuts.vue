@@ -59,7 +59,7 @@
             fitView();
         }
 
-        if (editor.state.locked) {
+        if (editor.persisted.locked) {
             return;
         }
 
@@ -110,7 +110,7 @@
         // copy (ctrl + v)
         if ((e.ctrlKey || e.metaKey) && e.key === "v") {
             e.preventDefault();
-            insertGraphFromClipboard(props.lastMouseFlowPosition, editor.state.subgraphId);
+            insertGraphFromClipboard(props.lastMouseFlowPosition, editor.transient.subgraphId);
             // disable multi selection which gets stuck on firefox due to paste-confirm dialog
             multiSelectionActive.value = false;
         }

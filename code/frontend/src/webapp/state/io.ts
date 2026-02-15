@@ -19,14 +19,14 @@ export const getModelFileFromState = (): common.ModelFileState => {
         graph: { ...graph.state },
         metadata: { ...metadata.state },
         computation: { ...computation.state },
-        editor: { ...editor.state }
+        editor: { ...editor.persisted }
     };
 };
 
 export const getGraphFileFromState = (selectedNodeIds: common.NodeId[]): common.GraphFileState => {
     const graph = useGraphStore();
     const editor = useEditorStore();
-    const rootSubgraphId = editor.state.subgraphId;
+    const rootSubgraphId = editor.transient.subgraphId;
     const anyDescendantsNodeIds = selectedNodeIds.reduce(
         (p, nodeId) => [...p, ...graph.getComputedAnyDescendants(nodeId).map(n => n.id)],
         [] as common.NodeId[]

@@ -48,7 +48,7 @@
                 x: window.innerWidth / 2.0,
                 y: window.innerHeight / 2.0
             } as Position,
-            editor.state.subgraphId
+            editor.transient.subgraphId
         );
     };
 
@@ -61,26 +61,26 @@
             <TopMenuItem
                 title="Undo"
                 shortcut="CTRL + Z"
-                :disabled="!graph.history.canUndo || editor.state.locked"
+                :disabled="!graph.history.canUndo || editor.persisted.locked"
                 @click="graph.history.undo"
             />
             <TopMenuItem
                 title="Redo"
                 shortcut="CTRL + SHIFT + Z"
-                :disabled="!graph.history.canRedo || editor.state.locked"
+                :disabled="!graph.history.canRedo || editor.persisted.locked"
                 @click="graph.history.redo"
             />
             <v-divider />
             <TopMenuItem
                 title="Select All Nodes"
                 shortcut="CTRL + A"
-                :disabled="!isEditorRoute || editor.state.locked"
+                :disabled="!isEditorRoute || editor.persisted.locked"
                 @click="selectAllNodes"
             />
             <TopMenuItem
                 title="Unselect All"
                 shortcut="CTRL + SHIFT + A"
-                :disabled="!isEditorRoute || nothingIsSelected || editor.state.locked"
+                :disabled="!isEditorRoute || nothingIsSelected || editor.persisted.locked"
                 @click="removeSelectedElements"
             />
             <TopMenuItem
@@ -99,33 +99,33 @@
             <TopMenuItem
                 title="Create Subgraph from Selection"
                 shortcut="CTRL + G"
-                :disabled="!isEditorRoute || getSelectedNodes.length == 0 || editor.state.locked"
+                :disabled="!isEditorRoute || getSelectedNodes.length == 0 || editor.persisted.locked"
                 @click="editor.createSubgraphFromSelection(getSelectedNodes.map(n => n.id))"
             />
             <v-divider />
             <TopMenuItem
                 title="Cut"
                 shortcut="CTRL + X"
-                :disabled="!isEditorRoute || getSelectedNodes.length == 0 || editor.state.locked"
+                :disabled="!isEditorRoute || getSelectedNodes.length == 0 || editor.persisted.locked"
                 @click="onCutClick"
             />
             <TopMenuItem
                 title="Copy"
                 shortcut="CTRL + C"
-                :disabled="!isEditorRoute || getSelectedNodes.length == 0 || editor.state.locked"
+                :disabled="!isEditorRoute || getSelectedNodes.length == 0 || editor.persisted.locked"
                 @click="onCopyClick"
             />
             <TopMenuItem
                 title="Paste"
                 shortcut="CTRL + V"
-                :disabled="!isEditorRoute || editor.state.locked"
+                :disabled="!isEditorRoute || editor.persisted.locked"
                 @click="onPasteClick"
             />
             <v-divider />
             <TopMenuItem
                 title="Remove"
                 shortcut="BACKSPACE"
-                :disabled="!isEditorRoute || nothingIsSelected || editor.state.locked"
+                :disabled="!isEditorRoute || nothingIsSelected || editor.persisted.locked"
                 @click="removeNodesOrEdges"
             />
         </v-list>

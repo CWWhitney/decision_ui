@@ -1,7 +1,9 @@
 import { SubgraphId } from "../graph";
 import { EditorFileState } from "../io";
 
-export interface EditorStoreState extends EditorFileState {
+export type EditorStorePersistedState = EditorFileState;
+
+export interface EditorStoreTansientState {
     subgraphId: SubgraphId | null;
     shouldFitOnNextUpdate: boolean;
 }

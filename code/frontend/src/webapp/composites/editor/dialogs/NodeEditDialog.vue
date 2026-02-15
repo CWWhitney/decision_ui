@@ -8,7 +8,7 @@
         NODE_EDIT_GENERAL_TAB,
         NODE_EDIT_STYLE_TAB,
         useNodeEditDialogStore
-    } from "@/state/dialogs";
+    } from "@/state/node_edit";
 
     import * as common from "@decision-support-ui/common";
     import { useGraphStore } from "@/state/graph";

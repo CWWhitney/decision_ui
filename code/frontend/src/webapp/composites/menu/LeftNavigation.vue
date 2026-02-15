@@ -8,7 +8,7 @@
     <div class="container">
         <v-navigation-drawer :rail="!expanded" permanent class="navigation-drawer">
             <v-list density="compact" nav>
-                <v-tooltip location="right" text="open General Information page" open-delay="500">
+                <v-tooltip location="right" text="Metadata" open-delay="500">
                     <template #activator="{ props }">
                         <v-list-item
                             :to="{ name: 'metadata' }"
@@ -18,7 +18,7 @@
                         />
                     </template>
                 </v-tooltip>
-                <v-tooltip location="right" text="open Model Editor" open-delay="500">
+                <v-tooltip location="right" text="Model Editor" open-delay="500">
                     <template #activator="{ props }">
                         <v-list-item
                             :to="{ name: 'editor' }"
@@ -28,36 +28,24 @@
                         />
                     </template>
                 </v-tooltip>
-                <v-tooltip location="right" text="open Estimates Table" open-delay="500">
+                <v-tooltip location="right" text="Analyze Model" open-delay="500">
                     <template #activator="{ props }">
                         <v-list-item
-                            to="/estimates"
+                            :to="{ name: 'analyze' }"
                             v-bind="props"
-                            prepend-icon="mdi-table"
-                            title="Estimates"
-                            disabled
+                            prepend-icon="mdi-chart-bar"
+                            title="Analyze"
                         />
                     </template>
                 </v-tooltip>
-                <v-tooltip location="right" text="open Results Dashboard" open-delay="500">
+                <v-tooltip location="right" text="Estimates Table" open-delay="500">
                     <template #activator="{ props }">
-                        <v-list-item
-                            to="/results"
-                            v-bind="props"
-                            prepend-icon="mdi-chart-histogram"
-                            title="Results"
-                            disabled
-                        />
+                        <v-list-item to="/estimates" v-bind="props" prepend-icon="mdi-table" title="Estimates" />
                     </template>
                 </v-tooltip>
-                <v-tooltip location="right" text="open R-Code page" open-delay="500">
+                <v-tooltip location="right" text="R-Code" open-delay="500">
                     <template #activator="{ props }">
-                        <v-list-item to="/code" v-bind="props" prepend-icon="mdi-language-r" title="R-Code" disabled />
-                    </template>
-                </v-tooltip>
-                <v-tooltip location="right" text="open Settings page" open-delay="500">
-                    <template #activator="{ props }">
-                        <v-list-item to="/settings" v-bind="props" prepend-icon="mdi-tune" title="Settings" disabled />
+                        <v-list-item to="/code" v-bind="props" prepend-icon="mdi-language-r" title="R-Code" />
                     </template>
                 </v-tooltip>
             </v-list>

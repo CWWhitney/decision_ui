@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 
 import {
     type Node as VueFlowNode,
@@ -15,15 +15,20 @@ import { useSessionStorage } from "@vueuse/core";
 
 export const EDITOR_STORE_ID = "editor";
 
-const getDefaultEditorState = (): common.EditorStoreState => {
+const getDefaultEditorTransientState = (): common.EditorStoreTansientState => {
     return {
         subgraphId: null,
+        shouldFitOnNextUpdate: false
+    };
+};
+
+const getDefaultEditorPersistedState = (): common.EditorStorePersistedState => {
+    return {
         locked: false,
         snapToGrid: true,
         edgeStyle: common.SMOOTH_STEP_EDGE_STYLE_TYPE,
         background: common.DOTS_EDITOR_BACKGROUND,
-        autoAddComputationEdges: true,
-        shouldFitOnNextUpdate: false
+        autoAddComputationEdges: true
     };
 };
 
@@ -32,12 +37,13 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
 
     // --- state
 
-    const state = useSessionStorage(EDITOR_STORE_ID, getDefaultEditorState());
+    const transient = ref<common.EditorStoreTansientState>(getDefaultEditorTransientState());
+    const persisted = useSessionStorage(EDITOR_STORE_ID, getDefaultEditorPersistedState());
 
     // computed
 
     const computedVisibleNodes = computed(() =>
-        common.filterNodesVisibleInSubgraph(state.value.subgraphId, graphStore.state.nodes)
+        common.filterNodesVisibleInSubgraph(transient.value.subgraphId, graphStore.state.nodes)
     );
 
     const computedVueFlowNodes = computed(() => {
@@ -97,7 +103,7 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
 
         const projectedComputationEdges = common.projectEdgesToSubgraph(
             computationEdges,
-            state.value.subgraphId,
+            transient.value.subgraphId,
             graphStore.getComputedNode,
             graphStore.getComputedSubgraphAncestors
         );
@@ -108,7 +114,7 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
             graphStore.state.nodes.filter(n => n.visualization.autoConnect).map(n => n.id)
         );
 
-        const filteredComputationEdges = state.value.autoAddComputationEdges
+        const filteredComputationEdges = persisted.value.autoAddComputationEdges
             ? projectedComputationEdges.filter(
                   e => autoConnectNodeIdSet.has(e.source) && autoConnectNodeIdSet.has(e.target)
               )
@@ -118,7 +124,7 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
 
         const projectedManualEdges = common.projectEdgesToSubgraph(
             graphStore.state.edges,
-            state.value.subgraphId,
+            transient.value.subgraphId,
             graphStore.getComputedNode,
             graphStore.getComputedSubgraphAncestors
         );
@@ -135,12 +141,12 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
     });
 
     const computedSubgraphTitle = computed(() => {
-        if (state.value.subgraphId != null) {
+        if (transient.value.subgraphId != null) {
             try {
-                return graphStore.getComputedNode(state.value.subgraphId).visualization.title;
+                return graphStore.getComputedNode(transient.value.subgraphId).visualization.title;
             } catch {
                 // subgraph node might not exist (e.g. when undoing creating a subgraph while viewing it)
-                state.value.subgraphId = null;
+                transient.value.subgraphId = null;
             }
         }
         return null;
@@ -150,8 +156,8 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
 
     const loadFromFile = (newState: common.EditorFileState) => {
         reset();
-        state.value = {
-            ...newState,
+        persisted.value = { ...newState };
+        transient.value = {
             shouldFitOnNextUpdate: true,
             subgraphId: null
         };
@@ -183,7 +189,7 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
             {
                 position: centerPosition,
                 size: common.getDefaultNodeSize(common.SUBGRAPH_NODE_TYPE),
-                subgraphParentId: state.value.subgraphId
+                subgraphParentId: transient.value.subgraphId
             }
         );
 
@@ -201,51 +207,60 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
     };
 
     const switchToSubgraph = (nodeId: common.NodeId) => {
-        state.value.subgraphId = nodeId;
+        transient.value.subgraphId = nodeId;
         if (graphStore.getComputedSubgraphChildren(nodeId).length > 0) {
-            state.value.shouldFitOnNextUpdate = true;
+            transient.value.shouldFitOnNextUpdate = true;
         }
     };
 
     const switchToParentSubgraph = () => {
-        if (state.value.subgraphId) {
-            state.value.subgraphId = graphStore.getComputedNode(state.value.subgraphId).subgraphParentId;
-            state.value.shouldFitOnNextUpdate = true;
+        if (transient.value.subgraphId) {
+            transient.value.subgraphId = graphStore.getComputedNode(transient.value.subgraphId).subgraphParentId;
+            transient.value.shouldFitOnNextUpdate = true;
         }
     };
 
     const switchEdgeStyle = () => {
         const nextIdx =
-            (common.AVAILABLE_EDGE_STYLE_TYPES.indexOf(state.value.edgeStyle) + 1) %
+            (common.AVAILABLE_EDGE_STYLE_TYPES.indexOf(persisted.value.edgeStyle) + 1) %
             common.AVAILABLE_EDGE_STYLE_TYPES.length;
-        state.value.edgeStyle = common.AVAILABLE_EDGE_STYLE_TYPES[nextIdx] ?? common.SMOOTH_STEP_EDGE_STYLE_TYPE;
+        persisted.value.edgeStyle = common.AVAILABLE_EDGE_STYLE_TYPES[nextIdx] ?? common.SMOOTH_STEP_EDGE_STYLE_TYPE;
     };
 
     const switchBackground = () => {
         const nextIdx =
-            (common.AVAILABLE_EDITOR_BACKGROUNDS.indexOf(state.value.background) + 1) %
+            (common.AVAILABLE_EDITOR_BACKGROUNDS.indexOf(persisted.value.background) + 1) %
             common.AVAILABLE_EDITOR_BACKGROUNDS.length;
-        state.value.background = common.AVAILABLE_EDITOR_BACKGROUNDS[nextIdx] ?? common.DOTS_EDITOR_BACKGROUND;
+        persisted.value.background = common.AVAILABLE_EDITOR_BACKGROUNDS[nextIdx] ?? common.DOTS_EDITOR_BACKGROUND;
     };
 
     const toggleLocked = () => {
-        state.value.locked = !state.value.locked;
+        persisted.value.locked = !persisted.value.locked;
     };
 
     const toggleSnapToGrid = () => {
-        state.value.snapToGrid = !state.value.snapToGrid;
+        persisted.value.snapToGrid = !persisted.value.snapToGrid;
     };
 
     const toggleAutoAddComputationEdges = () => {
-        state.value.autoAddComputationEdges = !state.value.autoAddComputationEdges;
+        persisted.value.autoAddComputationEdges = !persisted.value.autoAddComputationEdges;
+    };
+
+    const markAsNeedsFitOnNextUpdate = () => {
+        transient.value.shouldFitOnNextUpdate = true;
+    };
+
+    const markAsFittedOnUpdate = () => {
+        transient.value.shouldFitOnNextUpdate = false;
     };
 
     const reset = () => {
-        state.value = getDefaultEditorState();
+        persisted.value = getDefaultEditorPersistedState();
     };
 
     return {
-        state,
+        transient,
+        persisted,
         loadFromFile,
         createSubgraphFromSelection,
         switchToSubgraph,
@@ -258,6 +273,8 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
         toggleAutoAddComputationEdges,
         switchEdgeStyle,
         switchBackground,
+        markAsFittedOnUpdate,
+        markAsNeedsFitOnNextUpdate,
         reset
     };
 });

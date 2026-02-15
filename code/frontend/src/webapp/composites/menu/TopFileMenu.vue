@@ -2,6 +2,9 @@
     import TopMenuItem from "@/components/menu/TopMenuItem.vue";
     import { resetState } from "@/state";
     import { downloadModelFile, uploadModelFile } from "@/state/io";
+    import { OPEN_MODEL_FROM_FILE_TAB, useOpenModelDialogStore } from "@/state/open_model";
+
+    const openModelDialog = useOpenModelDialogStore();
 </script>
 
 <template>
@@ -9,7 +12,11 @@
         <v-list class="list">
             <TopMenuItem title="New" shortcut="ALT + N" @click="resetState" />
             <v-divider />
-            <TopMenuItem title="Open..." shortcut="CTRL + O" disabled @click="console.log('open file click')" />
+            <TopMenuItem
+                title="Open..."
+                shortcut="CTRL + O"
+                @click="openModelDialog.openDialog(OPEN_MODEL_FROM_FILE_TAB)"
+            />
             <TopMenuItem title="Save" shortcut="CTRL + S" disabled @click="console.log('save click')" />
             <TopMenuItem
                 title="Save As..."

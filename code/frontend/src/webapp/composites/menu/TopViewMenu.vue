@@ -16,9 +16,12 @@
             <TopMenuItem title="Zoom to Fit" shortcut="CTRL + ." @click="fitView" />
             <TopMenuItem title="Reset Zoom" shortcut="CTRL + #" @click="() => zoomTo(1.0)" />
             <v-divider />
-            <TopMenuItem :title="editor.state.locked ? 'Unlock Graph' : 'Lock Graph'" @click="editor.toggleLocked" />
             <TopMenuItem
-                :title="editor.state.snapToGrid ? 'Enable Free Movement' : 'Enable Snap to Grid'"
+                :title="editor.persisted.locked ? 'Unlock Graph' : 'Lock Graph'"
+                @click="editor.toggleLocked"
+            />
+            <TopMenuItem
+                :title="editor.persisted.snapToGrid ? 'Enable Free Movement' : 'Enable Snap to Grid'"
                 @click="editor.toggleSnapToGrid"
             />
             <v-divider />
@@ -27,7 +30,9 @@
             <v-divider />
             <TopMenuItem
                 :title="
-                    editor.state.autoAddComputationEdges ? 'Disable Auto-Connect Nodes' : 'Enable Auto-Connect Nodes'
+                    editor.persisted.autoAddComputationEdges
+                        ? 'Disable Auto-Connect Nodes'
+                        : 'Enable Auto-Connect Nodes'
                 "
                 @click="editor.toggleAutoAddComputationEdges"
             />

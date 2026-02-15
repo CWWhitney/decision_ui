@@ -15,7 +15,7 @@
     import * as common from "@decision-support-ui/common";
 
     import { useGraphStore } from "@/state/graph";
-    import { NODE_EDIT_FUNCTION_TAB, useNodeEditDialogStore } from "@/state/dialogs";
+    import { NODE_EDIT_FUNCTION_TAB, useNodeEditDialogStore } from "@/state/node_edit";
     import { ref, watch } from "vue";
     import { useEditorStore } from "@/state/editor";
 
@@ -96,7 +96,7 @@
     const onConnect = (connection: Connection) => graph.addEdgeFromVueFlowConnectionAction(connection);
 
     const onNodeDoubleClick = (event: NodeMouseEvent) => {
-        if (!editor.state.locked) {
+        if (!editor.persisted.locked) {
             const node = graph.getComputedNode(event.node.id);
             if (node.type == common.VARIABLE_NODE_TYPE) {
                 nodeEditStore.openDialog(event.node.id, NODE_EDIT_FUNCTION_TAB);
@@ -109,7 +109,7 @@
     };
 
     watch(
-        () => editor.state.locked,
+        () => editor.persisted.locked,
         locked => {
             if (locked) {
                 removeSelectedNodes(getSelectedNodes.value);
@@ -122,15 +122,15 @@
 
     const onInit = () => {
         fitView({ maxZoom: 1 });
-        if (editor.state.locked) {
+        if (editor.persisted.locked) {
             setInteractive(false);
         }
     };
 
     const onNodesInitialized = () => {
         // fit view to subgraph if it was changed (or on initial load)
-        if (editor.state.shouldFitOnNextUpdate) {
-            editor.state.shouldFitOnNextUpdate = false;
+        if (editor.transient.shouldFitOnNextUpdate) {
+            editor.markAsFittedOnUpdate();
             fitView({ maxZoom: 1 });
         }
     };
@@ -153,7 +153,7 @@
                 :nodes="editor.computedVueFlowNodes"
                 :edges="editor.computedVueFlowEdges"
                 :connection-mode="ConnectionMode.Loose"
-                :snap-to-grid="editor.state.snapToGrid"
+                :snap-to-grid="editor.persisted.snapToGrid"
                 :snap-grid="[EDITOR_GRID_DISTANCE, EDITOR_GRID_DISTANCE]"
                 :apply-default="false"
                 :zoom-on-double-click="false"
@@ -183,7 +183,7 @@
                 </template>
 
                 <MiniMap v-if="false" pannable zoomable position="top-right" />
-                <Background v-if="editor.state.background != 'none'" :variant="editor.state.background" />
+                <Background v-if="editor.persisted.background != 'none'" :variant="editor.persisted.background" />
             </VueFlow>
             <EditorSubgraphIndicator />
         </div>

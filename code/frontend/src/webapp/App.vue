@@ -1,13 +1,15 @@
 <script setup lang="ts">
     import LoginRefresh from "./components/old/LoginRefresh.vue";
     import NetworkErrorSnackbar from "./components/old/NetworkErrorSnackbar.vue";
-    import GlobalShortcuts from "./composites/GlobalShortcuts.vue";
+    import GlobalDialogs from "./composites/global/GlobalDialogs.vue";
+    import GlobalShortcuts from "./composites/global/GlobalShortcuts.vue";
 </script>
 
 <template>
     <v-app>
         <router-view />
         <GlobalShortcuts />
+        <GlobalDialogs />
         <LoginRefresh />
         <NetworkErrorSnackbar />
     </v-app>

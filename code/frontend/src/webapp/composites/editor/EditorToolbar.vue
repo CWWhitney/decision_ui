@@ -99,7 +99,7 @@
         functionType: common.NodeFunctionType,
         styleType: common.NodeStyleType
     ) => {
-        if (editor.state.locked) {
+        if (editor.persisted.locked) {
             return;
         }
 
@@ -112,7 +112,7 @@
             position: mousePosition,
             size: common.getDefaultNodeSize(nodeType),
             nodeParentId: parentNode ? parentNode.id : null,
-            subgraphParentId: editor.state.subgraphId
+            subgraphParentId: editor.transient.subgraphId
         });
 
         removeSelectedNodes(getSelectedNodes.value);
@@ -124,7 +124,7 @@
         functionType: common.NodeFunctionType,
         styleType: common.NodeStyleType
     ) => {
-        if (editor.state.locked) {
+        if (editor.persisted.locked) {
             return;
         }
 
@@ -134,7 +134,7 @@
         });
 
         graph.addNewNodeAction(title, nodeType, functionType, styleType, {
-            subgraphParentId: editor.state.subgraphId,
+            subgraphParentId: editor.transient.subgraphId,
             position
         });
     };
@@ -157,7 +157,7 @@
                         icon="mdi-undo"
                         variant="outlined"
                         size="small"
-                        :disabled="!graph.history.canUndo || editor.state.locked"
+                        :disabled="!graph.history.canUndo || editor.persisted.locked"
                         @click="graph.history.undo"
                     ></v-btn>
                 </template>
@@ -169,7 +169,7 @@
                         icon="mdi-redo"
                         variant="outlined"
                         size="small"
-                        :disabled="!graph.history.canRedo || editor.state.locked"
+                        :disabled="!graph.history.canRedo || editor.persisted.locked"
                         @click="graph.history.redo"
                     ></v-btn>
                 </template>
@@ -181,7 +181,7 @@
                         icon="mdi-sitemap-outline mdi-rotate-90"
                         variant="outlined"
                         size="small"
-                        :disabled="getSelectedNodes.length == 0 || editor.state.locked"
+                        :disabled="getSelectedNodes.length == 0 || editor.persisted.locked"
                         @click="editor.createSubgraphFromSelection(getSelectedNodes.map(n => n.id))"
                     ></v-btn>
                 </template>
@@ -193,7 +193,7 @@
                         icon="mdi-trash-can-outline"
                         variant="outlined"
                         size="small"
-                        :disabled="isNothingSelected || editor.state.locked"
+                        :disabled="isNothingSelected || editor.persisted.locked"
                         @click="removeNodesOrEdges"
                     ></v-btn>
                 </template>
@@ -206,7 +206,7 @@
                 :node-type="node.nodeType"
                 :function-type="node.functionType"
                 :style-type="node.styleType"
-                :draggable="!editor.state.locked"
+                :draggable="!editor.persisted.locked"
                 width="auto"
                 @click="() => onNodeClick(node.title, node.nodeType, node.functionType, node.styleType)"
                 @dragend="
@@ -243,24 +243,28 @@
 
             <v-tooltip
                 location="bottom"
-                :text="editor.state.snapToGrid ? 'snap to grid' : 'free movement'"
+                :text="editor.persisted.snapToGrid ? 'snap to grid' : 'free movement'"
                 open-delay="500"
             >
                 <template #activator="{ props }">
                     <v-btn
                         v-bind="props"
-                        :icon="editor.state.snapToGrid ? 'mdi-grid' : 'mdi-cursor-move'"
+                        :icon="editor.persisted.snapToGrid ? 'mdi-grid' : 'mdi-cursor-move'"
                         variant="outlined"
                         size="small"
                         @click="editor.toggleSnapToGrid"
                     ></v-btn>
                 </template>
             </v-tooltip>
-            <v-tooltip location="bottom" :text="editor.state.locked ? 'unlock graph' : 'lock graph'" open-delay="500">
+            <v-tooltip
+                location="bottom"
+                :text="editor.persisted.locked ? 'unlock graph' : 'lock graph'"
+                open-delay="500"
+            >
                 <template #activator="{ props }">
                     <v-btn
                         v-bind="props"
-                        :icon="editor.state.locked ? 'mdi-lock-outline' : 'mdi-lock-open-variant-outline'"
+                        :icon="editor.persisted.locked ? 'mdi-lock-outline' : 'mdi-lock-open-variant-outline'"
                         variant="outlined"
                         size="small"
                         @click="editor.toggleLocked"

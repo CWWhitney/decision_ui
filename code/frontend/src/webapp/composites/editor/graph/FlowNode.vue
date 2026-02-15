@@ -6,7 +6,7 @@
         NODE_EDIT_GENERAL_TAB,
         NODE_EDIT_STYLE_TAB,
         useNodeEditDialogStore
-    } from "@/state/dialogs";
+    } from "@/state/node_edit";
     import { useEditorStore } from "@/state/editor";
     import { useGraphStore } from "@/state/graph";
 
@@ -68,7 +68,7 @@
 
         // assign nodes to current subgraph
         for (const node of subgraphChildren) {
-            node.subgraphParentId = editor.state.subgraphId;
+            node.subgraphParentId = editor.transient.subgraphId;
         }
 
         // delete subgraph node
