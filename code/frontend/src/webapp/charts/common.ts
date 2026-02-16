@@ -79,6 +79,7 @@ export const getDefaultChartScales = (
                 bounds: "ticks",
                 max: maxValue,
                 min: minValue,
+                stacked: false,
                 ticks: {
                     maxRotation: 90,
                     minRotation: 0,
@@ -102,6 +103,7 @@ export const getDefaultChartScales = (
                     },
                     color: textColor
                 },
+                stacked: false,
                 beginAtZero,
                 ticks: {
                     color: textColor,

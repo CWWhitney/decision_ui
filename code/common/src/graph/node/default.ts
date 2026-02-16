@@ -58,7 +58,11 @@ export const getDefaultFunctionState = (variable: string, functionType: NodeFunc
                 distribution: NORMAL_DISTRIBUTION_TYPE,
                 lower: -1,
                 upper: 1,
-                comment: ""
+                comment: "",
+                isModifiable: true,
+                lowerBounds: [-2, 0],
+                upperBounds: [0, 2],
+                rangeStep: 0.1
             } as EstimateNodeFunctionState;
         case OPERATION_FUNCTION_TYPE:
             return {

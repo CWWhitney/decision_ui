@@ -7,6 +7,7 @@
         NODE_EDIT_FUNCTION_TAB,
         NODE_EDIT_GENERAL_TAB,
         NODE_EDIT_STYLE_TAB,
+        NODE_EDIT_ANALYZE_TAB,
         useNodeEditDialogStore
     } from "@/state/node_edit";
 
@@ -18,6 +19,7 @@
     import NodeEditDebugTab from "./NodeEditDebugTab.vue";
     import NodeEditDataTab from "./NodeEditDataTab.vue";
     import NodeEditStyleTab from "../../../components/editor/dialogs/NodeEditStyleTab.vue";
+    import NodeEditAnalyzeTab from "@/components/editor/dialogs/NodeEditAnalyzeTab.vue";
 
     const nodeEditDialog = useNodeEditDialogStore();
     const graph = useGraphStore();
@@ -112,6 +114,15 @@
                     ></v-tab>
                     <v-tab prepend-icon="mdi-palette-outline" text="Style" :value="NODE_EDIT_STYLE_TAB"></v-tab>
                     <v-tab
+                        v-if="
+                            node.type == common.VARIABLE_NODE_TYPE &&
+                            node.function.type == common.ESTIMATE_FUNCTION_TYPE
+                        "
+                        prepend-icon="mdi-tune-variant"
+                        text="Analyze"
+                        :value="NODE_EDIT_ANALYZE_TAB"
+                    ></v-tab>
+                    <v-tab
                         v-if="node.type == common.VARIABLE_NODE_TYPE"
                         prepend-icon="mdi-bug-outline"
                         text="Debug"
@@ -130,6 +141,12 @@
                     </v-tabs-window-item>
                     <v-tabs-window-item :value="NODE_EDIT_STYLE_TAB">
                         <NodeEditStyleTab v-if="nodeEditDialog.tab == NODE_EDIT_STYLE_TAB" v-model="node" />
+                    </v-tabs-window-item>
+                    <v-tabs-window-item :value="NODE_EDIT_ANALYZE_TAB">
+                        <NodeEditAnalyzeTab
+                            v-if="nodeEditDialog.tab == NODE_EDIT_ANALYZE_TAB"
+                            v-model="node as common.EstimateNode"
+                        />
                     </v-tabs-window-item>
                     <v-tabs-window-item :value="NODE_EDIT_DEBUG_TAB">
                         <NodeEditDebugTab v-if="nodeEditDialog.tab == NODE_EDIT_DEBUG_TAB" v-model="node" />

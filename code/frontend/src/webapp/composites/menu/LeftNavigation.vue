@@ -33,7 +33,7 @@
                         <v-list-item
                             :to="{ name: 'analyze' }"
                             v-bind="props"
-                            prepend-icon="mdi-chart-bar"
+                            prepend-icon="mdi-tune-variant"
                             title="Analyze"
                         />
                     </template>

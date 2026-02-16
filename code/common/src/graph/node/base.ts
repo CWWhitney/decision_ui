@@ -4,6 +4,7 @@ import { Position, PositionSchema, Size, SizeSchema } from "../../editor/layout"
 import {
     EmptyNodeFunctionSchema,
     EmptyNodeFunctionState,
+    EstimateNodeFunctionState,
     NodeFunctionState,
     NodeVariableFunctionSchema,
     VariableNodeFunctionState
@@ -46,6 +47,7 @@ export interface AbstractNode<T, F extends NodeFunctionState, S extends NodeStyl
 }
 
 export type VariableNode = AbstractNode<VariableNodeType, VariableNodeFunctionState, VariableNodeStyleState>;
+export type EstimateNode = AbstractNode<VariableNodeType, EstimateNodeFunctionState, VariableNodeStyleState>;
 export type CollectionNode = AbstractNode<CollectionNodeType, EmptyNodeFunctionState, CollectionNodeStyleState>;
 export type SugraphNode = AbstractNode<SubgraphNodeType, EmptyNodeFunctionState, SubgraphNodeStyleState>;
 

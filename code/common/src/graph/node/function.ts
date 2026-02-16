@@ -42,6 +42,10 @@ export interface EstimateNodeFunctionState extends AbstractVariableNodeFunctionS
     lower: number;
     upper: number;
     comment: string;
+    isModifiable: boolean;
+    lowerBounds: [number, number];
+    upperBounds: [number, number];
+    rangeStep: number;
 }
 
 export const EstimateNodeFunctionSchema: Schema = {
@@ -50,9 +54,13 @@ export const EstimateNodeFunctionSchema: Schema = {
         distribution: { enum: DISTRIBUTION_TYPES },
         lower: { type: "number" },
         upper: { type: "number" },
-        comment: { type: "string" }
+        comment: { type: "string" },
+        isModifiable: { type: "boolean" },
+        lowerBounds: { type: "array", items: [{ type: "number" }, { type: "number" }] },
+        upperBounds: { type: "array", items: [{ type: "number" }, { type: "number" }] },
+        rangeStep: { type: "number" }
     },
-    required: ["distribution", "lower", "upper", "comment"]
+    required: ["distribution", "lower", "upper", "comment", "isModifiable", "lowerBounds", "upperBounds", "rangeStep"]
 };
 
 export interface OperationNodeFunctionState extends AbstractVariableNodeFunctionState<OperationFunctionType> {

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+    import LazySlider from "@/components/form/LazySlider.vue";
     import TopMenuItem from "@/components/menu/TopMenuItem.vue";
     import { useComputationStore } from "@/state/computation";
 
@@ -13,11 +14,11 @@
             </div>
             <div class="sliderItems">
                 <span>Monte Carlo Runs</span>
-                <v-slider v-model="computation.persisted.mcRuns" min="1000" step="1000" max="100000" hide-details />
+                <LazySlider v-model="computation.persisted.mcRuns" min="1000" step="1000" max="100000" hide-details />
                 <span>{{ computation.persisted.mcRuns }}</span>
 
                 <span>Histogram Bins</span>
-                <v-slider v-model="computation.persisted.histogramBins" min="10" step="10" max="200" hide-details />
+                <LazySlider v-model="computation.persisted.histogramBins" min="10" step="10" max="200" hide-details />
                 <span>{{ computation.persisted.histogramBins }}</span>
             </div>
             <v-list-item class="gpuAccelerationToggle" @click="computation.toggleGpuAcceleration">

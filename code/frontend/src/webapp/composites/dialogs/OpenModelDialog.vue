@@ -37,7 +37,7 @@
     >
         <v-card>
             <v-toolbar>
-                <v-toolbar-title>Open Model</v-toolbar-title>
+                <v-toolbar-title>Open Existing Model</v-toolbar-title>
                 <v-toolbar-items>
                     <v-btn icon="mdi-close" @click="openModelDialog.closeDialog()"></v-btn>
                 </v-toolbar-items>
@@ -61,6 +61,7 @@
                 <v-tabs-window v-model="openModelDialog.tab">
                     <v-tabs-window-item :value="OPEN_MODEL_FROM_ACCOUNT_TAB"> From Account </v-tabs-window-item>
                     <v-tabs-window-item :value="OPEN_MODEL_FROM_FILE_TAB">
+                        <p>Open an existing model from a previously saved file:</p>
                         <div class="uploadFileContainer">
                             <v-btn
                                 text="Upload a File"
@@ -71,6 +72,7 @@
                         </div>
                     </v-tabs-window-item>
                     <v-tabs-window-item :value="OPEN_MODEL_FROM_EXAMPLE_TAB">
+                        <p>Open one of the example models:</p>
                         <v-list class="exampleList" lines="two">
                             <v-list-item
                                 v-for="(file, i) in EXAMPLE_MODEL_FILES"
@@ -122,6 +124,7 @@
         :deep(.v-window) {
             width: 100%;
             min-width: 35em;
+            min-height: 15em;
             overflow: auto;
         }
 

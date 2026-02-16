@@ -21,7 +21,11 @@ export const getAppleAgroforestExampleModelFile = (): ModelFileState => {
                         distribution: "posnorm",
                         lower: 3000,
                         upper: 5000,
-                        comment: ""
+                        comment: "",
+                        isModifiable: true,
+                        lowerBounds: [1000, 5000],
+                        upperBounds: [2000, 10000],
+                        rangeStep: 1000
                     },
                     visualization: {
                         title: "Sheep Income",
@@ -50,7 +54,11 @@ export const getAppleAgroforestExampleModelFile = (): ModelFileState => {
                         distribution: "posnorm",
                         lower: 30000,
                         upper: 60000,
-                        comment: ""
+                        comment: "",
+                        isModifiable: true,
+                        lowerBounds: [10000, 50000],
+                        upperBounds: [30000, 90000],
+                        rangeStep: 10000
                     },
                     visualization: {
                         title: "Apple Income",
@@ -79,7 +87,11 @@ export const getAppleAgroforestExampleModelFile = (): ModelFileState => {
                         distribution: "posnorm",
                         lower: 1000,
                         upper: 2500,
-                        comment: ""
+                        comment: "",
+                        isModifiable: true,
+                        lowerBounds: [100, 2000],
+                        upperBounds: [1000, 5000],
+                        rangeStep: 100
                     },
                     visualization: {
                         title: "Sheep Cost",
@@ -108,7 +120,11 @@ export const getAppleAgroforestExampleModelFile = (): ModelFileState => {
                         distribution: "posnorm",
                         lower: 15000,
                         upper: 30000,
-                        comment: ""
+                        comment: "",
+                        isModifiable: true,
+                        lowerBounds: [5000, 30000],
+                        upperBounds: [10000, 50000],
+                        rangeStep: 1000
                     },
                     visualization: {
                         title: "Apple Cost",
@@ -137,7 +153,11 @@ export const getAppleAgroforestExampleModelFile = (): ModelFileState => {
                         distribution: "posnorm",
                         lower: 9,
                         upper: 11,
-                        comment: ""
+                        comment: "",
+                        isModifiable: true,
+                        lowerBounds: [1, 15],
+                        upperBounds: [5, 20],
+                        rangeStep: 1
                     },
                     visualization: {
                         title: "Discount Rate",
@@ -245,7 +265,11 @@ export const getAppleAgroforestExampleModelFile = (): ModelFileState => {
                         distribution: "deterministic",
                         lower: 10,
                         upper: 10,
-                        comment: ""
+                        comment: "",
+                        isModifiable: true,
+                        lowerBounds: [5, 20],
+                        upperBounds: [5, 20],
+                        rangeStep: 1
                     },
                     visualization: {
                         title: "Years",

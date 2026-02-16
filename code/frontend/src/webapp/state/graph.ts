@@ -167,6 +167,12 @@ export const useGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         }
     );
 
+    const computedEstimateNodes = computed(() => {
+        return state.value.nodes.filter(
+            n => n.type == common.VARIABLE_NODE_TYPE && n.function.type == common.ESTIMATE_FUNCTION_TYPE
+        ) as common.AbstractNode<common.VariableNodeType, common.EstimateNodeFunctionState, any>[];
+    });
+
     // --- actions
 
     const addEdgeFromVueFlowConnectionAction = (connection: VueFlowConnection) => {
@@ -254,6 +260,7 @@ export const useGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
     return {
         state,
         history,
+        computedEstimateNodes,
         isVariableNameValid,
         getComputedNodeIdFromVariableName,
         getComputedNodePosition,

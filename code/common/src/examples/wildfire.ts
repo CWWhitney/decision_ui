@@ -21,7 +21,11 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                         distribution: "deterministic",
                         lower: 20,
                         upper: 20,
-                        comment: ""
+                        comment: "",
+                        isModifiable: true,
+                        lowerBounds: [5, 30],
+                        upperBounds: [5, 30],
+                        rangeStep: 1
                     },
                     visualization: {
                         autoConnect: false,
@@ -50,7 +54,11 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                         distribution: "deterministic",
                         lower: 1,
                         upper: 1,
-                        comment: ""
+                        comment: "",
+                        isModifiable: true,
+                        lowerBounds: [1, 100],
+                        upperBounds: [1, 100],
+                        rangeStep: 1
                     },
                     visualization: {
                         autoConnect: true,
@@ -79,7 +87,11 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                         distribution: "posnorm",
                         lower: 20,
                         upper: 100,
-                        comment: ""
+                        comment: "",
+                        isModifiable: true,
+                        lowerBounds: [10, 30],
+                        upperBounds: [50, 200],
+                        rangeStep: 1
                     },
                     visualization: {
                         autoConnect: true,
@@ -108,7 +120,11 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                         distribution: "posnorm",
                         lower: 10,
                         upper: 20,
-                        comment: ""
+                        comment: "",
+                        isModifiable: true,
+                        lowerBounds: [5, 20],
+                        upperBounds: [10, 30],
+                        rangeStep: 1
                     },
                     visualization: {
                         autoConnect: true,
@@ -137,7 +153,11 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                         distribution: "posnorm",
                         lower: 2,
                         upper: 5,
-                        comment: ""
+                        comment: "",
+                        isModifiable: true,
+                        lowerBounds: [1, 3],
+                        upperBounds: [3, 10],
+                        rangeStep: 1
                     },
                     visualization: {
                         autoConnect: true,
@@ -166,7 +186,11 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                         distribution: "posnorm",
                         lower: 10,
                         upper: 20,
-                        comment: ""
+                        comment: "",
+                        isModifiable: true,
+                        lowerBounds: [5, 20],
+                        upperBounds: [10, 30],
+                        rangeStep: 1
                     },
                     visualization: {
                         autoConnect: true,
@@ -195,7 +219,11 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                         distribution: "posnorm",
                         lower: 10,
                         upper: 40,
-                        comment: ""
+                        comment: "",
+                        isModifiable: true,
+                        lowerBounds: [5, 20],
+                        upperBounds: [30, 50],
+                        rangeStep: 1
                     },
                     visualization: {
                         autoConnect: true,
@@ -224,7 +252,11 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                         distribution: "posnorm",
                         lower: 40,
                         upper: 100,
-                        comment: ""
+                        comment: "",
+                        isModifiable: true,
+                        lowerBounds: [30, 50],
+                        upperBounds: [80, 120],
+                        rangeStep: 1
                     },
                     visualization: {
                         autoConnect: true,
@@ -253,7 +285,11 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                         distribution: "posnorm",
                         lower: 50,
                         upper: 120,
-                        comment: ""
+                        comment: "",
+                        isModifiable: true,
+                        lowerBounds: [40, 60],
+                        upperBounds: [100, 140],
+                        rangeStep: 1
                     },
                     visualization: {
                         autoConnect: true,
@@ -282,7 +318,11 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                         distribution: "posnorm",
                         lower: 2,
                         upper: 6,
-                        comment: ""
+                        comment: "",
+                        isModifiable: true,
+                        lowerBounds: [1, 3],
+                        upperBounds: [4, 8],
+                        rangeStep: 1
                     },
                     visualization: {
                         autoConnect: true,
@@ -311,7 +351,11 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                         distribution: "deterministic",
                         lower: 2,
                         upper: 2,
-                        comment: ""
+                        comment: "",
+                        isModifiable: true,
+                        lowerBounds: [1, 3],
+                        upperBounds: [1, 3],
+                        rangeStep: 1
                     },
                     visualization: {
                         autoConnect: true,
@@ -340,7 +384,11 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                         distribution: "tnorm_0_1",
                         lower: 0.1,
                         upper: 0.25,
-                        comment: ""
+                        comment: "",
+                        isModifiable: true,
+                        lowerBounds: [0.05, 0.2],
+                        upperBounds: [0.1, 0.4],
+                        rangeStep: 0.05
                     },
                     visualization: {
                         autoConnect: true,
@@ -369,7 +417,11 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                         distribution: "posnorm",
                         lower: 300,
                         upper: 1000,
-                        comment: ""
+                        comment: "",
+                        isModifiable: true,
+                        lowerBounds: [100, 500],
+                        upperBounds: [500, 2000],
+                        rangeStep: 1
                     },
                     visualization: {
                         autoConnect: true,
@@ -398,7 +450,11 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                         distribution: "posnorm",
                         lower: 1000,
                         upper: 6000,
-                        comment: ""
+                        comment: "",
+                        isModifiable: true,
+                        lowerBounds: [500, 1500],
+                        upperBounds: [4000, 8000],
+                        rangeStep: 1
                     },
                     visualization: {
                         autoConnect: true,
@@ -427,7 +483,11 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                         distribution: "norm",
                         lower: -500,
                         upper: 800,
-                        comment: ""
+                        comment: "",
+                        isModifiable: true,
+                        lowerBounds: [-1000, 0],
+                        upperBounds: [400, 1200],
+                        rangeStep: 1
                     },
                     visualization: {
                         autoConnect: true,
@@ -456,7 +516,11 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                         distribution: "posnorm",
                         lower: 100,
                         upper: 500,
-                        comment: ""
+                        comment: "",
+                        isModifiable: true,
+                        lowerBounds: [50, 150],
+                        upperBounds: [250, 1000],
+                        rangeStep: 1
                     },
                     visualization: {
                         autoConnect: true,
@@ -485,7 +549,11 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                         distribution: "posnorm",
                         lower: 1000,
                         upper: 10000,
-                        comment: ""
+                        comment: "",
+                        isModifiable: true,
+                        lowerBounds: [500, 1500],
+                        upperBounds: [5000, 15000],
+                        rangeStep: 1
                     },
                     visualization: {
                         autoConnect: true,
@@ -539,7 +607,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                         variable: "Controlled",
                         iterationsExpression: "n_years",
                         initExpression: "0",
-                        loopExpression: "i % controlled_burning_frequency"
+                        loopExpression: "i % controlled_burning_frequency == 0"
                     },
                     visualization: {
                         autoConnect: true,

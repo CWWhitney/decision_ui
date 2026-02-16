@@ -1,71 +1,30 @@
 <script setup lang="ts">
-    /**
-     * Functions Tab of the Node Edit Dialog for Nodes with Loop Function Type
-     */
-    import { USER_INPUT_DEBOUNCE_TIME } from "@/common/constants";
-    import {
-        type AbstractNode,
-        type EstimateNodeFunctionState,
-        type VariableNodeType,
-        DETERMINISTIC_DISTRIBUTION_TYPE,
-        NORMAL_DISTRIBUTION_TYPE,
-        POSNORM_DISTRIBUTION_TYPE,
-        TNORM01_DISTRIBUTION_TYPE,
-        debounce
-    } from "@decision-support-ui/common";
-    import { computed, ref, watch } from "vue";
+    import * as common from "@decision-support-ui/common";
     import HelpHintWrapper from "../../form/HelpHintWrapper.vue";
+    import DebouncedNumberInput from "@/components/form/DebouncedNumberInput.vue";
 
-    const node = defineModel<AbstractNode<VariableNodeType, EstimateNodeFunctionState, any>>({ required: true });
-    const props = defineProps({
-        debounceTime: {
-            type: Number,
-            default: USER_INPUT_DEBOUNCE_TIME,
-            required: false
-        }
+    const node = defineModel<common.AbstractNode<common.VariableNodeType, common.EstimateNodeFunctionState, any>>({
+        required: true
     });
 
-    const lowerInputValue = ref<number>(node.value.function.lower);
-    const upperInputValue = ref<number>(node.value.function.upper);
+    const DISTRIBUTION_VALUES = common.DISTRIBUTION_TYPES.map(dt => ({
+        title: common.DISTRIBUTION_LABELS[dt],
+        value: dt
+    }));
 
-    const lower = computed(() => node.value.function.lower);
-    const upper = computed(() => node.value.function.upper);
+    const onLowerValueChange = (v: number) => {
+        node.value.function.lowerBounds = common.extendRange(v, node.value.function.lowerBounds);
+    };
 
-    watch(lower, value => {
-        lowerInputValue.value = value;
-    });
+    const onUpperValueChange = (v: number) => {
+        node.value.function.upperBounds = common.extendRange(v, node.value.function.upperBounds);
+    };
 
-    watch(upper, value => {
-        upperInputValue.value = value;
-    });
-
-    watch(
-        lowerInputValue,
-        debounce((value: number) => {
-            if (node.value.function.lower != value) {
-                node.value.function.lower = value;
-                if (node.value.function.distribution == DETERMINISTIC_DISTRIBUTION_TYPE) {
-                    node.value.function.upper = value;
-                }
-            }
-        }, props.debounceTime)
-    );
-
-    watch(
-        upperInputValue,
-        debounce((value: number) => {
-            if (node.value.function.upper != value) {
-                node.value.function.upper = value;
-            }
-        }, props.debounceTime)
-    );
-
-    const DISTRIBUTION_VALUES = [
-        { title: "Deterministic (const)", value: DETERMINISTIC_DISTRIBUTION_TYPE },
-        { title: "Normal Distribution (norm)", value: NORMAL_DISTRIBUTION_TYPE },
-        { title: "Positive Truncated Normal Distribution (posnorm)", value: POSNORM_DISTRIBUTION_TYPE },
-        { title: "0-1 Truncated Normal Distribution (tnorm_0_1)", value: TNORM01_DISTRIBUTION_TYPE }
-    ];
+    const onDeterministicValueChange = (v: number) => {
+        node.value.function.upper = v;
+        node.value.function.lowerBounds = common.extendRange(v, node.value.function.lowerBounds);
+        node.value.function.upperBounds = [...node.value.function.lowerBounds];
+    };
 </script>
 
 <template>
@@ -118,23 +77,25 @@
                 </ul>
             </template>
         </HelpHintWrapper>
-        <HelpHintWrapper v-if="node.function.distribution != DETERMINISTIC_DISTRIBUTION_TYPE">
+        <HelpHintWrapper v-if="node.function.distribution != common.DETERMINISTIC_DISTRIBUTION_TYPE">
             <template #default>
                 <div class="lower-upper-inputs">
-                    <v-number-input
-                        v-model="lowerInputValue"
+                    <DebouncedNumberInput
+                        v-model="node.function.lower"
                         :precision="null"
                         label="Lower"
                         control-variant="split"
                         hide-details
-                    ></v-number-input>
-                    <v-number-input
-                        v-model="upperInputValue"
+                        @change="onLowerValueChange"
+                    />
+                    <DebouncedNumberInput
+                        v-model="node.function.upper"
                         :precision="null"
                         label="Upper"
                         control-variant="split"
                         hide-details
-                    ></v-number-input>
+                        @change="onUpperValueChange"
+                    />
                 </div>
             </template>
             <template #tooltip>
@@ -153,13 +114,14 @@
         <HelpHintWrapper v-else>
             <template #default>
                 <div>
-                    <v-number-input
-                        v-model="lowerInputValue"
+                    <DebouncedNumberInput
+                        v-model="node.function.lower"
                         :precision="null"
                         label="Value"
                         control-variant="split"
                         hide-details
-                    ></v-number-input>
+                        @change="onDeterministicValueChange"
+                    />
                 </div>
             </template>
             <template #tooltip> Choose a single constant value. </template>

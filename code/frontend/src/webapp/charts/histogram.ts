@@ -1,6 +1,6 @@
 import { Chart, type ChartDataset } from "chart.js";
 
-import { getDefaultChartOptions, getDefaultChartScales } from "./common";
+import { CHART_COLORS, getDefaultChartOptions, getDefaultChartScales, getDefaultHistogramLegend } from "./common";
 import { numberToPrettyString } from "@decision-support-ui/common";
 
 const TEXT_COLOR = "rgba(0, 0, 0, 1)";
@@ -57,6 +57,55 @@ export const drawHistogramChart = (
                         label: i => `occurrences = ${numberToPrettyString(values[i.dataIndex])}`
                     }
                 }
+            }
+        }
+    });
+};
+
+export const drawMultiHistogramChart = (
+    chart: Chart<"bar"> | null,
+    ctx: CanvasRenderingContext2D,
+    bins: number[],
+    counts: number[][],
+    labels: string[],
+    device_pixel_ratio: number = 1.0
+): Chart<"bar"> => {
+    const max_ticks = 10;
+    const n_variables = Object.keys(labels).length;
+
+    if (chart) chart.destroy();
+
+    return new Chart<"bar">(ctx, {
+        type: "bar",
+        data: {
+            labels: bins,
+            datasets: labels.map((label, idx) => {
+                return {
+                    label,
+                    data: counts[idx],
+                    categoryPercentage: 1.0,
+                    barPercentage: n_variables,
+                    inflateAmount: 0,
+                    stack: "overlay",
+                    backgroundColor: CHART_COLORS[idx % CHART_COLORS.length]
+                } as ChartDataset<"bar", any>;
+            })
+        },
+        options: {
+            ...getDefaultChartOptions(),
+            ...getDefaultChartScales(
+                "",
+                "occurrences",
+                Math.max(...bins),
+                Math.min(...bins),
+                max_ticks,
+                TEXT_COLOR,
+                GRID_COLOR,
+                true
+            ),
+            devicePixelRatio: device_pixel_ratio,
+            plugins: {
+                legend: getDefaultHistogramLegend(TEXT_COLOR)
             }
         }
     });

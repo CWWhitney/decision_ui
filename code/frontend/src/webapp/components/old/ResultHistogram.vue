@@ -4,7 +4,7 @@
     import { type Chart } from "chart.js";
 
     import { storeToRefs } from "pinia";
-    import { drawCombinedResultsHistogram } from "../../charts/old/combined";
+    import { drawCombinedResultsHistogram } from "../../charts/combined";
     import { downloadChart } from "../../charts/download";
 
     const modelStore = useModelStore();

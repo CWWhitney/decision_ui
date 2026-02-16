@@ -45,7 +45,7 @@
         async () => {
             if (tt.isProbabilistic && !tt.isSeries) {
                 await sleep(UI_REFRESH_SLEEP_TIMEOUT);
-                return await common.getHistogramBinsFromTensor(tt.tensor, bins);
+                return await common.getHistogramDataFromTensor(tt.tensor, bins);
             }
             return null;
         },
@@ -107,7 +107,7 @@
                     );
                 });
                 await sleep(UI_REFRESH_SLEEP_TIMEOUT);
-                const histogramData = await common.getHistogramBinsFromTensor(slicedTensor, bins);
+                const histogramData = await common.getHistogramDataFromTensor(slicedTensor, bins);
                 slicedTensor.dispose();
                 return histogramData;
             }
