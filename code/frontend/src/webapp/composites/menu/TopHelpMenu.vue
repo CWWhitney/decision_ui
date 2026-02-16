@@ -14,7 +14,8 @@
         <v-list class="list">
             <TopMenuItem title="Documentation" shortcut="CTRL + H" @click="router.push({ path: '/help' })" />
             <TopMenuItem title="Found A Bug?" shortcut="CTRL + B" @click="onFoundABugClick" />
-            <TopMenuItem title="AI Support" />
+            <v-divider />
+            <TopMenuItem title="AI Support Experiment" />
         </v-list>
     </v-card>
 </template>
