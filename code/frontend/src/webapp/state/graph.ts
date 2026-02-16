@@ -27,13 +27,6 @@ export const useGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
 
     // --- computed state
 
-    const computedComputationContext = computed(
-        () =>
-            ({
-                mcRuns: computationStore.state.mcRuns
-            }) as common.ComputationContext
-    );
-
     const _nodesByIdMap = computed(() => common.getNodeByIdMap(state.value.nodes));
     const _nodeChildrenByParentId = computed(() => common.getNodeChildrenByParentIdMap(state.value.nodes));
     const _subgraphChildrenByParentId = computed(() => common.getSubgraphChildrenByParentIdMap(state.value.nodes));
@@ -151,7 +144,6 @@ export const useGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
 
     const getComputedTypedTensor: (nodeId: common.NodeId) => common.TypedTensor = makeSafeComputedGetterByKey(
         (nodeId: common.NodeId, previousTensor: common.TypedTensor | undefined) => {
-            console.log(`start calculating tensor for node '${nodeId}'`);
             const started = +new Date();
             if (previousTensor) {
                 previousTensor.tensor.dispose();
@@ -165,7 +157,10 @@ export const useGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
                 getComputedExpressionMatches,
                 evaluateExpressionMatch,
                 getComputedTypedTensor,
-                computedComputationContext.value
+                {
+                    seed: computationStore.transient.seed,
+                    mcRuns: computationStore.persisted.mcRuns
+                } as common.ComputationContext
             );
             console.log(`calculated tensor for node ${nodeId} in ${+new Date() - started}ms`);
             return result;

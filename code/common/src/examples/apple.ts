@@ -281,7 +281,8 @@ export const getAppleAgroforestExampleModelFile = (): ModelFileState => {
         },
         computation: {
             mcRuns: 10000,
-            histogramBins: 40
+            histogramBins: 40,
+            gpuAcceleration: true
         },
         editor: {
             locked: false,

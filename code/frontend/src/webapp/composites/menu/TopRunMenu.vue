@@ -13,17 +13,23 @@
             </div>
             <div class="sliderItems">
                 <span>Monte Carlo Runs</span>
-                <v-slider v-model="computation.state.mcRuns" min="1000" step="1000" max="100000" hide-details />
-                <span>{{ computation.state.mcRuns }}</span>
+                <v-slider v-model="computation.persisted.mcRuns" min="1000" step="1000" max="100000" hide-details />
+                <span>{{ computation.persisted.mcRuns }}</span>
 
                 <span>Histogram Bins</span>
-                <v-slider v-model="computation.state.histogramBins" min="10" step="10" max="200" hide-details />
-                <span>{{ computation.state.histogramBins }}</span>
+                <v-slider v-model="computation.persisted.histogramBins" min="10" step="10" max="200" hide-details />
+                <span>{{ computation.persisted.histogramBins }}</span>
             </div>
-            <TopMenuItem title="Recalculate Frontend" shortcut="CTRL + 2" disabled @click="console.log('test')" />
+            <v-list-item class="gpuAccelerationToggle" @click="computation.toggleGpuAcceleration">
+                <template #title>Use GPU acceleration (if available)</template>
+                <template #append>
+                    <v-switch v-model="computation.persisted.gpuAcceleration" color="primary" hide-details inset />
+                </template>
+            </v-list-item>
+            <TopMenuItem title="Recalculate Frontend" shortcut="CTRL + 2" @click="computation.triggerRecalculation" />
             <v-divider />
             <div class="sectionHeader">
-                <h4>Backend</h4>
+                <h4>R Backend</h4>
             </div>
             <div class="sliderItems">
                 <span>Monte Carlo Runs</span>
@@ -55,6 +61,14 @@
             padding: 0;
             text-transform: uppercase;
         }
+    }
+
+    .gpuAccelerationToggle {
+        display: flex;
+        gap: 1em;
+        padding: 0em 1em;
+        align-items: center;
+        justify-content: space-between;
     }
 
     .sliderItems {

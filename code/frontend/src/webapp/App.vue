@@ -3,6 +3,7 @@
     import NetworkErrorSnackbar from "./components/old/NetworkErrorSnackbar.vue";
     import GlobalDialogs from "./composites/global/GlobalDialogs.vue";
     import GlobalShortcuts from "./composites/global/GlobalShortcuts.vue";
+    import GlobalTensorflowSetup from "./composites/global/GlobalTensorflowSetup.vue";
 </script>
 
 <template>
@@ -10,6 +11,7 @@
         <router-view />
         <GlobalShortcuts />
         <GlobalDialogs />
+        <GlobalTensorflowSetup />
         <LoginRefresh />
         <NetworkErrorSnackbar />
     </v-app>

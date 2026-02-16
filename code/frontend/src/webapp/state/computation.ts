@@ -1,25 +1,43 @@
 import { useSessionStorage } from "@vueuse/core";
 import { defineStore } from "pinia";
+import * as common from "@decision-support-ui/common";
+import { ref } from "vue";
 
 export const COMPUTATION_STORE_ID = "computation";
 
 export const DEFAULT_MC_RUNS = 10000;
 export const DEFAULT_HISTOGRAM_BINS = 40;
 
-const getDefaultComputationState = () => {
+const getDefaultComputationTransientState = (): common.ComputationTransientState => {
+    return {
+        seed: 1
+    };
+};
+
+const getDefaultComputationState = (): common.ComputationFileState => {
     return {
         mcRuns: 10000,
-        histogramBins: 40
+        histogramBins: 40,
+        gpuAcceleration: true
     };
 };
 
 export const useComputationStore = defineStore(COMPUTATION_STORE_ID, () => {
     // --- persisted state
-    const state = useSessionStorage(COMPUTATION_STORE_ID, getDefaultComputationState());
+    const transient = ref<common.ComputationTransientState>(getDefaultComputationTransientState());
+    const persisted = useSessionStorage(COMPUTATION_STORE_ID, getDefaultComputationState());
 
-    const reset = () => {
-        state.value = getDefaultComputationState();
+    const toggleGpuAcceleration = () => {
+        persisted.value.gpuAcceleration = !persisted.value.gpuAcceleration;
     };
 
-    return { state, reset };
+    const triggerRecalculation = () => {
+        transient.value.seed += 1;
+    };
+
+    const reset = () => {
+        persisted.value = getDefaultComputationState();
+    };
+
+    return { persisted, transient, triggerRecalculation, toggleGpuAcceleration, reset };
 });

@@ -1,11 +1,13 @@
 <script setup lang="ts">
     import { resetState } from "@/state";
+    import { useComputationStore } from "@/state/computation";
     import { downloadModelFile, uploadModelFile } from "@/state/io";
     import { useOpenModelDialogStore } from "@/state/open_model";
     import { onMounted, onUnmounted } from "vue";
     import { useRouter } from "vue-router";
 
     const openModelDialog = useOpenModelDialogStore();
+    const computation = useComputationStore();
     const router = useRouter();
 
     const onKeyDown = (e: KeyboardEvent) => {
@@ -43,6 +45,12 @@
         if ((e.ctrlKey || e.metaKey) && e.key === "b") {
             e.preventDefault();
             window.open("https://github.com/johanneskopton/decision_ui/issues", "_blank");
+        }
+
+        // trigger recalculation (ctrl + 2)
+        if ((e.ctrlKey || e.metaKey) && e.key === "2") {
+            e.preventDefault();
+            computation.triggerRecalculation();
         }
     };
 

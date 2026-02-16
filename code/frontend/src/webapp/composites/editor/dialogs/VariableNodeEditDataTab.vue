@@ -21,6 +21,7 @@
 
     const computedTypedTensorResult = computedAsync(
         async () => {
+            console.debug(`refresh variable data tab with seed ${computation.transient.seed}`);
             await sleep(UI_REFRESH_SLEEP_TIMEOUT);
             return catchForComputedResult(() => graphStore.getComputedTypedTensor(node.value.id));
         },
@@ -44,7 +45,7 @@
             <TypedTensorVisualization
                 :node-title="node.visualization.title"
                 :tt="computedTypedTensorResult.value"
-                :bins="computation.state.histogramBins"
+                :bins="computation.persisted.histogramBins"
             />
         </div>
         <div v-if="computedTypedTensorResult && computedTypedTensorResult.type == COMPUTED_RESULT_ERROR_TYPE">
