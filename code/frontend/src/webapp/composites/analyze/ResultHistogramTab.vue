@@ -1,5 +1,7 @@
 <script lang="ts" setup>
+    import { sleep } from "@/common/async";
     import { catchForComputedResult, COMPUTED_RESULT_ERROR_TYPE } from "@/common/computed";
+    import { UI_REFRESH_SLEEP_TIMEOUT } from "@/common/constants";
     import MultiHistogramChart from "@/components/charts/MultiHistogramChart.vue";
     import { useComputationStore } from "@/state/computation";
     import { useGraphStore } from "@/state/graph";
@@ -16,6 +18,15 @@
     const computationErrorLoading = ref<boolean>(true);
     const typedTensorsLoading = ref<boolean>(true);
 
+    const triggerComputedDependencies = () => {
+        // calculate useless sum over lower and upper values
+        // to trigger computed dependency tracking before sleep
+        const _seed = computation.transient.seed;
+        const _mcRuns = computation.persisted.mcRuns;
+        const _histogramBins = computation.persisted.histogramBins;
+        const _estimateSum = graph.computedEstimateNodes.reduce((p, n) => p + n.function.lower + n.function.upper, 0);
+    };
+
     const resultNodeIds = computed(() =>
         graph.state.nodes
             .filter(n => n.type == common.VARIABLE_NODE_TYPE && n.function.type == common.RESULT_FUNCTION_TYPE)
@@ -24,6 +35,8 @@
 
     const computationError = computedAsync(
         async () => {
+            triggerComputedDependencies();
+            await sleep(UI_REFRESH_SLEEP_TIMEOUT);
             const errors = resultNodeIds.value
                 .map(nodeId => catchForComputedResult(() => graph.getComputedTypedTensor(nodeId)))
                 .filter(r => r.type == COMPUTED_RESULT_ERROR_TYPE);
@@ -39,6 +52,8 @@
     const typedTensors = computedAsync(
         async () => {
             try {
+                triggerComputedDependencies();
+                await sleep(UI_REFRESH_SLEEP_TIMEOUT);
                 return resultNodeIds.value.map(nodeId => graph.getComputedTypedTensor(nodeId));
             } catch {
                 return null;
@@ -54,6 +69,8 @@
                 return null;
             }
 
+            triggerComputedDependencies();
+            await sleep(UI_REFRESH_SLEEP_TIMEOUT);
             const histogramData = await common.getMultiHistogramDataFromTensors(
                 typedTensors.value.map(t => t.tensor),
                 computation.persisted.histogramBins
