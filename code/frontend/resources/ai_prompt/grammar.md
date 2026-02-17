@@ -1,0 +1,129 @@
+### MATHEMATICAL EXPRESSION GRAMMAR
+
+All mathematical expressions in the Decision Support UI tool use the following Ohm.js grammar:
+
+```
+Arithmetic {
+Exp
+    = OrExp
+
+OrExp
+    = OrExp "|" AndExp    -- or
+    | AndExp
+
+AndExp
+    = AndExp "&" NegExp   -- and
+    | NegExp
+
+NegExp
+    = "!" NegExp          -- not
+    | RelExp
+
+RelExp
+    = AddExp relOperation AddExp -- rel
+    | AddExp
+
+AddExp
+    = AddExp "+" MulExp  -- plus
+    | AddExp "-" MulExp  -- minus
+    | MulExp
+
+MulExp
+    = MulExp "*" UnaryExp  -- times
+    | MulExp "/" UnaryExp  -- divide
+    | MulExp "%" UnaryExp  -- modulo
+    | UnaryExp
+
+UnaryExp
+    = "-" UnaryExp         -- neg
+    | ExpExp
+
+ExpExp
+    = PriExp "^" ExpExp    -- power
+    | PriExp
+
+PriExp
+    = "(" Exp ")"  -- paren
+    | IfExp
+    | FuncExp
+    | constants
+    | quotedText
+    | IndexedVariable
+    | variable
+    | number
+
+IfExp
+    = "if" "(" Exp ")" Exp "else" Exp
+
+FuncExp
+    = #(funcName "(") FuncArgs ")"
+
+FuncArgs
+    = Exp ("," Exp)*
+
+IndexedVariable
+    = #(variable "[i]")
+    | #(variable "[i-1]")
+
+quotedText
+    = "\"" alnum* "\""
+    | "'" alnum* "'"
+
+relOperation  (a comparison)
+    = ">=" | "<=" | ">" | "<" | "==" | "!="
+
+funcName  (a function)
+    = "chance_event"
+    | "vv"
+    | "discount"
+    | "abs"
+    | "sign"
+    | "ceiling"
+    | "floor"
+    | "sin"
+    | "cos"
+    | "tan"
+    | "tanh"
+    | "exp"
+    | "log"
+    | "round"
+    | "trunc"
+    | "sqrt"
+    | "sum"
+    | "prod"
+    | "min"
+    | "max"
+    | "mean"
+
+constants
+    = pi
+    | true
+    | false
+    | null
+
+pi  (pi)
+    = "pi"
+
+true  (true)
+    = "TRUE"
+
+false  (false)
+    = "FALSE"
+
+null  (null)
+    = "NA"
+
+variable  (a variable)
+    = variableStart variableContinue*
+
+variableStart
+    = letter
+
+variableContinue
+    = variableStart | digit | "_"
+
+number  (a number)
+    = digit* "." digit+  -- fract
+    | digit+             -- whole
+}
+```

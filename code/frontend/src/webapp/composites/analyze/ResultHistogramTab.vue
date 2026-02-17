@@ -65,7 +65,7 @@
 
     const histogramData = computedAsync(
         async () => {
-            if (!typedTensors.value) {
+            if (!typedTensors.value || typedTensors.value.length == 0) {
                 return null;
             }
 
