@@ -4,6 +4,16 @@
     import NifamLogo from "../../../resources/images/nifam.webp";
     import FundingLogo from "../../../resources/images/funding.webp";
     import DsuiLogo from "../../../resources/images/logo_large.svg";
+    import { useRouter } from "vue-router";
+    import { OPEN_MODEL_FROM_EXAMPLE_TAB, useOpenModelDialogStore } from "@/state/open_model";
+
+    const router = useRouter();
+    const openModelDialog = useOpenModelDialogStore();
+
+    const onExamplesClick = () => {
+        router.push({ name: "editor" });
+        openModelDialog.openDialog(OPEN_MODEL_FROM_EXAMPLE_TAB);
+    };
 </script>
 
 <template>
@@ -25,7 +35,7 @@
             </div>
             <div class="menu">
                 <div>
-                    <v-btn to="/help/getting-started" class="menuButton">
+                    <v-btn to="/help/getting-started" class="menuButton" variant="outlined">
                         <template #prepend>
                             <v-icon size="32px"> mdi-school-outline </v-icon>
                         </template>
@@ -33,15 +43,15 @@
                     </v-btn>
                 </div>
                 <div>
-                    <v-btn to="/user/files?examples=1" class="menuButton" disabled>
+                    <v-btn class="menuButton" variant="outlined" @click="onExamplesClick">
                         <template #prepend>
-                            <v-icon size="32px"> mdi-format-list-text </v-icon>
+                            <v-icon size="32px"> mdi-lightbulb-on-outline </v-icon>
                         </template>
                         <template #default> examples</template>
                     </v-btn>
                 </div>
                 <div>
-                    <v-btn to="/login" class="menuButton" disabled>
+                    <v-btn to="/login" class="menuButton" variant="outlined" disabled>
                         <template #prepend>
                             <v-icon size="32px"> mdi-login </v-icon>
                         </template>
@@ -49,9 +59,9 @@
                     </v-btn>
                 </div>
                 <div>
-                    <v-btn :to="{ name: 'editor' }" class="menuButton">
+                    <v-btn :to="{ name: 'editor' }" variant="outlined" class="menuButton">
                         <template #prepend>
-                            <v-icon size="32px"> mdi-graph mdi-rotate-90 </v-icon>
+                            <v-icon size="32px"> mdi-sitemap mdi-rotate-90</v-icon>
                         </template>
                         <template #default>model editor</template>
                     </v-btn>
