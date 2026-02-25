@@ -163,7 +163,7 @@
         .fundingLogo {
             display: block;
             margin: 0 1em 1.5em 0;
-            width: 20em;
+            width: 26em;
         }
     }
 </style>

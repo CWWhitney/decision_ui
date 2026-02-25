@@ -15,7 +15,7 @@
     import * as common from "@decision-support-ui/common";
 
     import { useGraphStore } from "@/state/graph";
-    import { NODE_EDIT_FUNCTION_TAB, useNodeEditDialogStore } from "@/state/node_edit";
+    import { useNodeEditDialogStore } from "@/state/node_edit";
     import { ref, watch } from "vue";
     import { useEditorStore } from "@/state/editor";
 
@@ -99,7 +99,7 @@
         if (!editor.persisted.locked) {
             const node = graph.getComputedNode(event.node.id);
             if (node.type == common.VARIABLE_NODE_TYPE) {
-                nodeEditStore.openDialog(event.node.id, NODE_EDIT_FUNCTION_TAB);
+                nodeEditStore.openDialog(event.node.id);
             } else if (node.type == common.COLLECTION_NODE_TYPE) {
                 nodeEditStore.openDialog(event.node.id);
             } else if (node.type == common.SUBGRAPH_NODE_TYPE) {
