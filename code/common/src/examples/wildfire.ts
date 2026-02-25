@@ -914,7 +914,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "result",
                         variable: "NPV_Controlled_Burning",
-                        expression: "discount(Bottom_Line_Difference, discount_rate)"
+                        expression: "discount(Bottom_Line_Difference, discount_rate, TRUE)"
                     },
                     visualization: {
                         autoConnect: true,

@@ -30,12 +30,10 @@ ${identCode(modelFunctionCode)}
 	return(list(${resultVariables.map(v => `${v}=${v}`).join(", ")}))
 }
 
-
 mc <- mcSimulation(estimate=input_estimates,
 		model_function=model_function,
 		numberOfModelRuns=${mcRuns},
 		functionSyntax='plainNames')
-
 
 write_csv(data.frame(mc["y"]), "${resultsFilepath}")`;
 };

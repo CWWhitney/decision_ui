@@ -184,7 +184,7 @@ export const getAppleAgroforestExampleModelFile = (): ModelFileState => {
                         type: "result",
                         variable: "Both_Gain_NPV",
                         expression:
-                            "discount(\n  vv(Sheep_Income + Apple_Income - Sheep_Cost - Apple_Cost, 0, Years), \n  Discount_Rate\n)"
+                            "discount(\n  vv(Sheep_Income + Apple_Income - Sheep_Cost - Apple_Cost, 0, Years), \n  Discount_Rate,\n  TRUE\n)"
                     },
                     visualization: {
                         title: "Both Gain NPV",
@@ -210,7 +210,8 @@ export const getAppleAgroforestExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "result",
                         variable: "Sheep_Only_Gain_NPV",
-                        expression: "discount(\n  vv(Sheep_Income - Sheep_Cost, 0, Years), \n  Discount_Rate\n)"
+                        expression:
+                            "discount(\n  vv(Sheep_Income - Sheep_Cost, 0, Years), \n  Discount_Rate,\n  TRUE\n)"
                     },
                     visualization: {
                         title: "Sheep Only Gain NPV",
