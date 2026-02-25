@@ -7,7 +7,7 @@
     const aiSupportDialog = useAiSupportDialogStore();
 
     const onFoundABugClick = () => {
-        window.open("https://github.com/johanneskopton/decision_ui/issues", "_blank");
+        window.open("https://github.com/CWWhitney/decision_ui/issues", "_blank");
     };
 </script>
 
@@ -15,7 +15,7 @@
     <v-card class="card">
         <v-list class="list">
             <TopMenuItem title="Documentation" shortcut="CTRL + H" @click="router.push({ path: '/help' })" />
-            <TopMenuItem title="Found A Bug?" shortcut="CTRL + B" @click="onFoundABugClick" />
+            <TopMenuItem title="Found a Bug?" shortcut="CTRL + B" @click="onFoundABugClick" />
             <v-divider />
             <TopMenuItem title="AI Support (Experiment)" @click="aiSupportDialog.openDialog" />
         </v-list>
