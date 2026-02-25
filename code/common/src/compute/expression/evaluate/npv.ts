@@ -20,7 +20,7 @@ export const netPresentValueExpression = ({
     const calculateNpvTT =
         calculateNpv && !isNullValue(calculateNpv)
             ? assertTensorValue(calculateNpv, "discount parameter 'calculate_NPV'")
-            : getTypedTensorFromConstant(tf.scalar(1));
+            : getTypedTensorFromConstant(tf.scalar(0));
 
     if (!xTT.isSeries) {
         throw new Error(`function 'discount' expects a time series as first parameter`);

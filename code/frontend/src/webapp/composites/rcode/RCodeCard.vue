@@ -1,28 +1,32 @@
 <script setup lang="ts">
     import JSZip from "jszip";
     import FileSaver from "file-saver";
+    import { useGraphStore } from "@/state/graph";
+    import { useRCodeStore } from "@/state/rcode";
+    import * as common from "@decision-support-ui/common";
 
-    import { useModelStore } from "../../state/old/model";
-
-    const modelStore = useModelStore();
+    const graph = useGraphStore();
+    const rcode = useRCodeStore();
 
     const saveZip = () => {
-        if (modelStore.decisionSupportResult == null) {
+        if (rcode.computedRCode == null) {
             return;
         }
 
         const zip = new JSZip();
-        let r_script = modelStore.decisionSupportResult.r_script;
-        r_script = r_script.replace(/\"\/tmp\/decision_ui_estimate_[a-z0-9].*\.csv\"/, '"estimates.csv"');
-        zip.file("script.R", r_script);
-        zip.file("estimates.csv", modelStore.decisionSupportResult.estimates_csv);
+
+        zip.file("script.R", rcode.computedRCode);
+        zip.file(
+            "estimates.csv",
+            common.convertEstimatesToCSV(common.generateEstimatesTableFromGraph(graph.state.nodes))
+        );
         zip.generateAsync({ type: "blob" }).then(function (content) {
             FileSaver.saveAs(content, "model.zip");
         });
     };
 
     const copyCode = () => {
-        navigator.clipboard.writeText(modelStore.decisionSupportResult?.r_script || "");
+        navigator.clipboard.writeText(rcode.computedRCode || "");
     };
 </script>
 
@@ -35,11 +39,7 @@
                 <v-btn-group>
                     <v-tooltip location="bottom" open-delay="500">
                         <template #activator="{ props }">
-                            <v-btn
-                                v-if="modelStore.decisionSupportResult !== null"
-                                v-bind="props"
-                                @click.prevent="copyCode"
-                            >
+                            <v-btn v-if="rcode.computedRCode !== null" v-bind="props" @click.prevent="copyCode">
                                 <template #prepend>
                                     <v-icon> mdi-content-copy </v-icon>
                                 </template>
@@ -50,11 +50,7 @@
                     </v-tooltip>
                     <v-tooltip location="bottom" open-delay="500">
                         <template #activator="{ props }">
-                            <v-btn
-                                v-if="modelStore.decisionSupportResult !== null"
-                                v-bind="props"
-                                @click.prevent="saveZip"
-                            >
+                            <v-btn v-if="rcode.computedRCode !== null" v-bind="props" @click.prevent="saveZip">
                                 <template #prepend>
                                     <v-icon> mdi-folder-download-outline </v-icon>
                                 </template>
@@ -78,9 +74,10 @@
         </v-card-item>
 
         <highlightjs
-            v-if="modelStore.decisionSupportResult !== null"
+            v-if="rcode.computedRCode !== null"
             language="r"
-            :code="modelStore.decisionSupportResult.r_script"
+            :autodetect="false"
+            :code="rcode.computedRCode"
             class="code"
         />
         <v-alert v-else type="info" elevation="2"> No R code to see.. Run the model first! </v-alert>
@@ -89,6 +86,8 @@
 
 <style scoped lang="scss">
     .codeCard {
+        padding: 1em;
+
         pre {
             margin: 1em;
             overflow-y: auto;

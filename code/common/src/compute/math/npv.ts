@@ -11,7 +11,7 @@ export const netPresentValue = ({
     seriesLength,
     x,
     discountRate,
-    calculateNpv = true
+    calculateNpv = false
 }: {
     mcRuns: number;
     seriesLength: number;
