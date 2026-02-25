@@ -18,7 +18,7 @@ export const getModelFileFromState = (): common.ModelFileState => {
         },
         graph: { ...graph.state },
         metadata: { ...metadata.state },
-        computation: { ...computation.state },
+        computation: { ...computation.persisted },
         editor: { ...editor.persisted }
     };
 };
@@ -109,7 +109,7 @@ export const loadModelFileToState = (file: common.ModelFileState): void => {
     editor.loadFromFile(file.editor);
 
     computation.reset();
-    computation.$patch({ state: file.computation });
+    computation.$patch({ persisted: file.computation });
 
     metadata.reset();
     metadata.$patch({ state: file.metadata });
