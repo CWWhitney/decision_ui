@@ -18,7 +18,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "n_years",
-                        distribution: "deterministic",
+                        distribution: "const",
                         lower: 20,
                         upper: 20,
                         comment: "",
@@ -51,7 +51,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "area_size",
-                        distribution: "deterministic",
+                        distribution: "const",
                         lower: 1,
                         upper: 1,
                         comment: "",
@@ -348,7 +348,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "controlled_burning_frequency",
-                        distribution: "deterministic",
+                        distribution: "const",
                         lower: 2,
                         upper: 2,
                         comment: "",

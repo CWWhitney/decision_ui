@@ -20,6 +20,7 @@
         "clean": "rm -rf node_modules && rm -rf build"
     },
     "dependencies": {
+        "csv-parse": "6.1.0",
         "gaussian": "^1.3.0",
         "@tensorflow/tfjs": "4.22.0",
         "ohm-js": "^17.3.0",

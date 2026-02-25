@@ -262,7 +262,7 @@ export const getAppleAgroforestExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "Years",
-                        distribution: "deterministic",
+                        distribution: "const",
                         lower: 10,
                         upper: 10,
                         comment: "",
