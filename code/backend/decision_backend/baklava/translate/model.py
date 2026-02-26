@@ -1,4 +1,4 @@
-"""Translate a Baklava model to R-code."""
+"""Translate a Baklava model to R code."""
 
 import logging
 
@@ -41,7 +41,7 @@ class GraphTranslationState:
         self.output_variables: Set[str] = set()
 
     def needs_translation(self, node: BaklavaNode) -> bool:
-        """Return true if a node still needs to be translated to R-code, or false, if it already was translated."""
+        """Return true if a node still needs to be translated to R code, or false, if it already was translated."""
         if node.type == self.input_node_type:
             for intf in node.outputs.values():
                 self.input_variables.add(self.variables.get_variable_name_for_node_interface(intf))
@@ -54,14 +54,14 @@ class GraphTranslationState:
         return node.id not in self.translated_node_ids
 
     def add_translation(self, node: BaklavaNode, translations: List[str]):
-        """Remember R-code translation of a single node."""
+        """Remember R code translation of a single node."""
         if node.id in self.translated_node_ids:
             raise AttributeError("cannot add translation for node that is already defined")
         self.translated_node_ids.add(node.id)
         self.translations.extend(translations)
 
     def add_line(self, line: str):
-        """Add an additional line to the R-code translation, e.g., for comments."""
+        """Add an additional line to the R code translation, e.g., for comments."""
         self.translations.append(line)
 
     def get_translations(self) -> List[str]:

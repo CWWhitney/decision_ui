@@ -6,5 +6,5 @@ This section describes each individual user interface page in detail:
 - [Model Editor](model-editor)
 - [Estimate Editor](estimate-editor)
 - [Results Dashboard](results-dashboard)
-- [R-code](r-code)
+- [R Code](r-code)
 - [Settings](settings)

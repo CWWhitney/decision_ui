@@ -33,8 +33,8 @@
 <template>
     <v-card color="white" elevation="1" class="codeCard" rounded>
         <v-card-item>
-            <template #title>Generated R code</template>
-            <template #subtitle>The R script that was used to run the monte carlo simulation:</template>
+            <template #title>R Code</template>
+            <template #subtitle>The R script that corresponds to the model:</template>
             <template #append>
                 <v-btn-group>
                     <v-tooltip location="bottom" open-delay="500">
@@ -61,7 +61,7 @@
                     </v-tooltip>
                     <v-tooltip location="bottom" text="go to help section" open-delay="500">
                         <template #activator="{ props }">
-                            <v-btn v-bind="props" to="/user/workspace/help/user-interface/r-code/">
+                            <v-btn v-bind="props" to="/help/user-interface/r-code/">
                                 <template #prepend>
                                     <v-icon size="large"> mdi-help-circle-outline </v-icon>
                                 </template>

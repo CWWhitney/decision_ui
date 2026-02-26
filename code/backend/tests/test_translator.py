@@ -1,4 +1,4 @@
-"""Test Baklava model to R-code translation"""
+"""Test Baklava model to R code translation"""
 
 # pylint: disable=protected-access
 

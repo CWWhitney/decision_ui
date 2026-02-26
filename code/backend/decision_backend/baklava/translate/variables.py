@@ -134,7 +134,7 @@ class VariableManager:
         self._register_subgraph(model.get_main_graph(), RESULT_NODE_TYPE)
 
     def get_function_name_for_subgraph(self, graph: GraphParser) -> str:
-        """Return R-code function name for a subgraph."""
+        """Return R code function name for a subgraph."""
         if graph.get_id() in self.graph_id_to_name:
             return self.graph_id_to_name[graph.get_id()]
         raise KeyError(f"subgraph with id '{graph.get_id()}' does not have a function name assigned to it")

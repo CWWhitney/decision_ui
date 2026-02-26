@@ -9,7 +9,7 @@
         "inputs": {
           "note": {
             "id": "6336915f-8c1c-4c80-b43d-1534c356fa97",
-            "value": "This model contains the minimal nodes required to form a valid model: a single input estimate node connected to a single result node. Click on the blue rocket button in the right bottom corner to run the monte carlo simulation and inspect the results in the 'Results dashboard' by clicking the diagram button in the left menu.\n\nNodes may be renamed from the 3-dot menu, which influences how they are referenced in diagrams and the R-code."
+            "value": "This model contains the minimal nodes required to form a valid model: a single input estimate node connected to a single result node. Click on the blue rocket button in the right bottom corner to run the monte carlo simulation and inspect the results in the 'Results dashboard' by clicking the diagram button in the left menu.\n\nNodes may be renamed from the 3-dot menu, which influences how they are referenced in diagrams and the R code."
           }
         },
         "outputs": {},

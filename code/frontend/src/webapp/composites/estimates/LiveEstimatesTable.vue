@@ -59,7 +59,9 @@
     <v-card color="white" elevation="1" class="estimatesTableCard" rounded>
         <v-card-item>
             <template #title> Estimates Table </template>
-            <template #subtitle> All estimates of the model synchronized with the model editor: </template>
+            <template #subtitle>
+                All estimates synchronized with the model editor. Any changes will immediately be applied:
+            </template>
             <template #append>
                 <v-btn-group density="compact">
                     <v-tooltip location="bottom" text="download table as CSV" open-delay="500">

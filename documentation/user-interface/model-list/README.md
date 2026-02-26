@@ -24,5 +24,5 @@ Currently, the following information is not saved:
 
 - the result diagram
 - the EVPI diagram
-- the R-code
+- the R code
 - settings

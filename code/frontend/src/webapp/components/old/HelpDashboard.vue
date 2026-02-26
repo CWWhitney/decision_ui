@@ -17,7 +17,7 @@
         "model-editor": "Model Editor",
         "estimate-editor": "Estimate Editor",
         "results-dashboard": "Results Dashboard",
-        "r-code": "R-Code",
+        "r-code": "R Code",
         "getting-started": "Getting Started",
         "developer-guide": "Developer Guide",
         "advanced-features": "Advanced Features",

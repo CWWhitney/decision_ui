@@ -75,7 +75,7 @@ class SubgraphOutputNodeTranslator(NodeTranslator):
 
 
 class PassthroughNodeTranslator(NodeTranslator):
-    """Passthrough translator used for Type Contraint nodes. Will not generate any R-code."""
+    """Passthrough translator used for Type Contraint nodes. Will not generate any R code."""
 
     def __call__(self, graph: GraphParser, node: BaklavaNode, variables: VariableManager) -> List[str]:
         return []

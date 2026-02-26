@@ -38,7 +38,7 @@ The following settings are available:
   visualized in the EVPI diagram on the Result dashboard page.
 
 - Maximum R-Script Runtime \
-  The number of seconds that the generated R-code is allowed to run before it will be forcefully stopped. Depending
+  The number of seconds that the generated R code is allowed to run before it will be forcefully stopped. Depending
   on the complexity of your model and the CPU performance of your machine, the R-script will take more or less time to
   finish simulating all Monte Carlo runs. Please adjust this timeout appropriately.
 

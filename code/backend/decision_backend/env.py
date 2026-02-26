@@ -21,7 +21,7 @@ DSUI_R_MAX_BINS = int(os.environ.get("DSUI_MAX_HISTOGRAM_BINS", "200"))
 """Maximum number of histogram bins that can be calculated on user request"""
 
 DSUI_R_VALUE_PRECISION = int(os.environ.get("DSUI_R_VALUE_PRECISION", "5"))
-"""Maximum precision (floating point digits) when translating numbers into the R-code"""
+"""Maximum precision (floating point digits) when translating numbers into the R code"""
 
 DSUI_CORS_ORIGINS = os.environ.get("DSUI_CORS_ORIGINS", "*")
 """Origins parameter of the CORS configuration"""

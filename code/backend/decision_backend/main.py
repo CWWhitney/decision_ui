@@ -147,7 +147,7 @@ def create_app():
                     decisionSupport package"""
             },
             500: {
-                "description": """execution error that might be caused by a incorrect translation to R-code, exceeding
+                "description": """execution error that might be caused by a incorrect translation to R code, exceeding
                     limits of the number of MC runs, or other R related errors""",
                 "model": ExecutionErrorMessage,
             },
@@ -155,7 +155,7 @@ def create_app():
     )
     def monte_carlo(
         model: BaklavaModel = Body(
-            None, description="""the Baklava model that is translated into R-code and simulated"""
+            None, description="""the Baklava model that is translated into R code and simulated"""
         ),
         mc_runs: int = Query(
             50000,
@@ -196,7 +196,7 @@ def create_app():
                     result variables followed by the names of all estimate variables"""
             },
             500: {
-                "description": """execution error that might be caused by a incorrect translation to R-code, exceeding
+                "description": """execution error that might be caused by a incorrect translation to R code, exceeding
                     limits of the number of MC runs, or other R related errors""",
                 "model": ExecutionErrorMessage,
             },
@@ -204,7 +204,7 @@ def create_app():
     )
     def evpi(
         model: BaklavaModel = Body(
-            None, description="""the Baklava model that is translated into R-code and simulated"""
+            None, description="""the Baklava model that is translated into R code and simulated"""
         ),
         mc_runs: int = Query(
             1000,

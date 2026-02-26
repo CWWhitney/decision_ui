@@ -58,7 +58,7 @@ def write_estimates_csv_file(estimates_df: pd.DataFrame, file: tempfile.NamedTem
 
 
 def write_r_script_file(r_script: str, file: tempfile.NamedTemporaryFile):
-    """Write r-code file to disk."""
+    """Write r code file to disk."""
     try:
         file.write(r_script)
         file.flush()

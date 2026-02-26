@@ -15,7 +15,7 @@ The table contains the following columns:
 - `Label` \
   the estimate node label that is shown at the top of a node
 - `Variable Name` \
-  The name of the variable that is used inside the R-code for that particular estimate. It is inferred from the label
+  The name of the variable that is used inside the R code for that particular estimate. It is inferred from the label
   of an estimate.
 - `Distribution` \
   The distribution type of the estimate. It can be either `const` (deterministic estimate), `norm` (normal distribution),

@@ -2,7 +2,7 @@
 
 The model editor allows building a mathematical representation of a decision and its outcomes. It uses interconnected
 boxes called _nodes_ to design a mathematical function as a computational network called a _graph_. Because of that,
-users do not need to be familiar with writing R-code. However, eventually, the model graph is converted to R-code,
+users do not need to be familiar with writing R code. However, eventually, the model graph is converted to R code,
 which is then used to run a Monte Carlo simulation to evaluate all outcomes of a decision-making process.
 
 The model editor is divided into multiple parts:
@@ -33,7 +33,7 @@ Alternatively, you can right-click on the work space area and select a node type
 
 A node consists of various parts:
 
-- Name of the Node - references a node and is converted to a matching variable name in the R-code
+- Name of the Node - references a node and is converted to a matching variable name in the R code
 - 3-dot Menu - allows renaming or deleting a node
 - Node Inputs - properties that influence the calculations inside a node
 - Node Outputs - the results of these calculations

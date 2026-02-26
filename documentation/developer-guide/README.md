@@ -81,7 +81,7 @@ The following environment variables will be considered when running the backend:
 - `DSUI_R_MAX_BINS=200` \
   maximum number of histogram bins that can be generated in the backend (default 200)
 - `DSUI_R_VALUE_PRECISION=5` \
-  maximum floating point precision when writing numeric values in the R-code
+  maximum floating point precision when writing numeric values in the R code
 - `DSUI_CORS_ORIGINS=*` \
   backend CORS origins parameter, adapt according to your deployment strategy
 - `DSUI_CORS_METHODS=GET,POST` \

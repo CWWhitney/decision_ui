@@ -43,9 +43,9 @@
                         <v-list-item to="/estimates" v-bind="props" prepend-icon="mdi-table" title="Estimates" />
                     </template>
                 </v-tooltip>
-                <v-tooltip location="right" text="R-Code" open-delay="500">
+                <v-tooltip location="right" text="R Code" open-delay="500">
                     <template #activator="{ props }">
-                        <v-list-item to="/code" v-bind="props" prepend-icon="mdi-language-r" title="R-Code" />
+                        <v-list-item to="/code" v-bind="props" prepend-icon="mdi-language-r" title="R Code" />
                     </template>
                 </v-tooltip>
             </v-list>
