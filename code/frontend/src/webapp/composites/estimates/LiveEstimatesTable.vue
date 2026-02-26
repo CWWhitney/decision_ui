@@ -173,8 +173,8 @@
                 />
                 <vue-excel-column :field="common.ESTIMATES_CSV_NODE_HEADER" invisible />
             </vue-excel-editor>
-            <v-alert v-else type="info" elevation="2">
-                No estimates yet. Please add an Estimate node in the graph editor.
+            <v-alert v-else type="info" variant="outlined">
+                There are no estimates yet. Please add at least one estimate node to your model.
             </v-alert>
         </v-card-text>
     </v-card>

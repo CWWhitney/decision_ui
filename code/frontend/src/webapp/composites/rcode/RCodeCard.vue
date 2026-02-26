@@ -73,23 +73,26 @@
             </template>
         </v-card-item>
 
-        <highlightjs
-            v-if="rcode.computedRCode !== null"
-            language="r"
-            :autodetect="false"
-            :code="rcode.computedRCode"
-            class="code"
-        />
-        <v-alert v-else type="info" elevation="2"> No R code to see.. Run the model first! </v-alert>
+        <v-card-text>
+            <highlightjs
+                v-if="rcode.computedRCode !== null"
+                language="r"
+                :autodetect="false"
+                :code="rcode.computedRCode"
+                class="code"
+            />
+            <v-alert v-else type="info" variant="outlined"> Please add at least one result node to you model! </v-alert>
+        </v-card-text>
     </v-card>
 </template>
 
 <style scoped lang="scss">
     .codeCard {
         padding: 1em;
+        width: 100%;
 
         pre {
-            margin: 1em;
+            margin: 1em 0 0 0;
             overflow-y: auto;
             border: 1px solid #ddd;
             min-height: 2em;
