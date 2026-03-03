@@ -12,7 +12,7 @@
     const route = useRoute();
 
     const form = ref<boolean>(false);
-    const email = ref<string>("");
+    const username = ref<string>("");
     const password = ref<string>("");
     const snackbarNetworkErrorVisible = ref<boolean>(false);
     const snackbarRegisterSuccessVisible = ref<boolean>(!!route.query.registered);
@@ -20,19 +20,19 @@
     const formErrorMessage = ref<string>("");
     const showPass = ref<boolean>(false);
 
-    watch([email, password], () => (formErrorMessage.value = ""));
+    watch([username, password], () => (formErrorMessage.value = ""));
 
     const login = async () => {
         await doLoginRequest({
-            email: email.value,
+            username: username.value,
             password: password.value,
             onSuccess: (token: string) => {
-                userStore.doLogin(email.value, token);
+                userStore.doLogin(username.value, token);
                 router.push("/user/files");
             },
             onWrongCredentials: () => {
                 snackbarLoginFailedVisible.value = true;
-                formErrorMessage.value = "Wrong email or password";
+                formErrorMessage.value = "Wrong username or password";
             }
         });
     };
@@ -59,10 +59,10 @@
                         </v-toolbar>
                         <v-card-text>
                             <v-text-field
-                                v-model="email"
-                                prepend-icon="mdi-email-outline"
-                                name="email"
-                                label="Email"
+                                v-model="username"
+                                prepend-icon="mdi-account-circle"
+                                name="username"
+                                label="Username"
                                 type="text"
                                 :rules="[required]"
                                 :error="!!formErrorMessage"

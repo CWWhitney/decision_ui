@@ -1,5 +1,4 @@
 <script setup lang="ts">
-    import LoginRefresh from "./components/old/LoginRefresh.vue";
     import NetworkErrorSnackbar from "./components/old/NetworkErrorSnackbar.vue";
     import GlobalDialogs from "./composites/global/GlobalDialogs.vue";
     import GlobalShortcuts from "./composites/global/GlobalShortcuts.vue";
@@ -12,7 +11,6 @@
         <GlobalShortcuts />
         <GlobalDialogs />
         <GlobalTensorflowSetup />
-        <LoginRefresh />
         <NetworkErrorSnackbar />
     </v-app>
 </template>

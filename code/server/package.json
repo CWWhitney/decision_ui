@@ -1,31 +1,39 @@
 {
-  "name": "@uni-bonn/decision-support-ui_server",
-  "version": "0.2.1",
-  "description": "webserver hosting decision support ui",
-  "private": true,
-  "scripts": {
-    "build": "tsc -p .",
-    "watch-build": "tsc -p . -w --preserveWatchOutput",
-    "watch-server": "nodemon -w ./build ./build/src/run.js",
-    "watch": "concurrently -k -c auto -n build,server \"npm run watch-build\" \"npm run watch-server\"",
-    "lint": "eslint .",
-    "start": "node build/src/run.js"
-  },
-  "dependencies": {
-    "compression": "^1.8.1",
-    "express": "^5.2.1",
-    "http-proxy-middleware": "^3.0.5",
-    "nocache": "^4.0.0",
-    "winston": "^3.19.0"
-  },
-  "devDependencies": {
-    "@types/compression": "^1.8.1",
-    "@types/express": "^5.0.6",
-    "@typescript-eslint/parser": "^8.52.0",
-    "@typescript-eslint/eslint-plugin": "^8.52.0",
-    "concurrently": "^9.2.1",
-    "eslint": "^9.39.2",
-    "nodemon": "^3.1.11",
-    "typescript": "^5.9.3"
-  }
+    "name": "@uni-bonn/decision-support-ui_server",
+    "version": "0.2.1",
+    "description": "webserver hosting decision support ui",
+    "private": true,
+    "scripts": {
+        "build": "tsc -p .",
+        "watch-build": "tsc -p . -w --preserveWatchOutput",
+        "watch-server": "nodemon -w ./build ./build/src/run.js",
+        "watch": "concurrently -k -c auto -n build,server \"npm run watch-build\" \"npm run watch-server\"",
+        "lint": "eslint .",
+        "start": "node build/src/run.js"
+    },
+    "dependencies": {
+        "@decision-support-ui/common": "file:../common",
+        "bcrypt": "^6.0.0",
+        "compression": "^1.8.1",
+        "express": "^5.2.1",
+        "http-proxy-middleware": "^3.0.5",
+        "jsonwebtoken": "^9.0.3",
+        "nocache": "^4.0.0",
+        "sequelize": "^6.37.7",
+        "sqlite3": "^5.1.7",
+        "uuid": "^13.0.0",
+        "winston": "^3.19.0"
+    },
+    "devDependencies": {
+        "@types/bcrypt": "^6.0.0",
+        "@types/compression": "^1.8.1",
+        "@types/jsonwebtoken": "^9.0.10",
+        "@types/express": "^5.0.6",
+        "@typescript-eslint/parser": "^8.52.0",
+        "@typescript-eslint/eslint-plugin": "^8.52.0",
+        "concurrently": "^9.2.1",
+        "eslint": "^9.39.2",
+        "nodemon": "^3.1.11",
+        "typescript": "^5.9.3"
+    }
 }

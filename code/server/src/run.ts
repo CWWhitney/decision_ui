@@ -7,6 +7,7 @@ import * as nocache from "nocache";
 import { createProxyMiddleware } from "http-proxy-middleware";
 
 import { logger } from "./logging";
+import { getRestApi } from "./rest";
 
 logger.info("starting web server");
 
@@ -21,8 +22,16 @@ app.use(compress());
 app.use(nocache());
 app.set("etag", false);
 
+// enable json parsing
+app.use(express.json());
+
+// enable html form data parsing
+app.use(express.urlencoded({ extended: true }));
+
+app.use("/api", getRestApi());
+
 // proxy api calls
-app.use("/api", createProxyMiddleware({
+/*app.use("/api", createProxyMiddleware({
     target: "http://localhost:8000/api",
     changeOrigin: true,
     on: {
@@ -32,7 +41,7 @@ app.use("/api", createProxyMiddleware({
             }
         }
     }
-}));
+}));*/
 
 // serve static files
 const pathToStatic = path.join(__dirname, "../../../frontend/dist/webapp");
@@ -56,4 +65,4 @@ const exitHandler = async (signal: string) => {
     process.kill(process.pid, signal);
 };
 
-["SIGUSR2", "SIGINT", "SIGTERM", "SIGHUP"].forEach((signal) => process.once(signal, exitHandler));
+["SIGUSR2", "SIGINT", "SIGTERM", "SIGHUP"].forEach(signal => process.once(signal, exitHandler));

@@ -7,8 +7,11 @@
     import { useRoute } from "vue-router";
     import TopHelpMenu from "./TopHelpMenu.vue";
     import TopRunMenu from "./TopRunMenu.vue";
+    import TopAccountMenu from "./TopAccountMenu.vue";
+    import { useAccountStore } from "@/state/account";
 
     const metadata = useMetadataStore();
+    const account = useAccountStore();
 
     const route = useRoute();
     const isEditorRoute = route.name == "editor";
@@ -78,7 +81,22 @@
                         <TopHelpMenu />
                     </v-menu>
 
-                    <v-btn prepend-icon="mdi-account-circle" text="Account" disabled variant="plain"></v-btn>
+                    <v-menu>
+                        <template #activator="{ props }">
+                            <v-btn
+                                v-bind="props"
+                                prepend-icon="mdi-account-circle"
+                                :color="account.isLoggedIn ? 'primary' : undefined"
+                                :text="
+                                    account.isLoggedIn && account.persisted.username
+                                        ? account.persisted.username
+                                        : 'Account'
+                                "
+                                variant="plain"
+                            ></v-btn>
+                        </template>
+                        <TopAccountMenu />
+                    </v-menu>
                 </v-btn-group>
             </div>
         </div>
