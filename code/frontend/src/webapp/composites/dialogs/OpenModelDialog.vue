@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { loadModelFileToState, uploadModelFile } from "@/state/io";
+    import { loadModelFileToState } from "@/state/io";
     import {
         OPEN_MODEL_FROM_ACCOUNT_TAB,
         OPEN_MODEL_FROM_EXAMPLE_TAB,
@@ -18,11 +18,6 @@
 
     const onExampleModelClick = (file: common.ModelFileState) => {
         loadModelFileToState(file);
-        openModelDialog.closeDialog();
-    };
-
-    const onUploadFileClick = () => {
-        uploadModelFile();
         openModelDialog.closeDialog();
     };
 </script>
@@ -67,7 +62,7 @@
                                 text="Upload a File"
                                 color="primary"
                                 variant="outlined"
-                                @click="onUploadFileClick"
+                                @click="openModelDialog.uploadAndLoadModelFile"
                             ></v-btn>
                         </div>
                     </v-tabs-window-item>

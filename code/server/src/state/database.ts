@@ -47,6 +47,7 @@ UserTable.init(
 export class ModelTable extends Model<InferAttributes<ModelTable>, InferCreationAttributes<ModelTable>> {
     declare id: CreationOptional<number>;
     declare name: string;
+    declare description: string;
     declare userId: ForeignKey<UserTable["id"]>;
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
@@ -61,6 +62,7 @@ ModelTable.init(
             primaryKey: true
         },
         name: DataTypes.STRING,
+        description: DataTypes.STRING,
         createdAt: DataTypes.DATE,
         updatedAt: DataTypes.DATE,
         file: DataTypes.JSONB

@@ -6,13 +6,20 @@
     import DsuiLogo from "../../../resources/images/logo_large.svg";
     import { useRouter } from "vue-router";
     import { OPEN_MODEL_FROM_EXAMPLE_TAB, useOpenModelDialogStore } from "@/state/open_model";
+    import { useLoginDialogStore } from "@/state/account/login_dialog";
 
     const router = useRouter();
     const openModelDialog = useOpenModelDialogStore();
+    const loginDialog = useLoginDialogStore();
 
     const onExamplesClick = () => {
         router.push({ name: "editor" });
         openModelDialog.openDialog(OPEN_MODEL_FROM_EXAMPLE_TAB);
+    };
+
+    const onLoginClick = () => {
+        router.push({ name: "editor" });
+        loginDialog.openDialog();
     };
 </script>
 
@@ -51,7 +58,7 @@
                     </v-btn>
                 </div>
                 <div>
-                    <v-btn to="/login" class="menuButton" variant="outlined" disabled>
+                    <v-btn to="/login" class="menuButton" variant="outlined" @click="onLoginClick">
                         <template #prepend>
                             <v-icon size="32px"> mdi-login </v-icon>
                         </template>

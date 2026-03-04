@@ -1,4 +1,4 @@
-import { Schema } from "jsonschema";
+import { Schema } from "ajv";
 import {
     AVAILABLE_EDGE_STYLE_TYPES,
     AVAILABLE_EDITOR_BACKGROUNDS,

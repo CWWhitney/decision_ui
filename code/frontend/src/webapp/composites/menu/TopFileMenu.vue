@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import TopMenuItem from "@/components/menu/TopMenuItem.vue";
     import { resetState } from "@/state";
-    import { downloadModelFile, uploadModelFile } from "@/state/io";
+    import { downloadModelFile } from "@/state/io";
     import { OPEN_MODEL_FROM_FILE_TAB, useOpenModelDialogStore } from "@/state/open_model";
 
     const openModelDialog = useOpenModelDialogStore();
@@ -26,7 +26,11 @@
             />
             <v-divider />
             <TopMenuItem title="Export as File ..." shortcut="CTRL + E" @click="downloadModelFile" />
-            <TopMenuItem title="Import from File ..." shortcut="CTRL + I" @click="uploadModelFile" />
+            <TopMenuItem
+                title="Import from File ..."
+                shortcut="CTRL + I"
+                @click="openModelDialog.uploadAndLoadModelFile"
+            />
             <v-divider />
             <TopMenuItem title="Settings" disabled @click="console.log('settings click')" />
         </v-list>

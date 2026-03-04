@@ -1,12 +1,13 @@
 import * as express from "express";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
+import * as common from "@decision-support-ui/common";
 
 import { v4 as uuidv4 } from "uuid";
 
 import { addUser, findUserByUsername } from "../state/queries";
-import { UserTable } from "../state/database";
 import { logger } from "../logging";
+import { validateJsonBody } from "./common";
 
 const BEARER_HEADER = process.env.BEARER_HEADER || "Authorization";
 
@@ -49,7 +50,7 @@ const generateRefreshToken = (id: number) => {
 };
 
 const hashPassword = async (password: string) => {
-    return bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
+    return await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
 };
 
 const verifyPassword = async (password: string, hash: string) => {
@@ -61,41 +62,47 @@ const REFRESH_TOKENS: Set<string> = new Set<string>();
 export const getAuthenticationApi = () => {
     const app = express();
 
-    app.post("/register", async (req, res) => {
+    // register new account
+    app.post("/register", validateJsonBody(common.RegisterRequestSchema), async (req, res) => {
         const { username, password } = req.body;
 
         if (username.length < 3) {
-            return res.status(400).json({ error: "username needs to consist of at least 3 characters" });
+            return res
+                .status(400)
+                .json(common.makeErrorResponseBody("username needs to consist of at least 3 characters"));
         }
 
         if (password.length < 8) {
-            return res.status(400).json({ error: "password needs to consist of at least 8 characters" });
+            return res
+                .status(400)
+                .json(common.makeErrorResponseBody("password needs to consist of at least 8 characters"));
         }
 
         const user = await findUserByUsername(username);
         if (user) {
             logger.info(`registration for already existing user`);
-            return res.status(400).json({ error: "username already exists" });
+            return res.status(403).json(common.makeErrorResponseBody("username already exists"));
         }
         logger.info(`successful registration`);
 
         await addUser(username, await hashPassword(password));
-        return res.sendStatus(200);
+        return res.status(200).json({});
     });
 
-    app.post("/jwt/login", async (req, res) => {
+    // login to existing account
+    app.post("/jwt/login", validateJsonBody(common.LoginRequestSchema), async (req, res) => {
         const { username, password } = req.body;
 
         const user = await findUserByUsername(username);
         if (!user) {
             logger.info(`login with unknown username`);
-            return res.status(400).json({ error: "invalid credentials" });
+            return res.status(403).json(common.makeErrorResponseBody("invalid credentials"));
         }
 
         const isValidPassword = await verifyPassword(password, user.password);
         if (!isValidPassword) {
             logger.info(`login with incorrect password`);
-            return res.status(400).json({ error: "invalid credentials" });
+            return res.status(403).json(common.makeErrorResponseBody("invalid credentials"));
         }
         logger.info(`successful login`);
 
@@ -104,25 +111,26 @@ export const getAuthenticationApi = () => {
 
         REFRESH_TOKENS.add(refreshToken);
 
-        res.json({ accessToken, refreshToken });
+        res.status(200).json({ accessToken, refreshToken });
     });
 
-    app.post("/jwt/refresh", (req, res) => {
+    // refresh login tokens
+    app.post("/jwt/refresh", validateJsonBody(common.RefreshRequestSchema), (req, res) => {
         const { refreshToken } = req.body;
 
         if (!refreshToken) {
             logger.info(`not jwt refresh token provided, cannot refresh`);
-            return res.status(400).json({ message: "invalid refresh token" });
+            return res.status(403).json(common.makeErrorResponseBody("invalid refresh token"));
         }
         if (!REFRESH_TOKENS.has(refreshToken)) {
             logger.info(`jwt refresh token not known, cannot refresh`);
-            return res.status(400).json({ message: "invalid refresh token" });
+            return res.status(403).json(common.makeErrorResponseBody("invalid refresh token"));
         }
 
         jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, (err: jwt.VerifyErrors | null, token: RefreshToken) => {
             if (err) {
                 logger.info(`jwt refresh token cannot be verified`, err);
-                return res.status(400).json({ message: "invalid refresh token" });
+                return res.status(403).json(common.makeErrorResponseBody("invalid refresh token"));
             }
 
             REFRESH_TOKENS.delete(refreshToken);
@@ -136,13 +144,14 @@ export const getAuthenticationApi = () => {
         });
     });
 
-    app.post("/jwt/logout", (req, res) => {
+    // logout of account
+    app.post("/jwt/logout", validateJsonBody(common.LogoutRequestSchema), (req, res) => {
         const { refreshToken } = req.body;
         if (!REFRESH_TOKENS.has(refreshToken)) {
             logger.info(`jwt refresh token not found during logout`);
         }
         REFRESH_TOKENS.delete(refreshToken);
-        res.sendStatus(200);
+        res.send(200).json({});
     });
 
     return app;
@@ -159,7 +168,7 @@ export const authenticateRoute = (req: express.Request, res: express.Response, n
 
     if (!bearerHeader || !bearerHeader.startsWith("Bearer ")) {
         logger.error("received request for protected route without bearer token");
-        return res.sendStatus(401);
+        return res.send(401).json(common.makeErrorResponseBody("invalid access token"));
     }
 
     const accessToken = bearerHeader.split(" ")[1];
@@ -167,7 +176,7 @@ export const authenticateRoute = (req: express.Request, res: express.Response, n
     jwt.verify(accessToken, ACCESS_TOKEN_SECRET, (err: jwt.VerifyErrors | null, token: AccessToken) => {
         if (err) {
             logger.error("received request with invalid access token");
-            return res.sendStatus(401);
+            return res.status(401).json(common.makeErrorResponseBody("invalid access token"));
         }
 
         req.authenticatedUserId = token.id;

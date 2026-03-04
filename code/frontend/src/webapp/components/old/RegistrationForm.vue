@@ -2,7 +2,7 @@
     import { ref, watch } from "vue";
     import { useRouter } from "vue-router";
     import axios, { AxiosError, type AxiosResponse } from "axios";
-    import { getBackendBaseURL } from "../../backend/common";
+    import { getBackendBaseURL } from "../../rest/common";
 
     const router = useRouter();
 

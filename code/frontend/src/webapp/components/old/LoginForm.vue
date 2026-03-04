@@ -4,7 +4,7 @@
 
     import { useUserStore } from "../../state/old/user";
     import { useModelStore } from "../../state/old/model";
-    import { doLoginRequest } from "../../backend/authentication";
+    import { generateDoLoginRequest } from "../../rest/authentication";
 
     const userStore = useUserStore();
     const modelStore = useModelStore();
@@ -23,7 +23,7 @@
     watch([username, password], () => (formErrorMessage.value = ""));
 
     const login = async () => {
-        await doLoginRequest({
+        await generateDoLoginRequest({
             username: username.value,
             password: password.value,
             onSuccess: (token: string) => {

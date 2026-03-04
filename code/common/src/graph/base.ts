@@ -1,4 +1,4 @@
-import { Schema } from "jsonschema";
+import { Schema } from "ajv";
 import { Edge, EdgeSchema } from "./edge";
 import { Node, NodeSchema } from "./node";
 

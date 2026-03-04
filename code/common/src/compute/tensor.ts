@@ -12,7 +12,7 @@ export const getTypedTensorFromConstant = (t: tf.Tensor): TypedTensor => ({
     isSeries: false
 });
 
-export const getSeriesLengthFromTypedTensor = (tt: TypedTensor) => {
+export const getSeriesLengthFromTypedTensor = (tt: TypedTensor): number => {
     if (!tt.isSeries) {
         throw new Error(`cannot determine series length for non-series tensor`);
     }
@@ -21,7 +21,7 @@ export const getSeriesLengthFromTypedTensor = (tt: TypedTensor) => {
         if (tt.tensor.shape.length < 2) {
             throw new Error(`cannot determine series length for tensor with shape ${JSON.stringify(tt.tensor.shape)}`);
         }
-        return tt.tensor.shape[1];
+        return tt.tensor.shape[1] as number;
     }
     return tt.tensor.shape[0];
 };

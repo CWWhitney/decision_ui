@@ -7,7 +7,7 @@
     import { useUserStore } from "../state/user";
     import { useModelStore } from "../state/model";
 
-    import { getBackendBaseURL, AUTHORIZATION_HEADER } from "../../backend/common";
+    import { getBackendBaseURL, AUTHORIZATION_HEADER } from "../../rest/common";
 
     const nameDialog = ref<boolean>(false);
     const modelName = ref<string>("");

@@ -6,6 +6,7 @@
         "rootDir": ".",
         "allowJs": false,
         "noImplicitAny": true,
+        "skipLibCheck": true,
         "sourceMap": false,
         "lib": ["dom", "es2017"]
     },

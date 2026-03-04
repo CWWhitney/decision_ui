@@ -31,6 +31,7 @@
         "@vue-flow/node-resizer": "^1.5.0",
         "@vue-flow/node-toolbar": "^1.1.1",
         "@vueuse/core": "^14.1.0",
+        "ajv": "^8.18.0",
         "axios": "^1.13.2",
         "baklavajs": "2.6.0",
         "chart.js": "^4.5.1",

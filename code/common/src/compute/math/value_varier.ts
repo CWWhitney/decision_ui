@@ -19,10 +19,10 @@ export const probabilisticValuerVarier = ({
     n: number;
     varMean: tf.Tensor;
     varCv: tf.Tensor;
-    absoluteTrend?: tf.Tensor;
-    relativeTrend?: tf.Tensor;
-    lowerLimit?: tf.Tensor;
-    upperLimit?: tf.Tensor;
+    absoluteTrend?: tf.Tensor | null;
+    relativeTrend?: tf.Tensor | null;
+    lowerLimit?: tf.Tensor | null;
+    upperLimit?: tf.Tensor | null;
 }) => {
     const varMeanSeries = probabilisticTensorToProbabilisticSeries(varMean, n);
     const varCvSeries = probabilisticTensorToProbabilisticSeries(varCv, n);
@@ -71,10 +71,10 @@ export const deterministicValuerVarier = ({
     n: number;
     varMean: tf.Tensor | number;
     varCv: tf.Tensor | number;
-    absoluteTrend?: tf.Tensor | number;
-    relativeTrend?: tf.Tensor | number;
-    lowerLimit?: tf.Tensor | number;
-    upperLimit?: tf.Tensor | number;
+    absoluteTrend?: tf.Tensor | number | null;
+    relativeTrend?: tf.Tensor | number | null;
+    lowerLimit?: tf.Tensor | number | null;
+    upperLimit?: tf.Tensor | number | null;
 }) => {
     const varMeanSeries = scalarTensorToSeries(varMean, n);
     const varCvSeries = scalarTensorToSeries(varCv, n);

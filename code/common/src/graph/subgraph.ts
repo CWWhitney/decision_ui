@@ -6,7 +6,7 @@ export const filterNodesVisibleInSubgraph = (targetSubgraphId: SubgraphId | null
 
 export const projectNodeToSubgraph = (
     node: Node,
-    targetSubgraphNodeId: SubgraphId,
+    targetSubgraphNodeId: SubgraphId | null,
     getSubgraphAncestors: (nodeId: NodeId) => Node[]
 ): Node | null => {
     if (node.subgraphParentId == targetSubgraphNodeId) {

@@ -1,4 +1,4 @@
-import { Schema } from "jsonschema";
+import { Schema } from "ajv";
 
 export interface Position {
     x: number;

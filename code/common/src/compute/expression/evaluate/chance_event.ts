@@ -24,12 +24,12 @@ export const chanceEventExpression = ({
 }: {
     mcRuns: number;
     chance: ExpressionValue;
-    valueIf?: ExpressionValue;
-    valueIfNot?: ExpressionValue;
-    n?: ExpressionValue;
-    cvIf?: ExpressionValue;
-    cvIfNot?: ExpressionValue;
-    oneDraw?: ExpressionValue;
+    valueIf?: ExpressionValue | null;
+    valueIfNot?: ExpressionValue | null;
+    n?: ExpressionValue | null;
+    cvIf?: ExpressionValue | null;
+    cvIfNot?: ExpressionValue | null;
+    oneDraw?: ExpressionValue | null;
 }): TypedTensorValue => {
     // default values
     let chanceTT = assertTensorValue(chance, "chanve_event 'chance'");

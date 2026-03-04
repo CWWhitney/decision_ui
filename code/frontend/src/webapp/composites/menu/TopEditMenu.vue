@@ -2,7 +2,7 @@
     import TopMenuItem from "@/components/menu/TopMenuItem.vue";
     import { useEditorStore } from "@/state/editor";
     import { useGraphStore } from "@/state/graph";
-    import { insertGraphFromClipboard, saveGraphFileToClipboard } from "@/state/io";
+    import { generateInsertGraphFromClipboard, saveGraphFileToClipboard } from "@/state/io";
     import type { Position } from "@decision-support-ui/common";
     import { useVueFlow } from "@vue-flow/core";
     import { computed } from "vue";
@@ -20,6 +20,8 @@
 
     const graph = useGraphStore();
     const editor = useEditorStore();
+
+    const insertGraphFromClipboard = generateInsertGraphFromClipboard();
 
     const route = useRoute();
     const isEditorRoute = route.name == "editor";

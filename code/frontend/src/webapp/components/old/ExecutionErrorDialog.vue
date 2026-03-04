@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import type { ExecutionError } from "../../backend/models";
+    import type { ExecutionError } from "../../rest/models";
     import { ref } from "vue";
 
     const show_dialog = ref<boolean>(false);

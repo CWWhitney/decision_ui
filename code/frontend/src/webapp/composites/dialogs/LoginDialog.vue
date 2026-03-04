@@ -3,6 +3,7 @@
 
     import { useLoginDialogStore } from "@/state/account/login_dialog";
     import { useAccountStore } from "@/state/account";
+    import { USERNAME_REGEX_PATTERN } from "@decision-support-ui/common";
 
     const account = useAccountStore();
     const loginDialog = useLoginDialogStore();
@@ -49,6 +50,14 @@
         return value.length >= min || `needs to have at least ${min} characters`;
     };
 
+    const maxLength = (max: number) => (value: string) => {
+        return value.length <= max || `cannot have more than ${max} characters`;
+    };
+
+    const usernamePattern = (value: string) => {
+        return !!value.match(USERNAME_REGEX_PATTERN) || `only letters and numbers are allowed`;
+    };
+
     watch(
         () => loginDialog.isOpen,
         () => {
@@ -82,7 +91,7 @@
                         name="username"
                         label="Username"
                         type="text"
-                        :rules="[required, minLength(3)]"
+                        :rules="[required, minLength(3), maxLength(64), usernamePattern]"
                         :error="!!errorMessage"
                     />
                     <v-text-field
@@ -92,7 +101,7 @@
                         name="password"
                         label="Password"
                         :append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
-                        :rules="[required, minLength(8)]"
+                        :rules="[required, minLength(8), maxLength(32)]"
                         :type="showPass ? 'text' : 'password'"
                         :error-messages="errorMessage"
                         :error="!!errorMessage"
@@ -101,9 +110,7 @@
                     />
                 </v-card-text>
                 <v-card-actions>
-                    <v-btn color="primary" type="submit" :disabled="!form" @click="register"
-                        >Register New Account</v-btn
-                    >
+                    <v-btn color="primary" :disabled="!form" @click="register">Register New Account</v-btn>
                     <v-spacer />
                     <v-btn color="primary" type="submit" :disabled="!form" @click="login">Login</v-btn>
                 </v-card-actions>

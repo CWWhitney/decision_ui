@@ -1,4 +1,4 @@
-import { Schema } from "jsonschema";
+import { Schema } from "ajv";
 import { DISTRIBUTION_TYPES, DistributionType } from "../../compute";
 
 export const ESTIMATE_FUNCTION_TYPE = "estimate";

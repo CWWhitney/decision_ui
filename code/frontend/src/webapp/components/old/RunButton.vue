@@ -8,7 +8,7 @@
     import { useModelStore, type DecisionSupportResult, type EVPIResult } from "../../state/old/model";
     import { useUserStore } from "../../state/old/user";
 
-    import { doRunModel, type ExecutionError } from "../../backend/models";
+    import { doRunModel, type ExecutionError } from "../../rest/models";
 
     const { getEvpi = false } = defineProps<{ getEvpi?: boolean }>();
 

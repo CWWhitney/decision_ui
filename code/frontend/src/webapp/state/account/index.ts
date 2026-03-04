@@ -1,8 +1,14 @@
-import { doLoginRequest, doLogoutRequest, doRefreshRequest, doRegisterRequest } from "@/backend/authentication";
-import { registerUnauthorizedInterceptor } from "@/backend/interceptors";
+import {
+    generateDoLoginRequest,
+    generateDoRegisterRequest,
+    generateDoRefreshRequest,
+    generateDoLogoutRequest
+} from "@/rest/authentication";
+import { registerUnauthorizedInterceptor } from "@/rest/interceptors";
 import { useSessionStorage } from "@vueuse/core";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
+import { useErrorDialogStore } from "../error_dialog";
 
 const ACCOUNT_STORE_ID = "account";
 const REFRESH_INTERVAL = 60000; // 60 seconds
@@ -25,6 +31,13 @@ const getDefaultTransientAccountState = () => {
 };
 
 export const useAccountStore = defineStore(ACCOUNT_STORE_ID, () => {
+    const doLoginRequest = generateDoLoginRequest();
+    const doRefreshRequest = generateDoRefreshRequest();
+    const doLogoutRequest = generateDoLogoutRequest();
+    const doRegisterRequest = generateDoRegisterRequest();
+
+    const errorDialog = useErrorDialogStore();
+
     const persisted = useSessionStorage(ACCOUNT_STORE_ID, getDefaultPersistedAccountState());
     const transient = ref(getDefaultTransientAccountState());
 
@@ -45,7 +58,13 @@ export const useAccountStore = defineStore(ACCOUNT_STORE_ID, () => {
                 transient.value.accessToken = accessToken;
                 onSuccess();
             },
-            onWrongCredentials
+            onWrongCredentials,
+            onError: m =>
+                errorDialog.openDialog(
+                    "Login Failed",
+                    "There was a technical problem while logging in. Please try again later.",
+                    m
+                )
         });
     };
 

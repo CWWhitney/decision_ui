@@ -1,4 +1,4 @@
-import { Schema } from "jsonschema";
+import { Schema } from "ajv";
 
 import { Position, PositionSchema, Size, SizeSchema } from "../../editor/layout";
 import {
@@ -29,21 +29,21 @@ import {
 export type NodeId = string;
 export type SubgraphId = NodeId;
 
+export interface NodeVisualization<S extends NodeStyleState> {
+    title: string;
+    position: Position;
+    size: Size;
+    style: S;
+    autoConnect: boolean;
+}
+
 export interface AbstractNode<T, F extends NodeFunctionState, S extends NodeStyleState> {
     id: NodeId;
     type: T;
     nodeParentId: NodeId | null;
     subgraphParentId: SubgraphId | null;
-
     function: F;
-
-    visualization: {
-        title: string;
-        position: Position;
-        size: Size;
-        style: S;
-        autoConnect: boolean;
-    };
+    visualization: NodeVisualization<S>;
 }
 
 export type VariableNode = AbstractNode<VariableNodeType, VariableNodeFunctionState, VariableNodeStyleState>;

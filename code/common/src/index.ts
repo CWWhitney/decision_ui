@@ -5,3 +5,4 @@ export * from "./editor";
 export * from "./io";
 export * from "./examples";
 export * from "./csv";
+export * from "./rest";

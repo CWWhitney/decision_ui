@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import { resetState } from "@/state";
     import { useComputationStore } from "@/state/computation";
-    import { downloadModelFile, uploadModelFile } from "@/state/io";
+    import { downloadModelFile } from "@/state/io";
     import { useOpenModelDialogStore } from "@/state/open_model";
     import { onMounted, onUnmounted } from "vue";
     import { useRouter } from "vue-router";
@@ -32,7 +32,7 @@
         // import from file (ctrl + i)
         if ((e.ctrlKey || e.metaKey) && e.key === "i") {
             e.preventDefault();
-            uploadModelFile();
+            openModelDialog.uploadAndLoadModelFile();
         }
 
         // open documentation (ctrl + h)

@@ -1,4 +1,4 @@
-import { Schema } from "jsonschema";
+import { Schema } from "ajv";
 
 import { Graph, GraphSchema } from "../../graph";
 import { MetadataFileState, MetadataFileSchema } from "./metadata";

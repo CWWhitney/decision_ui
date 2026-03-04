@@ -13,6 +13,7 @@
     },
     "dependencies": {
         "@decision-support-ui/common": "file:../common",
+        "ajv": "^8.18.0",
         "bcrypt": "^6.0.0",
         "compression": "^1.8.1",
         "express": "^5.2.1",

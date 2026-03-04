@@ -58,18 +58,18 @@ export const saveGraphFileToClipboard = (selectedNodeIds: common.NodeId[]) => {
     navigator.clipboard.writeText(JSON.stringify(json, null, 2));
 };
 
-export const insertGraphFromClipboard = async (
-    targetPosition: common.Position,
-    targetSubgraphId: common.SubgraphId | null
-) => {
-    const jsonText = await navigator.clipboard.readText();
-    const graphFile = JSON.parse(jsonText) as common.GraphFileState;
-    const validationErrors = common.validateJson(graphFile, common.GraphFileSchema);
-    if (!validationErrors) {
-        insertGraphFileToState(graphFile, targetPosition, targetSubgraphId);
-    } else {
-        console.error("validation errors", validationErrors);
-    }
+export const generateInsertGraphFromClipboard = () => {
+    const validateGraph = common.validateSchema(common.GraphFileSchema);
+    return async (targetPosition: common.Position, targetSubgraphId: common.SubgraphId | null) => {
+        const jsonText = await navigator.clipboard.readText();
+        const graphFile = JSON.parse(jsonText) as common.GraphFileState;
+        const error = validateGraph(graphFile);
+        if (!error) {
+            insertGraphFileToState(graphFile, targetPosition, targetSubgraphId);
+        } else {
+            console.error(`validation error ${error}`);
+        }
+    };
 };
 
 export const insertGraphFileToState = (
@@ -120,17 +120,6 @@ export const downloadModelFile = () => {
     const date = new Date().toISOString().split("T")[0];
     const filename = `${date}_${state.metadata.name.replace(/\s/, "_")}.json`;
     downloadJson(state, filename);
-};
-
-export const uploadModelFile = async () => {
-    const text = await uploadFile();
-    const state = JSON.parse(text) as common.ModelFileState;
-    const validationErrors = common.validateJson(state, common.ModelFileSchema);
-    if (!validationErrors) {
-        loadModelFileToState(state);
-    } else {
-        console.error("validation errors", validationErrors);
-    }
 };
 
 export const downloadJson = (json: object, filename: string) => {

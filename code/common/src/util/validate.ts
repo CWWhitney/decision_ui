@@ -1,17 +1,27 @@
-import { Schema, Validator } from "jsonschema";
+import Ajv, { Schema } from "ajv";
+import { prettify } from "awesome-ajv-errors";
 
-export const validateJson = <T>(json: T, schema: Schema): string[] | null => {
-    try {
-        const validator = new Validator();
-        const result = validator.validate(json, schema);
-
-        if (result.valid) {
-            return null;
+export const validateSchema = <T>(schema: Schema): ((json: T) => string | false) => {
+    const ajv = new Ajv({
+        allErrors: true,
+        strict: false
+    });
+    const validate = ajv.compile(schema);
+    return (json: T) => {
+        try {
+            const valid = validate(json);
+            if (!valid) {
+                if (validate.errors) {
+                    // return validate.errors?.map(e => `${e.instancePath}: ${e.message}`);
+                    return prettify(validate, { data: json, colors: false, location: true });
+                } else {
+                    return `unknown validation error`;
+                }
+            }
+            return false;
+        } catch (e) {
+            console.warn("unexpected error validating json", e);
+            return `unexpected validation error: ${e.message}`;
         }
-
-        return result.errors.map(e => `'${e.path}' ${e.message}`);
-    } catch (e) {
-        console.warn("error validating json", e);
-        return [`error validating json: ${e.message}`];
-    }
+    };
 };

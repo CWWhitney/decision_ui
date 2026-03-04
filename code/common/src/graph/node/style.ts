@@ -1,4 +1,4 @@
-import { Schema } from "jsonschema";
+import { Schema } from "ajv";
 
 export const COST_STYLE_TYPE = "cost";
 export const BENEFIT_STYLE_TYPE = "benefit";
@@ -151,10 +151,13 @@ export const NodeStyleSchema: Schema = {
             },
             then: {
                 properties: {
-                    shape: { enum: [NODE_STYLE_BOX_SHAPE, NODE_STYLE_ROUNDED_BOX_SHAPE, NODE_STYLE_ELLIPSE_SHAPE] },
+                    shape: {
+                        type: "string",
+                        enum: NODE_STYLE_SHAPE_VARIANTS
+                    },
                     backgroundColor: { type: "string" },
                     borderWidth: { type: "number" },
-                    border: { enum: [NODE_STYLE_BORDER_SOLID, NODE_STYLE_BORDER_DASHED, NODE_STYLE_BORDER_DOTTED] }
+                    border: { enum: NODE_STYLE_BORDER_VARIANTS }
                 },
                 required: ["shape", "backgroundColor", "borderWidth", "border"]
             }

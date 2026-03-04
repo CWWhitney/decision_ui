@@ -1,4 +1,4 @@
-import { Schema } from "jsonschema";
+import { Schema } from "ajv";
 import { Node, NodeId } from "./node";
 import { projectNodeToSubgraph } from "./subgraph";
 
