@@ -1,7 +1,7 @@
-import { useSessionStorage } from "@vueuse/core";
 import { defineStore } from "pinia";
 import * as common from "@decision-support-ui/common";
 import { ref } from "vue";
+import { useValidatedSessionStorage } from "./io";
 
 export const COMPUTATION_STORE_ID = "computation";
 
@@ -23,9 +23,15 @@ const getDefaultComputationState = (): common.ComputationFileState => {
 };
 
 export const useComputationStore = defineStore(COMPUTATION_STORE_ID, () => {
+    const validateComputationState = common.validateSchema(common.ComputationFileSchema);
+
     // --- persisted state
     const transient = ref<common.ComputationTransientState>(getDefaultComputationTransientState());
-    const persisted = useSessionStorage(COMPUTATION_STORE_ID, getDefaultComputationState());
+    const persisted = useValidatedSessionStorage(
+        COMPUTATION_STORE_ID,
+        getDefaultComputationState(),
+        validateComputationState
+    );
 
     const toggleGpuAcceleration = () => {
         persisted.value.gpuAcceleration = !persisted.value.gpuAcceleration;

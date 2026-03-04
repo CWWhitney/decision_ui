@@ -69,8 +69,6 @@
                 return null;
             }
 
-            triggerComputedDependencies();
-            await sleep(UI_REFRESH_SLEEP_TIMEOUT);
             const histogramData = await common.getMultiHistogramDataFromTensors(
                 typedTensors.value.map(t => t.tensor),
                 computation.persisted.histogramBins

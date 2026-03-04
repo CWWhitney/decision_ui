@@ -4,6 +4,7 @@ import { useGraphStore } from "./graph";
 import { useEditorStore } from "./editor";
 import { useComputationStore } from "./computation";
 import { useMetadataStore } from "./metadata";
+import { useSessionStorage } from "@vueuse/core";
 
 export const getModelFileFromState = (): common.ModelFileState => {
     const graph = useGraphStore();
@@ -152,5 +153,28 @@ export const uploadFile = async (): Promise<string> => {
         };
 
         input.click();
+    });
+};
+
+export const useValidatedSessionStorage = <T>(
+    key: string,
+    fallbackState: T,
+    validate: (state: T) => string | false
+) => {
+    return useSessionStorage(key, fallbackState, {
+        serializer: {
+            read: (raw: string) => {
+                const json = JSON.parse(raw);
+                const error = validate(json);
+                if (!error) {
+                    return json as T;
+                }
+                console.error(`error validating state from session storage:\n\n${error}`);
+                return fallbackState;
+            },
+            write: (state: T) => {
+                return JSON.stringify(state);
+            }
+        }
     });
 };

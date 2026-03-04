@@ -1,8 +1,8 @@
-import { useSessionStorage } from "@vueuse/core";
 import { defineStore } from "pinia";
 import { useGraphStore } from "./graph";
 
 import * as common from "@decision-support-ui/common";
+import { useValidatedSessionStorage } from "./io";
 
 export const FLOW_METADATA_STORE_ID = "metadata";
 
@@ -18,10 +18,15 @@ const getDefaultMetadataState = (): common.MetadataFileState => {
 };
 
 export const useMetadataStore = defineStore(FLOW_METADATA_STORE_ID, () => {
+    const validatePersistedMetadataState = common.validateSchema(common.MetadataFileSchema);
     const graphStore = useGraphStore();
 
     // --- persisted state
-    const state = useSessionStorage(FLOW_METADATA_STORE_ID, getDefaultMetadataState());
+    const state = useValidatedSessionStorage(
+        FLOW_METADATA_STORE_ID,
+        getDefaultMetadataState(),
+        validatePersistedMetadataState
+    );
 
     const reset = () => {
         state.value = getDefaultMetadataState();

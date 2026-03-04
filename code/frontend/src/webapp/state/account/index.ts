@@ -1,3 +1,5 @@
+import * as common from "@decision-support-ui/common";
+
 import {
     generateDoLoginRequest,
     generateDoRegisterRequest,
@@ -5,10 +7,11 @@ import {
     generateDoLogoutRequest
 } from "@/rest/authentication";
 import { registerUnauthorizedInterceptor } from "@/rest/interceptors";
-import { useSessionStorage } from "@vueuse/core";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import { useErrorDialogStore } from "../error_dialog";
+import type { Schema } from "ajv";
+import { useValidatedSessionStorage } from "../io";
 
 const ACCOUNT_STORE_ID = "account";
 const REFRESH_INTERVAL = 60000; // 60 seconds
@@ -22,6 +25,16 @@ interface PersistedAccountState {
     refreshToken: string | null;
 }
 
+const PersistedAccountSchema: Schema = {
+    title: "PersistedAccountSchema",
+    type: "object",
+    properties: {
+        username: { type: ["string", "null"] },
+        refreshToken: { type: ["string", "null"] }
+    },
+    required: ["username", "refreshToken"]
+};
+
 const getDefaultPersistedAccountState = () => {
     return { username: null, refreshToken: null } as PersistedAccountState;
 };
@@ -31,6 +44,7 @@ const getDefaultTransientAccountState = () => {
 };
 
 export const useAccountStore = defineStore(ACCOUNT_STORE_ID, () => {
+    const validatePersistedAccountState = common.validateSchema(PersistedAccountSchema);
     const doLoginRequest = generateDoLoginRequest();
     const doRefreshRequest = generateDoRefreshRequest();
     const doLogoutRequest = generateDoLogoutRequest();
@@ -38,7 +52,11 @@ export const useAccountStore = defineStore(ACCOUNT_STORE_ID, () => {
 
     const errorDialog = useErrorDialogStore();
 
-    const persisted = useSessionStorage(ACCOUNT_STORE_ID, getDefaultPersistedAccountState());
+    const persisted = useValidatedSessionStorage(
+        ACCOUNT_STORE_ID,
+        getDefaultPersistedAccountState(),
+        validatePersistedAccountState
+    );
     const transient = ref(getDefaultTransientAccountState());
 
     const reset = () => {

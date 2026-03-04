@@ -3,26 +3,31 @@ import { computed } from "vue";
 import { type Connection as VueFlowConnection } from "@vue-flow/core";
 
 import { defineStore } from "pinia";
-import { useRefHistory, useSessionStorage } from "@vueuse/core";
+import { useRefHistory } from "@vueuse/core";
 
 import * as common from "@decision-support-ui/common";
 
 import { useComputationStore } from "./computation";
 import { makeSafeComputedGetterByKey } from "@/common/computed";
+import { useValidatedSessionStorage } from "./io";
 
 export const FLOW_GRAPH_STORE_ID = "graph";
 
+const defaultGraphState = () => {
+    return {
+        nodes: [],
+        edges: []
+    } as common.Graph;
+};
+
 export const useGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
     const computationStore = useComputationStore();
+    const validateGraph = common.validateSchema(common.GraphSchema);
     const evaluateExpressionForVariableDependencies = common.getExpressionEvaluatorForVariableDependencies();
     const evaluateExpressionMatch = common.getExpressionMatchEvaluator();
 
     // --- persisted state
-    const state = useSessionStorage(FLOW_GRAPH_STORE_ID, {
-        nodes: [] as common.Node[],
-        edges: [] as common.Edge[]
-    });
-
+    const state = useValidatedSessionStorage(FLOW_GRAPH_STORE_ID, defaultGraphState(), validateGraph);
     const history = useRefHistory(state, { deep: true, capacity: 50 });
 
     // --- computed state
@@ -249,10 +254,7 @@ export const useGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
 
     const reset = () => {
         console.log("clear history");
-        state.value = {
-            nodes: [],
-            edges: []
-        };
+        state.value = defaultGraphState();
         history.commit();
         history.clear();
     };

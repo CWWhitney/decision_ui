@@ -11,7 +11,7 @@ import {
 import * as common from "@decision-support-ui/common";
 import { useGraphStore } from "./graph";
 import { getHandlePositions } from "@/common/layout";
-import { useSessionStorage } from "@vueuse/core";
+import { useValidatedSessionStorage } from "./io";
 
 export const EDITOR_STORE_ID = "editor";
 
@@ -34,11 +34,16 @@ const getDefaultEditorPersistedState = (): common.EditorStorePersistedState => {
 
 export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
     const graphStore = useGraphStore();
+    const validatePersistedEditorState = common.validateSchema(common.EditorFileSchema);
 
     // --- state
 
     const transient = ref<common.EditorStoreTansientState>(getDefaultEditorTransientState());
-    const persisted = useSessionStorage(EDITOR_STORE_ID, getDefaultEditorPersistedState());
+    const persisted = useValidatedSessionStorage(
+        EDITOR_STORE_ID,
+        getDefaultEditorPersistedState(),
+        validatePersistedEditorState
+    );
 
     // computed
 

@@ -4,8 +4,6 @@ import * as compress from "compression";
 import * as http from "http";
 import * as nocache from "nocache";
 
-import { createProxyMiddleware } from "http-proxy-middleware";
-
 import { logger } from "./logging";
 import { getRestApi } from "./rest";
 
@@ -29,19 +27,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", getRestApi());
-
-// proxy api calls
-/*app.use("/api", createProxyMiddleware({
-    target: "http://localhost:8000/api",
-    changeOrigin: true,
-    on: {
-        proxyReq: (proxyReq, req) => {
-            if ('x-auth-token' in req.headers) {
-                proxyReq.setHeader('Authorization', req.headers['x-auth-token']);
-            }
-        }
-    }
-}));*/
 
 // serve static files
 const pathToStatic = path.join(__dirname, "../../../frontend/dist/webapp");

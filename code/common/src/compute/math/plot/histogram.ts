@@ -100,7 +100,6 @@ export const getMultiHistogramDataFromTensors = async (
 
         // caluclate combined bins
         const combinedTensor = tf.concat(probabilisticTensors);
-        console.log(`combined tensor has shape of ${combinedTensor.shape}`);
         const combinedLength = combinedTensor.size;
 
         const loRank = Math.ceil(lowerQ * combinedLength);
