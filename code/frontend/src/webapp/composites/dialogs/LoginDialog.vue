@@ -1,46 +1,12 @@
 <script lang="ts" setup>
-    import { ref, watch } from "vue";
+    import { ref } from "vue";
 
     import { useLoginDialogStore } from "@/state/account/login_dialog";
-    import { useAccountStore } from "@/state/account";
     import { USERNAME_REGEX_PATTERN } from "@decision-support-ui/common";
 
-    const account = useAccountStore();
     const loginDialog = useLoginDialogStore();
 
     const form = ref<boolean>(false);
-    const username = ref<string>("");
-    const password = ref<string>("");
-    const errorMessage = ref<string>("");
-    const showPass = ref<boolean>(false);
-
-    watch([username, password], () => (errorMessage.value = ""));
-
-    const login = () => {
-        account.login(
-            username.value,
-            password.value,
-            () => {
-                loginDialog.closeDialog();
-            },
-            () => {
-                errorMessage.value = "wrong credentials";
-            }
-        );
-    };
-
-    const register = () => {
-        account.register(
-            username.value,
-            password.value,
-            () => {
-                loginDialog.closeDialog();
-            },
-            () => {
-                errorMessage.value = "username already registered";
-            }
-        );
-    };
 
     const required = (value: string) => {
         return !!value || "required";
@@ -57,14 +23,6 @@
     const usernamePattern = (value: string) => {
         return !!value.match(USERNAME_REGEX_PATTERN) || `only letters and numbers are allowed`;
     };
-
-    watch(
-        () => loginDialog.isOpen,
-        () => {
-            username.value = "";
-            password.value = "";
-        }
-    );
 </script>
 
 <template>
@@ -86,33 +44,33 @@
                 <v-card-text>
                     <p>Login in to an existing account or register a new account:</p>
                     <v-text-field
-                        v-model="username"
+                        v-model="loginDialog.username"
                         prepend-icon="mdi-account-circle"
                         name="username"
                         label="Username"
                         type="text"
                         :rules="[required, minLength(3), maxLength(64), usernamePattern]"
-                        :error="!!errorMessage"
+                        :error="!!loginDialog.errorMessage"
                     />
                     <v-text-field
                         id="password"
-                        v-model="password"
+                        v-model="loginDialog.password"
                         prepend-icon="mdi-lock"
                         name="password"
                         label="Password"
-                        :append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
+                        :append-icon="loginDialog.showPass ? 'mdi-eye' : 'mdi-eye-off'"
                         :rules="[required, minLength(8), maxLength(32)]"
-                        :type="showPass ? 'text' : 'password'"
-                        :error-messages="errorMessage"
-                        :error="!!errorMessage"
-                        @click:append="showPass = !showPass"
-                        @keyup.enter="login"
+                        :type="loginDialog.showPass ? 'text' : 'password'"
+                        :error-messages="loginDialog.errorMessage"
+                        :error="!!loginDialog.errorMessage"
+                        @click:append="loginDialog.toggleShowPass"
+                        @keyup.enter="loginDialog.login"
                     />
                 </v-card-text>
                 <v-card-actions>
-                    <v-btn color="primary" :disabled="!form" @click="register">Register New Account</v-btn>
+                    <v-btn color="primary" :disabled="!form" @click="loginDialog.register">Register New Account</v-btn>
                     <v-spacer />
-                    <v-btn color="primary" type="submit" :disabled="!form" @click="login">Login</v-btn>
+                    <v-btn color="primary" type="submit" :disabled="!form" @click="loginDialog.login">Login</v-btn>
                 </v-card-actions>
             </v-form>
         </v-card>

@@ -23,9 +23,6 @@ app.set("etag", false);
 // enable json parsing
 app.use(express.json());
 
-// enable html form data parsing
-app.use(express.urlencoded({ extended: true }));
-
 app.use("/api", getRestApi());
 
 // serve static files

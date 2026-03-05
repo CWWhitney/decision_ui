@@ -5,6 +5,7 @@ import { useEditorStore } from "./editor";
 import { useComputationStore } from "./computation";
 import { useMetadataStore } from "./metadata";
 import { useSessionStorage } from "@vueuse/core";
+import { useSaveModelDialogStore } from "./save_model_dialog";
 
 export const getModelFileFromState = (): common.ModelFileState => {
     const graph = useGraphStore();
@@ -96,18 +97,22 @@ export const insertGraphFileToState = (
     });
 };
 
-export const loadModelFileToState = (file: common.ModelFileState): void => {
+export const loadModelFileToState = (modelId: number | null, file: common.ModelFileState): void => {
     const graph = useGraphStore();
     const editor = useEditorStore();
     const computation = useComputationStore();
     const metadata = useMetadataStore();
+    const saveModelDialog = useSaveModelDialogStore();
+
+    saveModelDialog.setModelId(modelId);
+
+    editor.reset();
+    editor.loadFromFile(file.editor);
 
     graph.reset();
     graph.$patch({ state: file.graph });
     graph.history.commit();
     graph.history.clear();
-
-    editor.loadFromFile(file.editor);
 
     computation.reset();
     computation.$patch({ persisted: file.computation });
@@ -116,10 +121,9 @@ export const loadModelFileToState = (file: common.ModelFileState): void => {
     metadata.$patch({ state: file.metadata });
 };
 
-export const downloadModelFile = () => {
-    const state = getModelFileFromState();
+export const downloadModelFile = (state: common.ModelFileState) => {
     const date = new Date().toISOString().split("T")[0];
-    const filename = `${date}_${state.metadata.name.replace(/\s/, "_")}.json`;
+    const filename = `${date}_${state.metadata.name.replace(/\s/g, "_")}.json`;
     downloadJson(state, filename);
 };
 

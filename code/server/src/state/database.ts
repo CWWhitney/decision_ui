@@ -11,7 +11,7 @@ import {
 
 const sequelize = new Sequelize({
     dialect: "sqlite",
-    storage: "database.sqlite",
+    storage: "data/database.sqlite",
     define: {
         freezeTableName: true
     }

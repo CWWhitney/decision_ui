@@ -160,7 +160,6 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
     // actions
 
     const loadFromFile = (newState: common.EditorFileState) => {
-        reset();
         persisted.value = { ...newState };
         transient.value = {
             shouldFitOnNextUpdate: true,

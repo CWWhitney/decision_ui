@@ -60,6 +60,7 @@
             padding: 0.5em;
             border: 1px solid #eee;
             background: rgb(250, 250, 250);
+            overflow: auto;
         }
     }
 </style>

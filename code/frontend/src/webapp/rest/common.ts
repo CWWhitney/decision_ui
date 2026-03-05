@@ -3,9 +3,8 @@ import * as common from "@decision-support-ui/common";
 import { type Schema } from "ajv";
 import type { AxiosError, AxiosResponse } from "axios";
 
-export const AUTHORIZATION_HEADER = (import.meta.env.VITE_BACKEND_AUTH_HEADER || "Authorization").trim();
-
-export const REQUEST_TIMEOUT = 2000;
+export const BEARER_HEADER = (import.meta.env.VITE_BEARER_HEADER || "Authorization").trim();
+export const REQUEST_TIMEOUT = parseInt(import.meta.env.VITE_REQUSET_TIMEOUT) || 2000;
 
 const _getBackendBaseURL = async (): Promise<string> => {
     if (window && (window as any).api && (window as any).api.getBackendBaseURL) {

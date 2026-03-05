@@ -10,7 +10,7 @@ COPY .git /root/workspace/.git
 RUN bash /root/workspace/bin/install.sh
 
 # build
-ENV VITE_BACKEND_AUTH_HEADER="X-Auth-Token"
+ENV VITE_BEARER_HEADER="X-Auth-Token"
 RUN bash /root/workspace/bin/build.sh
 
 # start backend and frontend

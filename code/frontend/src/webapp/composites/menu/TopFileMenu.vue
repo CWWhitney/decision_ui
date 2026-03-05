@@ -1,10 +1,11 @@
 <script setup lang="ts">
     import TopMenuItem from "@/components/menu/TopMenuItem.vue";
     import { resetState } from "@/state";
-    import { downloadModelFile } from "@/state/io";
-    import { OPEN_MODEL_FROM_FILE_TAB, useOpenModelDialogStore } from "@/state/open_model";
+    import { useOpenModelDialogStore } from "@/state/open_model";
+    import { useSaveModelDialogStore } from "@/state/save_model_dialog";
 
     const openModelDialog = useOpenModelDialogStore();
+    const saveModelDialog = useSaveModelDialogStore();
 </script>
 
 <template>
@@ -12,27 +13,9 @@
         <v-list class="list">
             <TopMenuItem title="New" shortcut="ALT + N" @click="resetState" />
             <v-divider />
-            <TopMenuItem
-                title="Open..."
-                shortcut="CTRL + O"
-                @click="openModelDialog.openDialog(OPEN_MODEL_FROM_FILE_TAB)"
-            />
-            <TopMenuItem title="Save" shortcut="CTRL + S" disabled @click="console.log('save click')" />
-            <TopMenuItem
-                title="Save As..."
-                shortcut="CTRL + SHIFT + S"
-                disabled
-                @click="console.log('save as click')"
-            />
-            <v-divider />
-            <TopMenuItem title="Export as File ..." shortcut="CTRL + E" @click="downloadModelFile" />
-            <TopMenuItem
-                title="Import from File ..."
-                shortcut="CTRL + I"
-                @click="openModelDialog.uploadAndLoadModelFile"
-            />
-            <v-divider />
-            <TopMenuItem title="Settings" disabled @click="console.log('settings click')" />
+            <TopMenuItem title="Open..." shortcut="CTRL + O" @click="openModelDialog.openDialog()" />
+            <TopMenuItem title="Save" shortcut="CTRL + S" @click="saveModelDialog.saveCurrent()" />
+            <TopMenuItem title="Save As..." shortcut="CTRL + SHIFT + S" @click="saveModelDialog.openDialog()" />
         </v-list>
     </v-card>
 </template>

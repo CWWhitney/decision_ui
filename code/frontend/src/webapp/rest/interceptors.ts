@@ -6,7 +6,7 @@ export const registerUnauthorizedInterceptor = (onUnauthorized: () => void) => {
             return response;
         },
         async (error: AxiosError) => {
-            if (error.code === "ERR_BAD_REQUEST" && error.status == 400) {
+            if (error.code === "ERR_BAD_REQUEST" && error.status == 401) {
                 onUnauthorized();
             }
             throw error;

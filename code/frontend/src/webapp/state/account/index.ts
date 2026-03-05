@@ -124,11 +124,11 @@ export const useAccountStore = defineStore(ACCOUNT_STORE_ID, () => {
     };
 
     const isLoggedIn = computed(() => {
-        return persisted.value.username && persisted.value.refreshToken;
+        return !!persisted.value.username && !!persisted.value.refreshToken && !!transient.value.accessToken;
     });
 
     registerUnauthorizedInterceptor(() => {
-        logout();
+        reset();
     });
 
     // keep token fresh

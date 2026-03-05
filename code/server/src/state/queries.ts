@@ -1,6 +1,6 @@
 import { Model, Op } from "sequelize";
 import { ModelTable, UserTable } from "./database";
-import { ModelFileState } from "@decision-support-ui/common";
+import { ModelFileState, ListModelsEntry } from "@decision-support-ui/common";
 
 export const findUserByUsername = async (username: string) => {
     return await UserTable.findOne({
@@ -16,19 +16,30 @@ export const addUser = async (username: string, password: string) => {
     return await UserTable.create({ username, password });
 };
 
-export const listModelsForUser = async (userId: number, limit = 100) => {
-    return await ModelTable.findAll({
-        attributes: {
-            exclude: ["file"]
-        },
-        where: {
-            userId: {
-                [Op.eq]: userId
-            }
-        },
-        order: ["updatedAt", "DESC"],
-        limit
-    });
+export const listModelsForUser = async (userId: number, limit = 100): Promise<ListModelsEntry[]> => {
+    return (
+        await ModelTable.findAll({
+            attributes: {
+                exclude: ["file", "userId"]
+            },
+            where: {
+                userId: {
+                    [Op.eq]: userId
+                }
+            },
+            order: [["updatedAt", "DESC"]],
+            limit
+        })
+    ).map(
+        model =>
+            ({
+                id: model.id,
+                name: model.name,
+                description: model.description,
+                createdAt: model.createdAt.toUTCString(),
+                updatedAt: model.updatedAt.toUTCString()
+            }) as ListModelsEntry
+    );
 };
 
 export const getModel = async (modelId: number) => {

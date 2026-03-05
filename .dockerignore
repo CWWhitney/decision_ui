@@ -7,4 +7,5 @@ code/backend/.venv
 code/backend/data/*
 code/backend/decision_backend.egg-info
 code/backend/dist
+code/server/data/*
 deployment/staging/data

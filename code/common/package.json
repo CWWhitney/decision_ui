@@ -1,6 +1,6 @@
 {
     "name": "@decision-support-ui/common",
-    "version": "0.0.1",
+    "version": "0.3.0",
     "description": "common types and functions",
     "author": "Thomas Low <code@thomaslow.com>",
     "private": true,

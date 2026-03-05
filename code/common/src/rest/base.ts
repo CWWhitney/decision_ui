@@ -25,3 +25,11 @@ export const EmptyResponseSchema: Schema = {
     type: "object",
     additionalProperties: false
 };
+
+export type EmptyOrErrorResponseBody = EmptyResponseBody | ErrorResponseBody;
+
+export const EmptyOrErrorResponseSchema: Schema = {
+    title: "EmptyOrErrorResponseSchema",
+    type: "object",
+    oneOf: [ErrorResponseSchema, EmptyResponseSchema]
+};

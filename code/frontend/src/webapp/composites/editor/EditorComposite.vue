@@ -128,6 +128,7 @@
     };
 
     const onNodesInitialized = () => {
+        console.log("nodes initialized");
         // fit view to subgraph if it was changed (or on initial load)
         if (editor.transient.shouldFitOnNextUpdate) {
             editor.markAsFittedOnUpdate();

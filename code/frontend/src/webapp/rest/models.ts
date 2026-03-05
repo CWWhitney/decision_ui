@@ -1,117 +1,204 @@
+import {
+    AddModelResponseSchema,
+    DeleteModelResponseSchema,
+    GetModelResponseSchema,
+    ListModelsResponseSchema,
+    UpdateModelResponseSchema,
+    type AddModelRequestBody,
+    type ListModelsEntry,
+    type ModelFileState,
+    type UpdateModelRequestBody
+} from "@decision-support-ui/common";
+import { BEARER_HEADER, getBackendBaseURL, REQUEST_TIMEOUT, validateAxiosResponse } from "./common";
 import axios, { AxiosError, type AxiosResponse } from "axios";
-import { AUTHORIZATION_HEADER, getBackendBaseURL } from "./common";
-import type { DecisionSupportResult, EVPIResult } from "../state/old/model";
 
-export interface ModelData {
-    id: string;
-    name: string;
-    content: string;
-    saved: string;
-    owner_id: string;
-}
-
-export interface ExecutionError {
-    reason: string;
-    r_script: string;
-    estimates: string;
-    stderr: string;
-}
-
-export const doQueryModels = async ({
-    token,
-    onSuccess,
-    onError
-}: {
-    token: string;
-    onSuccess: (models: ModelData[]) => void;
-    onError: () => void;
-}) => {
-    axios
-        .get((await getBackendBaseURL()) + "/api/v1/decision_models/", {
-            headers: {
-                [AUTHORIZATION_HEADER]: `Bearer ${token}`
+export const generateListModelsRequest = () => {
+    const validateResponse = validateAxiosResponse(ListModelsResponseSchema);
+    return async ({
+        accessToken,
+        onSuccess = () => {},
+        onError = () => {}
+    }: {
+        accessToken: string;
+        onSuccess?: (models: ListModelsEntry[]) => void;
+        onError?: (message: string) => void;
+    }) => {
+        return validateResponse(
+            axios.get((await getBackendBaseURL()) + "/api/models/for_user", {
+                headers: {
+                    [BEARER_HEADER]: `Bearer ${accessToken}`
+                },
+                timeout: REQUEST_TIMEOUT
+            }),
+            (response: AxiosResponse) => {
+                if (response.status === 200) {
+                    return onSuccess(response.data.models);
+                }
+                return onError(`unknown success status '${response.status}' while retrieving model list`);
+            },
+            (message: string) => {
+                console.error(`validation error while retrieving model list:\n\n${message}`);
+                return onError(message);
+            },
+            (error: AxiosError) => {
+                console.error(`unknown axios error`, error);
+                return onError(error.message);
             }
-        })
-        .then((response: AxiosResponse) => {
-            return onSuccess(response.data as ModelData[]);
-        })
-        .catch((response: AxiosError) => {
-            console.error(`Error retrieving models: ${JSON.stringify(response, null, 2)}`);
-            return onError();
-        });
+        );
+    };
 };
 
-export const doDeleteModel = async ({
-    token,
-    modelId,
-    onSuccess,
-    onError
-}: {
-    token: string;
-    modelId: string;
-    onSuccess: () => void;
-    onError: () => void;
-}) => {
-    axios
-        .delete((await getBackendBaseURL()) + "/api/v1/decision_models/" + modelId, {
-            headers: {
-                [AUTHORIZATION_HEADER]: `Bearer ${token}`
+export const generateAddModelRequest = () => {
+    const validateResponse = validateAxiosResponse(AddModelResponseSchema);
+    return async ({
+        accessToken,
+        modelfile,
+        onSuccess = () => {},
+        onMaxModelsReached = () => {},
+        onError = () => {}
+    }: {
+        accessToken: string;
+        modelfile: ModelFileState;
+        onSuccess?: (modelId: number) => void;
+        onMaxModelsReached?: () => void;
+        onError?: (message: string) => void;
+    }) => {
+        return validateResponse(
+            axios.post((await getBackendBaseURL()) + "/api/models/model", { modelfile } as AddModelRequestBody, {
+                headers: { "Content-Type": "application/json", [BEARER_HEADER]: `Bearer ${accessToken}` },
+                timeout: REQUEST_TIMEOUT
+            }),
+            (response: AxiosResponse) => {
+                if (response.status === 200) {
+                    return onSuccess(response.data.modelId);
+                }
+                return onError(`unknown success status '${response.status}' while adding model`);
+            },
+            (message: string) => {
+                console.error(`validation error while adding model:\n\n${message}`);
+                return onError(message);
+            },
+            (error: AxiosError) => {
+                if (error.status == 403) {
+                    return onMaxModelsReached();
+                }
+                console.error(`unknown axios error`, error);
+                return onError(error.message);
             }
-        })
-        .then(() => {
-            return onSuccess();
-        })
-        .catch((response: AxiosError) => {
-            console.error(`Error deleting model: ${JSON.stringify(response, null, 2)}`);
-            return onError();
-        });
+        );
+    };
 };
 
-export const doRunModel = async ({
-    token,
-    model,
-    mcRuns,
-    bins,
-    timeout,
-    getEvpi,
-    onSuccess,
-    onExecutionError,
-    onUnknownError
-}: {
-    token: string;
-    model: any;
-    mcRuns: number;
-    bins: number;
-    timeout: number;
-    getEvpi: boolean;
-    onSuccess: (results: DecisionSupportResult | EVPIResult) => void;
-    onExecutionError: (error: ExecutionError) => void;
-    onUnknownError: () => void;
-}) => {
-    const route = getEvpi ? "/api/v1/evpi" : "/api/v1/monte_carlo";
-    const options = `?mc_runs=${mcRuns}&timeout=${timeout}` + (getEvpi ? `` : `&bins=${bins}`);
-    axios
-        .post((await getBackendBaseURL()) + route + options, model, {
-            headers: {
-                [AUTHORIZATION_HEADER]: `Bearer ${token}`
+export const generateGetModelRequest = () => {
+    const validateResponse = validateAxiosResponse(GetModelResponseSchema);
+    return async ({
+        accessToken,
+        modelId,
+        onSuccess = () => {},
+        onError = () => {}
+    }: {
+        accessToken: string;
+        modelId: number;
+        onSuccess?: (modelId: number, modelfile: ModelFileState) => void;
+        onError?: (message: string) => void;
+    }) => {
+        return validateResponse(
+            axios.get((await getBackendBaseURL()) + `/api/models/model/${modelId}`, {
+                headers: { "Content-Type": "application/json", [BEARER_HEADER]: `Bearer ${accessToken}` },
+                timeout: REQUEST_TIMEOUT
+            }),
+            (response: AxiosResponse) => {
+                if (response.status === 200) {
+                    return onSuccess(response.data.id, response.data.modelfile);
+                }
+                return onError(`unknown success status '${response.status}' while retrieving model`);
+            },
+            (message: string) => {
+                console.error(`validation error while retrieving model:\n\n${message}`);
+                return onError(message);
+            },
+            (error: AxiosError) => {
+                console.error(`unknown axios error`, error);
+                return onError(error.message);
             }
-        })
-        .then((response: AxiosResponse) => {
-            if (getEvpi) {
-                onSuccess(response.data as EVPIResult);
-            } else {
-                onSuccess(response.data as DecisionSupportResult);
+        );
+    };
+};
+
+export const generateDeleteModelRequest = () => {
+    const validateResponse = validateAxiosResponse(DeleteModelResponseSchema);
+    return async ({
+        accessToken,
+        modelId,
+        onSuccess = () => {},
+        onError = () => {}
+    }: {
+        accessToken: string;
+        modelId: number;
+        onSuccess?: () => void;
+        onError?: (message: string) => void;
+    }) => {
+        return validateResponse(
+            axios.delete((await getBackendBaseURL()) + `/api/models/model/${modelId}`, {
+                headers: { "Content-Type": "application/json", [BEARER_HEADER]: `Bearer ${accessToken}` },
+                timeout: REQUEST_TIMEOUT
+            }),
+            (response: AxiosResponse) => {
+                if (response.status === 200) {
+                    return onSuccess();
+                }
+                return onError(`unknown success status '${response.status}' while deleting model`);
+            },
+            (message: string) => {
+                console.error(`validation error while deleting model:\n\n${message}`);
+                return onError(message);
+            },
+            (error: AxiosError) => {
+                console.error(`unknown axios error`, error);
+                return onError(error.message);
             }
-        })
-        .catch((error: AxiosError) => {
-            if (error.response?.status === 422) {
-                // unprocessable content
-                onUnknownError();
-            } else if (error.response?.status === 500) {
-                onExecutionError(error.response?.data as ExecutionError);
-            } else {
-                // unknown error
-                onUnknownError();
+        );
+    };
+};
+
+export const generateUpdateModelRequest = () => {
+    const validateResponse = validateAxiosResponse(UpdateModelResponseSchema);
+    return async ({
+        accessToken,
+        modelId,
+        modelfile,
+        onSuccess = () => {},
+        onError = () => {}
+    }: {
+        accessToken: string;
+        modelId: number;
+        modelfile: ModelFileState;
+        onSuccess?: () => void;
+        onError?: (message: string) => void;
+    }) => {
+        return validateResponse(
+            axios.put(
+                (await getBackendBaseURL()) + `/api/models/model/${modelId}`,
+                { modelfile } as UpdateModelRequestBody,
+                {
+                    headers: { "Content-Type": "application/json", [BEARER_HEADER]: `Bearer ${accessToken}` },
+                    timeout: REQUEST_TIMEOUT
+                }
+            ),
+            (response: AxiosResponse) => {
+                if (response.status === 200) {
+                    return onSuccess();
+                }
+                return onError(`unknown success status '${response.status}' while saving model`);
+            },
+            (message: string) => {
+                console.error(`validation error while saving model:\n\n${message}`);
+                return onError(message);
+            },
+            (error: AxiosError) => {
+                console.error(`unknown axios error`, error);
+                return onError(error.message);
             }
-        });
+        );
+    };
 };

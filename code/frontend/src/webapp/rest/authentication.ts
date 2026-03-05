@@ -76,7 +76,7 @@ export const generateDoRefreshRequest = () => {
             }),
             (response: AxiosResponse) => {
                 if (response.status === 200) {
-                    return onSuccess(response.data.access_token, response.data.refreshToken);
+                    return onSuccess(response.data.accessToken, response.data.refreshToken);
                 }
                 return onError(`unknown success status '${response.status}' while refreshing tokens`);
             },

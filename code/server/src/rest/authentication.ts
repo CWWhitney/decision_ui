@@ -9,7 +9,7 @@ import { addUser, findUserByUsername } from "../state/queries";
 import { logger } from "../logging";
 import { validateJsonBody } from "./common";
 
-const BEARER_HEADER = process.env.BEARER_HEADER || "Authorization";
+const BEARER_HEADER = process.env.VITE_BEARER_HEADER || "Authorization";
 
 const BCRYPT_SALT_ROUNDS = parseInt(process.env.BCRYPT_SALT_ROUNDS) || 10;
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || "default";
@@ -151,7 +151,7 @@ export const getAuthenticationApi = () => {
             logger.info(`jwt refresh token not found during logout`);
         }
         REFRESH_TOKENS.delete(refreshToken);
-        res.send(200).json({});
+        res.status(200).json({});
     });
 
     return app;
@@ -164,11 +164,11 @@ declare module "express-serve-static-core" {
 }
 
 export const authenticateRoute = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const bearerHeader = req.headers[BEARER_HEADER] as string;
+    const bearerHeader = req.get(BEARER_HEADER);
 
     if (!bearerHeader || !bearerHeader.startsWith("Bearer ")) {
         logger.error("received request for protected route without bearer token");
-        return res.send(401).json(common.makeErrorResponseBody("invalid access token"));
+        return res.status(401).json(common.makeErrorResponseBody("invalid access token"));
     }
 
     const accessToken = bearerHeader.split(" ")[1];

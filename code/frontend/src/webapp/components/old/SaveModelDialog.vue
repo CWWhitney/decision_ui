@@ -7,7 +7,7 @@
     import { useUserStore } from "../state/user";
     import { useModelStore } from "../state/model";
 
-    import { getBackendBaseURL, AUTHORIZATION_HEADER } from "../../rest/common";
+    import { getBackendBaseURL, BEARER_HEADER } from "../../rest/common";
 
     const nameDialog = ref<boolean>(false);
     const modelName = ref<string>("");
@@ -39,7 +39,7 @@
         axios
             .post((await getBackendBaseURL()) + "/api/v1/decision_model/", bodyContent, {
                 headers: {
-                    [AUTHORIZATION_HEADER]: `Bearer ${userStore.login.token}`
+                    [BEARER_HEADER]: `Bearer ${userStore.login.token}`
                 }
             })
             .then(response => receiveResults(response))
