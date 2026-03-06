@@ -289,13 +289,7 @@ export const getAppleAgroforestExampleModelFile = (): ModelFileState => {
                     }
                 }
             ],
-            edges: [
-                {
-                    id: "4-8",
-                    source: "4",
-                    target: "8"
-                }
-            ]
+            edges: []
         },
         metadata: {
             name: "Apple Agroforestry",
