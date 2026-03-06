@@ -70,72 +70,77 @@
                 </v-tabs>
                 <v-tabs-window v-model="openModelDialog.tab">
                     <v-tabs-window-item :value="OPEN_MODEL_FROM_ACCOUNT_TAB">
-                        <p>Open an existing model from your account:</p>
-                        <v-list class="modelList" lines="two">
-                            <v-list-item
-                                v-for="item in openModelDialog.userModelList"
-                                :key="item.id"
-                                lines="one"
-                                @click="openModelDialog.openUserModel(item.id)"
-                            >
-                                <template #prepend>
-                                    <v-avatar>
-                                        <v-icon class="grey-lighten-1"> mdi-file-outline </v-icon>
-                                    </v-avatar>
-                                </template>
-                                <template #title>
-                                    {{ item.name }}
-                                </template>
-                                <template #subtitle>
-                                    {{ item.description }}
-                                </template>
-                                <template #append>
-                                    <span class="date">
-                                        <span class="time">{{ getPrettyTime(item.updatedAt) }}</span>
-                                        <span class="day">{{ getPrettyDate(item.updatedAt) }}</span>
-                                    </span>
-                                    <v-tooltip location="bottom" text="download model as file" open-delay="500">
-                                        <template #activator="{ props }">
-                                            <v-btn
-                                                v-bind="props"
-                                                icon="mdi-download-outline"
-                                                variant="outlined"
-                                                size="small"
-                                                @click.stop="openModelDialog.downloadUserModel(item.id)"
-                                            />
-                                        </template>
-                                    </v-tooltip>
-                                    <v-tooltip
-                                        location="bottom"
-                                        :text="
-                                            openModelDialog.deleteConfirmModelId == item.id
-                                                ? 'really delete?'
-                                                : 'delete model from account'
-                                        "
-                                        open-delay="500"
-                                    >
-                                        <template #activator="{ props }">
-                                            <v-btn
-                                                v-bind="props"
-                                                :icon="
-                                                    openModelDialog.deleteConfirmModelId == item.id
-                                                        ? 'mdi-check'
-                                                        : 'mdi-trash-can-outline'
-                                                "
-                                                :color="
-                                                    openModelDialog.deleteConfirmModelId == item.id
-                                                        ? 'error'
-                                                        : undefined
-                                                "
-                                                variant="outlined"
-                                                size="small"
-                                                @click.stop="openModelDialog.onModelListDeleteClick(item.id)"
-                                            />
-                                        </template>
-                                    </v-tooltip>
-                                </template>
-                            </v-list-item>
-                        </v-list>
+                        <template v-if="openModelDialog.userModelList.length > 0">
+                            <p>Open an existing model from your account:</p>
+                            <v-list class="modelList" lines="two">
+                                <v-list-item
+                                    v-for="item in openModelDialog.userModelList"
+                                    :key="item.id"
+                                    lines="one"
+                                    @click="openModelDialog.openUserModel(item.id)"
+                                >
+                                    <template #prepend>
+                                        <v-avatar>
+                                            <v-icon class="grey-lighten-1"> mdi-file-outline </v-icon>
+                                        </v-avatar>
+                                    </template>
+                                    <template #title>
+                                        {{ item.name }}
+                                    </template>
+                                    <template #subtitle>
+                                        {{ item.description }}
+                                    </template>
+                                    <template #append>
+                                        <span class="date">
+                                            <span class="time">{{ getPrettyTime(item.updatedAt) }}</span>
+                                            <span class="day">{{ getPrettyDate(item.updatedAt) }}</span>
+                                        </span>
+                                        <v-tooltip location="bottom" text="download model as file" open-delay="500">
+                                            <template #activator="{ props }">
+                                                <v-btn
+                                                    v-bind="props"
+                                                    icon="mdi-download-outline"
+                                                    variant="outlined"
+                                                    size="small"
+                                                    @click.stop="openModelDialog.downloadUserModel(item.id)"
+                                                />
+                                            </template>
+                                        </v-tooltip>
+                                        <v-tooltip
+                                            location="bottom"
+                                            :text="
+                                                openModelDialog.deleteConfirmModelId == item.id
+                                                    ? 'really delete?'
+                                                    : 'delete model from account'
+                                            "
+                                            open-delay="500"
+                                        >
+                                            <template #activator="{ props }">
+                                                <v-btn
+                                                    v-bind="props"
+                                                    :icon="
+                                                        openModelDialog.deleteConfirmModelId == item.id
+                                                            ? 'mdi-check'
+                                                            : 'mdi-trash-can-outline'
+                                                    "
+                                                    :color="
+                                                        openModelDialog.deleteConfirmModelId == item.id
+                                                            ? 'error'
+                                                            : undefined
+                                                    "
+                                                    variant="outlined"
+                                                    size="small"
+                                                    @click.stop="openModelDialog.onModelListDeleteClick(item.id)"
+                                                />
+                                            </template>
+                                        </v-tooltip>
+                                    </template>
+                                </v-list-item>
+                            </v-list>
+                        </template>
+                        <div v-if="openModelDialog.userModelList.length == 0">
+                            <p>There are no models stored in your account yet.</p>
+                        </div>
                     </v-tabs-window-item>
                     <v-tabs-window-item :value="OPEN_MODEL_FROM_FILE_TAB">
                         <p>Open an existing model from a previously saved file:</p>
