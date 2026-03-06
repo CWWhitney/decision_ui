@@ -1,12 +1,13 @@
 <script setup lang="ts">
     import { resetState } from "@/state";
     import { useComputationStore } from "@/state/computation";
-    import { downloadModelFile } from "@/state/io";
     import { useOpenModelDialogStore } from "@/state/open_model";
+    import { useSaveModelDialogStore } from "@/state/save_model_dialog";
     import { onMounted, onUnmounted } from "vue";
     import { useRouter } from "vue-router";
 
     const openModelDialog = useOpenModelDialogStore();
+    const saveModelDialog = useSaveModelDialogStore();
     const computation = useComputationStore();
     const router = useRouter();
 
@@ -23,16 +24,22 @@
             openModelDialog.openDialog();
         }
 
-        // export as file (ctrl + e)
-        if ((e.ctrlKey || e.metaKey) && e.key === "e") {
+        // save current (ctrl + s)
+        if ((e.ctrlKey || e.metaKey) && e.key === "s") {
             e.preventDefault();
-            downloadModelFile();
+            saveModelDialog.saveCurrent();
         }
 
-        // import from file (ctrl + i)
-        if ((e.ctrlKey || e.metaKey) && e.key === "i") {
+        // save current (ctrl + s)
+        if ((e.ctrlKey || e.metaKey) && e.key === "s") {
             e.preventDefault();
-            openModelDialog.uploadAndLoadModelFile();
+            saveModelDialog.saveCurrent();
+        }
+
+        // export as file (ctrl + shift + s)
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "S") {
+            e.preventDefault();
+            saveModelDialog.openDialog();
         }
 
         // open documentation (ctrl + h)
