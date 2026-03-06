@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-    import { ref } from "vue";
+    import { computed, ref } from "vue";
 
     import { useLoginDialogStore } from "@/state/account/login_dialog";
     import { USERNAME_REGEX_PATTERN } from "@decision-support-ui/common";
@@ -23,6 +23,15 @@
     const usernamePattern = (value: string) => {
         return !!value.match(USERNAME_REGEX_PATTERN) || `only letters and numbers are allowed`;
     };
+
+    const onSubmit = (e: SubmitEvent) => {
+        e.preventDefault();
+        loginDialog.login();
+    };
+
+    const submitPossible = computed(() => {
+        return form.value && loginDialog.username && loginDialog.password;
+    });
 </script>
 
 <template>
@@ -40,7 +49,7 @@
                     <v-btn icon="mdi-close" @click="loginDialog.closeDialog()"></v-btn>
                 </v-toolbar-items>
             </v-toolbar>
-            <v-form v-model="form" @submit.prevent>
+            <v-form v-model="form" @submit="onSubmit">
                 <v-card-text>
                     <p>Login in to an existing account or register a new account:</p>
                     <v-text-field
@@ -64,13 +73,23 @@
                         :error-messages="loginDialog.errorMessage"
                         :error="!!loginDialog.errorMessage"
                         @click:append="loginDialog.toggleShowPass"
-                        @keyup.enter="loginDialog.login"
                     />
                 </v-card-text>
                 <v-card-actions>
-                    <v-btn color="primary" :disabled="!form" @click="loginDialog.register">Register New Account</v-btn>
+                    <v-btn
+                        color="primary"
+                        :disabled="!submitPossible"
+                        text="Register New Account"
+                        @click="loginDialog.register"
+                    />
                     <v-spacer />
-                    <v-btn color="primary" type="submit" :disabled="!form" @click="loginDialog.login">Login</v-btn>
+                    <v-btn
+                        color="primary"
+                        type="submit"
+                        :disabled="!submitPossible"
+                        text="Login"
+                        @click="loginDialog.login"
+                    />
                 </v-card-actions>
             </v-form>
         </v-card>
