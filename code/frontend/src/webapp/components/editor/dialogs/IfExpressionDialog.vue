@@ -4,6 +4,15 @@
 
     const model = defineModel<boolean>();
 
+    const props = withDefaults(
+        defineProps<{
+            knownVariables?: string[];
+        }>(),
+        {
+            knownVariables: () => []
+        }
+    );
+
     const conditionExpression = ref<string>("");
     const valueIfExpression = ref<string>("");
     const valueIfNotExpression = ref<string>("");
@@ -32,6 +41,7 @@
                     :show-toolbar="false"
                     :focused-rows="1"
                     hint="Required: if this condition evaluates to TRUE, 'value_if' is used, otherwise 'value_if_not' is used"
+                    :known-variables="props.knownVariables"
                 />
                 <ExpressionInput
                     v-model="valueIfExpression"
@@ -40,6 +50,7 @@
                     :show-toolbar="false"
                     :focused-rows="1"
                     hint="Required: output value in case the condition evaluates to TRUE."
+                    :known-variables="props.knownVariables"
                 />
                 <ExpressionInput
                     v-model="valueIfNotExpression"
@@ -48,6 +59,7 @@
                     :show-toolbar="false"
                     :focused-rows="1"
                     hint="Required: output value in case the condition evaluates to FALSE."
+                    :known-variables="props.knownVariables"
                 />
                 <h4>Example</h4>
                 <p>

@@ -9,6 +9,15 @@
     import HelpHintWrapper from "../../form/HelpHintWrapper.vue";
 
     const node = defineModel<AbstractNode<VariableNodeType, LoopNodeFunctionState, any>>({ required: true });
+
+    const props = withDefaults(
+        defineProps<{
+            knownVariables?: string[];
+        }>(),
+        {
+            knownVariables: () => []
+        }
+    );
 </script>
 
 <template>
@@ -19,6 +28,7 @@
                     v-model="node.function.iterationsExpression"
                     :empty-label="`Expression Loop Iterations `"
                     :filled-label="`Iterations =`"
+                    :known-variables="props.knownVariables"
                 />
             </template>
             <template #tooltip
@@ -38,6 +48,7 @@
                     v-model="node.function.initExpression"
                     :empty-label="`Expression for Initial Value (i = 0) `"
                     :filled-label="`${node.function.variable}[0] = `"
+                    :known-variables="props.knownVariables"
                 />
             </template>
             <template #tooltip>
@@ -58,6 +69,7 @@
                     v-model="node.function.loopExpression"
                     :empty-label="`Expression for Iteration Value (i > 0)`"
                     :filled-label="`${node.function.variable}[i] = `"
+                    :known-variables="props.knownVariables"
                 />
             </template>
             <template #tooltip>

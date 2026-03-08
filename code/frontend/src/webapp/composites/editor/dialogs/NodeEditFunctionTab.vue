@@ -8,6 +8,7 @@
         LOOP_FUNCTION_TYPE,
         OPERATION_FUNCTION_TYPE,
         RESULT_FUNCTION_TYPE,
+        VARIABLE_NODE_TYPE,
         type AbstractNode,
         type EstimateNodeFunctionState,
         type LoopNodeFunctionState,
@@ -27,6 +28,13 @@
 
     const node = defineModel<Node>({ required: true });
     const graphStore = useGraphStore();
+
+    const knownVariables = computed(() =>
+        graphStore.state.nodes
+            .filter(n => n.type == VARIABLE_NODE_TYPE)
+            .filter(n => n.id != node.value.id)
+            .map(n => n.function.variable)
+    );
 
     const computationError = computed(() => {
         try {
@@ -113,6 +121,7 @@
                 v-model="
                     node as AbstractNode<VariableNodeType, OperationNodeFunctionState, any> //
                 "
+                :known-variables="knownVariables"
             />
         </div>
         <div v-if="node.function.type == LOOP_FUNCTION_TYPE">
@@ -127,6 +136,7 @@
                 v-model="
                     node as AbstractNode<VariableNodeType, ResultNodeFunctionState, any> //
                 "
+                :known-variables="knownVariables"
             />
         </div>
         <div>

@@ -51,6 +51,8 @@
         :width="maximized ? '90%' : 'auto'"
         :height="maximized ? '90%' : 'auto'"
         :class="`nodeEditDialog ${maximized ? 'maximized' : ''}`"
+        persistent
+        no-click-animation
         @click:outside="nodeEditDialog.closeDialog()"
     >
         <v-card>

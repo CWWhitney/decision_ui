@@ -4,6 +4,15 @@
 
     const model = defineModel<boolean>();
 
+    const props = withDefaults(
+        defineProps<{
+            knownVariables?: string[];
+        }>(),
+        {
+            knownVariables: () => []
+        }
+    );
+
     const chanceExpression = ref<string>("");
     const valueIfExpression = ref<string>("");
     const valueIfNotExpression = ref<string>("");
@@ -55,6 +64,7 @@
                     :show-toolbar="false"
                     :focused-rows="1"
                     hint="Required: probability that the risky event will occur (between 0 and 1)"
+                    :known-variables="props.knownVariables"
                 />
                 <ExpressionInput
                     v-model="valueIfExpression"
@@ -63,6 +73,7 @@
                     :show-toolbar="false"
                     :focused-rows="1"
                     hint="Optional (default 1): output value in case the event occurs. This can be either a single numeric value or a numeric vector."
+                    :known-variables="props.knownVariables"
                 />
                 <ExpressionInput
                     v-model="valueIfNotExpression"
@@ -72,6 +83,7 @@
                     :focused-rows="1"
                     hint="Optional (default 0): output value in case the event does not occur. This can be either a single
                         numeric value or a numeric vector. If it is a vector, it must have the same length as value_if"
+                    :known-variables="props.knownVariables"
                 />
                 <ExpressionInput
                     v-model="nExpression"
@@ -80,6 +92,7 @@
                     :show-toolbar="false"
                     :focused-rows="1"
                     hint="Optional (default 1): number of times the risky event is simulated. This is ignored if length(value_if)>1."
+                    :known-variables="props.knownVariables"
                 />
                 <ExpressionInput
                     v-model="cvIfExpression"
@@ -89,6 +102,7 @@
                     :focused-rows="1"
                     hint="Optional (default 0): coefficient of variation for introducing randomness into the value_if data set. This
                         defaults to 0 for no artificial variation. See documentation for the vv function for details."
+                    :known-variables="props.knownVariables"
                 />
                 <ExpressionInput
                     v-model="cvIfNotExpression"
@@ -98,6 +112,7 @@
                     :focused-rows="1"
                     hint="Optional (default CV_if): coefficient of variation for introducing randomness into the value_if_not data set.
                         This defaults to the value for CV_if. See documentation for the vv function for details."
+                    :known-variables="props.knownVariables"
                 />
                 <ExpressionInput
                     v-model="oneDrawExpression"
@@ -108,6 +123,7 @@
                     hint="Optional (default false): boolean coefficient indicating if event occurrence is determined only once (TRUE)
                         with results applying to all elements of the results vector, or if event occurrence is
                         determined independently for each element (FALSE; the default)"
+                    :known-variables="props.knownVariables"
                 />
                 <h4>Return Value</h4>
                 <p>

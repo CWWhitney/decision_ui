@@ -14,6 +14,15 @@
             required: true
         }
     );
+
+    const props = withDefaults(
+        defineProps<{
+            knownVariables?: string[];
+        }>(),
+        {
+            knownVariables: () => []
+        }
+    );
 </script>
 
 <template>
@@ -24,12 +33,14 @@
                 v-model="node.function.expression"
                 :empty-label="`Expression for Variable`"
                 :filled-label="`${node.function.variable} = `"
+                :known-variables="props.knownVariables"
             />
         </template>
-        <template #tooltip
-            >Please enter the mathematical formula that determines the value of this node's variable '{{
+        <template #tooltip>
+            Please enter the mathematical formula that determines the value of this node's variable '{{
                 node.function.variable
-            }}'. Clicking inside the input field will show all available mathematical operators and functions.
+            }}'. Clicking inside the input field will show all available mathematical operators and functions. You can
+            use <code>CTRL + SPACE</code> to list available variables and functions.
         </template>
     </HelpHintWrapper>
 </template>

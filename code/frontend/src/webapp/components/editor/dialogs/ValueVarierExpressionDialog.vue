@@ -4,6 +4,15 @@
 
     const model = defineModel<boolean>();
 
+    const props = withDefaults(
+        defineProps<{
+            knownVariables?: string[];
+        }>(),
+        {
+            knownVariables: () => []
+        }
+    );
+
     const varMeanExpression = ref<string>("");
     const varCvExpression = ref<string>("");
     const nExpression = ref<string>("");
@@ -56,6 +65,7 @@
                     :show-toolbar="false"
                     :focused-rows="1"
                     hint="Required: mean of the variable to be varied"
+                    :known-variables="props.knownVariables"
                 />
                 <ExpressionInput
                     v-model="varCvExpression"
@@ -64,6 +74,7 @@
                     :show-toolbar="false"
                     :focused-rows="1"
                     hint="Required: desired coefficient of variation (in percent)"
+                    :known-variables="props.knownVariables"
                 />
                 <ExpressionInput
                     v-model="nExpression"
@@ -72,6 +83,7 @@
                     :show-toolbar="false"
                     :focused-rows="1"
                     hint="Required: integer; number of values to produce"
+                    :known-variables="props.knownVariables"
                 />
                 <ExpressionInput
                     v-model="distributionExpression"
@@ -89,6 +101,7 @@
                     :show-toolbar="false"
                     :focused-rows="1"
                     hint="Optional (default 0): absolute increment in the var_mean in each time step. Defaults to NA, which means no such absolute value trend is present. If both absolute and relative trends are specified, only original means are used"
+                    :known-variables="props.knownVariables"
                 />
                 <ExpressionInput
                     v-model="relativeTrendExpression"
@@ -97,6 +110,7 @@
                     :show-toolbar="false"
                     :focused-rows="1"
                     hint="Optional (default 0): relative trend in the var_mean in each time step (in percent). Defaults to NA, which means no such relative value trend is present. If both absolute and relative trends are specified, only original means are used"
+                    :known-variables="props.knownVariables"
                 />
                 <ExpressionInput
                     v-model="lowerLimitExpression"
@@ -105,6 +119,7 @@
                     :show-toolbar="false"
                     :focused-rows="1"
                     hint="Optional (default NA): lowest possible value for elements of the resulting vector"
+                    :known-variables="props.knownVariables"
                 />
                 <ExpressionInput
                     v-model="lowerLimitExpression"
@@ -113,6 +128,7 @@
                     :show-toolbar="false"
                     :focused-rows="1"
                     hint="Optional (default NA): upper possible value for elements of the resulting vector"
+                    :known-variables="props.knownVariables"
                 />
                 <h4>Note</h4>
                 <p>

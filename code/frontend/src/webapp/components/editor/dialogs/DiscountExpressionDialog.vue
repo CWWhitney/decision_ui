@@ -4,6 +4,15 @@
 
     const model = defineModel<boolean>();
 
+    const props = withDefaults(
+        defineProps<{
+            knownVariables?: string[];
+        }>(),
+        {
+            knownVariables: () => []
+        }
+    );
+
     const xExpression = ref<string>("");
     const discountRateExpression = ref<string>("");
     const calculateNpvExpression = ref<string>("");
@@ -41,6 +50,7 @@
                     :show-toolbar="false"
                     :focused-rows="1"
                     hint="Required: numeric vector, typically containing time series data of costs or benefits"
+                    :known-variables="props.knownVariables"
                 />
                 <ExpressionInput
                     v-model="discountRateExpression"
@@ -49,6 +59,7 @@
                     :show-toolbar="false"
                     :focused-rows="1"
                     hint="Required: numeric; the discount rate (in percent), expressing the time preference of whoever is evaluating these data economically"
+                    :known-variables="props.knownVariables"
                 />
                 <ExpressionInput
                     v-model="calculateNpvExpression"
@@ -57,6 +68,7 @@
                     :show-toolbar="false"
                     :focused-rows="1"
                     hint="Optional: boolean (default FALSE); if set to TRUE, the discounted time values are summed, otherwise, they are returned as a vector"
+                    :known-variables="props.knownVariables"
                 />
                 <h4>Return Value</h4>
                 <p>

@@ -10,6 +10,7 @@
     import ValueVarierExpressionDialog from "../dialogs/ValueVarierExpressionDialog.vue";
     import DiscountExpressionDialog from "../dialogs/DiscountExpressionDialog.vue";
     import IfExpressionDialog from "../dialogs/IfExpressionDialog.vue";
+    import ExpressionCodeMirror from "./ExpressionCodeMirror.vue";
 
     const expression = defineModel<string>({
         required: true
@@ -22,6 +23,7 @@
             showToolbar?: boolean;
             hint?: string;
             focusedRows?: number;
+            knownVariables?: string[];
             disabled?: boolean;
         }>(),
         {
@@ -29,6 +31,7 @@
             showToolbar: true,
             hint: undefined,
             focusedRows: 3,
+            knownVariables: () => [],
             disabled: false
         }
     );
@@ -249,8 +252,8 @@
             tooltip: "round down to nearest integer"
         },
         {
-            label: "ceil",
-            expression: "ceil(X)",
+            label: "ceiling",
+            expression: "ceiling(X)",
             tooltip: "round up to nearest integer"
         },
         {
@@ -323,10 +326,37 @@
             tooltip: "parentheses for grouping operations"
         }
     ];
+
+    const VALUE_VARIER_SYNTAX =
+        "vv(VAR_MEAN, VAR_CV, N, DISTRIBUTION, ABSOLUTE_TREND, RELATIVE_TREND, LOWER_LIMIT, UPPER_LIMIT)";
+    const VALUE_VARIER_SUGGESTION = 'vv(VAR_MEAN, VAR_CV, N, "normal", ABSOLUTE_TREND, RELATIVE_TREND)';
+
+    const DISCOUNT_SYNTAX = "discount(X, DISCOUNT_RATE, CALCULATE_NPV)";
+    const CHANCE_EVENT_SYNTAX = "chance_event(CHANCE, VALUE_IF, VALUE_IF_NOT, N, CV_IF, CV_IF_NOT, ONE_DRAW)";
+
+    const AUTOCOMPLETE_FUNCTIONS: string[] = [
+        ...SERIES_FUNCTIONS.map(i => i.expression ?? "").filter(s => !!s),
+        ...TRIGONOMETRY_FUNCTIONS.filter(i => i.expression?.includes("("))
+            .map(i => i.expression ?? "")
+            .filter(s => !!s),
+        ...MATH_FUNCTIONS.filter(i => i.expression?.includes("("))
+            .map(i => i.expression ?? "")
+            .filter(s => !!s),
+        DISCOUNT_SYNTAX,
+        CHANCE_EVENT_SYNTAX,
+        VALUE_VARIER_SUGGESTION
+    ];
+
+    const AUTOCOMPLETE_CONSTANTS: string[] = ["pi", "TRUE", "FALSE", "NA"];
 </script>
 
 <template>
-    <div class="expressionInputContainer" tabindex="-1" @focusin="focused = true" @focusout="onFocusOut">
+    <div
+        :class="`expressionWrapper ${expressionError ? 'expressionError' : ''} ${props.disabled ? 'expressionDisabled' : ''}`"
+        tabindex="-1"
+        @focusin="focused = true"
+        @focusout="onFocusOut"
+    >
         <div v-if="shouldShowToolbar">
             <v-btn-group class="functionGroup">
                 <template
@@ -397,7 +427,7 @@
                 <ExpressionToolbarButton
                     label="vv"
                     tooltip="decisionSupport 'vv' function (value varier)"
-                    syntax="vv(VAR_MEAN, VAR_CV, N, DISTRIBUTION, ABSOLUTE_TREND, RELATIVE_TREND, LOWER_LIMIT, UPPER_LIMIT)"
+                    :syntax="VALUE_VARIER_SYNTAX"
                     size="small"
                     :click="() => (isValueVarierDialogOpen = true)"
                 />
@@ -441,6 +471,7 @@
         </div>
 
         <v-textarea
+            v-if="false"
             ref="expressionInputRef"
             v-model="expressionInputValue"
             :label="expressionInputValue ? filledLabel : emptyLabel"
@@ -455,14 +486,71 @@
             :error-messages="expressionError"
             :disabled="props.disabled"
         ></v-textarea>
+
+        <div class="expressionContainer">
+            <span :class="`expressionLabel `">{{ expressionInputValue ? filledLabel : emptyLabel }}</span>
+            <ExpressionCodeMirror
+                v-model="expressionInputValue"
+                :disabled="props.disabled"
+                :known-variables="knownVariables"
+                :known-functions="AUTOCOMPLETE_FUNCTIONS"
+                :known-constants="AUTOCOMPLETE_CONSTANTS"
+            />
+        </div>
+        <span v-if="!!expressionError" class="expressionHint">{{ expressionError }}</span>
     </div>
 </template>
 
 <style scoped lang="scss">
-    .expressionInputContainer {
+    .expressionWrapper {
         display: flex;
         flex-direction: column;
-        gap: 1px;
+    }
+
+    .expressionDisabled {
+        background-color: rgba(0, 0, 0, 0.08);
+    }
+
+    .expressionError {
+        .expressionLabel,
+        .expressionHint {
+            color: rgb(var(--v-theme-error));
+        }
+
+        .expressionContainer {
+            border-bottom: 1px solid rgb(var(--v-theme-error));
+        }
+    }
+
+    .expressionWrapper:not(.expressionError) {
+        .expressionLabel,
+        .expressinoHint {
+            opacity: var(--v-medium-emphasis-opacity);
+        }
+
+        .expressionContainer {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+        }
+    }
+
+    .expressionContainer {
+        background-color: rgba(0, 0, 0, 0.04);
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+    }
+
+    .expressionContainer:has(.cm-focused) {
+        background-color: rgba(0, 0, 0, 0.08);
+    }
+
+    .expressionLabel {
+        font-size: 9pt;
+        padding: 0 1.25em 0 1.25em;
+    }
+
+    .expressionHint {
+        font-size: 9pt;
+        padding: 0.25em 1.25em;
     }
 
     .functionGroup {
