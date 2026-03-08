@@ -497,7 +497,9 @@
                 :known-constants="AUTOCOMPLETE_CONSTANTS"
             />
         </div>
-        <span v-if="!!expressionError" class="expressionHint">{{ expressionError }}</span>
+        <span v-if="!!expressionError || props.hint" class="expressionHint">{{
+            expressionError ? expressionError : props.hint
+        }}</span>
     </div>
 </template>
 

@@ -46,7 +46,7 @@
 </script>
 
 <template>
-    <v-dialog v-model="model" width="auto" height="auto" @click:outside="model = false">
+    <v-dialog v-model="model" width="auto" height="auto" persistent no-click-animation @click:outside="model = false">
         <v-card>
             <v-card-title>Chance Event Function</v-card-title>
             <v-card-text>
