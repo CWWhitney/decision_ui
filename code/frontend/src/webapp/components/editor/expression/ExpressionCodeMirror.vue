@@ -11,7 +11,8 @@
         closeBracketsKeymap,
         type CompletionSource,
         CompletionContext,
-        type CompletionResult
+        type CompletionResult,
+        type CompletionSection
     } from "@codemirror/autocomplete";
 
     import { rLanguage } from "codemirror-lang-r";
@@ -57,9 +58,21 @@
         return {
             from: word.from,
             options: [
-                ...props.knownFunctions.map(v => ({ label: v, type: "function" })),
-                ...props.knownVariables.map(v => ({ label: v, type: "variable" })),
-                ...props.knownConstants.map(v => ({ label: v, type: "constant" }))
+                ...props.knownFunctions.map(v => ({
+                    label: v,
+                    type: "function",
+                    section: { name: "Functions", rank: 1 } as CompletionSection
+                })),
+                ...props.knownVariables.map(v => ({
+                    label: v,
+                    type: "variable",
+                    section: { name: "Variables", rank: 0 } as CompletionSection
+                })),
+                ...props.knownConstants.map(v => ({
+                    label: v,
+                    type: "constant",
+                    section: { name: "Constants", rank: 2 } as CompletionSection
+                }))
             ]
         } as CompletionResult;
     };
@@ -143,6 +156,10 @@
     .cm-tooltip-autocomplete {
         li[aria-selected="true"] {
             background: #17c;
+        }
+
+        completion-section:not(:first-child) {
+            margin-top: 0.5em;
         }
     }
 </style>

@@ -557,6 +557,7 @@
         flex-grow: 1;
         display: flex;
         height: auto;
+        overflow: hidden;
 
         &:not(:last-child) {
             :deep(button) {
