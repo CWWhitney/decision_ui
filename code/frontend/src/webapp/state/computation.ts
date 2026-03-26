@@ -16,9 +16,15 @@ const getDefaultComputationTransientState = (): common.ComputationTransientState
 
 const getDefaultComputationState = (): common.ComputationFileState => {
     return {
-        mcRuns: 10000,
-        histogramBins: 40,
-        gpuAcceleration: true
+        frontend: {
+            mcRuns: 10000,
+            histogramBins: 40,
+            gpuAcceleration: true
+        },
+        backend: {
+            mcRuns: 10000,
+            histogramBins: 40
+        }
     };
 };
 
@@ -34,7 +40,7 @@ export const useComputationStore = defineStore(COMPUTATION_STORE_ID, () => {
     );
 
     const toggleGpuAcceleration = () => {
-        persisted.value.gpuAcceleration = !persisted.value.gpuAcceleration;
+        persisted.value.frontend.gpuAcceleration = !persisted.value.frontend.gpuAcceleration;
     };
 
     const triggerRecalculation = () => {

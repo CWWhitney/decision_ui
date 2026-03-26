@@ -1,15 +1,12 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 
 import EditorPage from "./pages/EditorPage.vue";
-import LoginForm from "./components/old/LoginForm.vue";
-import RegistrationForm from "./components/old/RegistrationForm.vue";
 import HelpPage from "./pages/HelpPage.vue";
 import WelcomePage from "./pages/WelcomePage.vue";
 import MetadataPage from "./pages/MetadataPage.vue";
 import AnalyzePage from "./pages/AnalyzePage.vue";
 import EstimatesTablePage from "./pages/EstimatesTablePage.vue";
 import CodePage from "./pages/CodePage.vue";
-import SettingsPage from "./pages/SettingsPage.vue";
 
 const routes = [
     {
@@ -33,10 +30,12 @@ const routes = [
     },
     {
         path: "/estimates",
+        name: "estimates",
         component: EstimatesTablePage
     },
     {
         path: "/code",
+        name: "code",
         component: CodePage
     },
     {
@@ -48,18 +47,6 @@ const routes = [
         path: "/help/:path*",
         name: "help",
         component: HelpPage
-    },
-    {
-        path: "/settings",
-        component: SettingsPage
-    },
-    {
-        path: "/login",
-        component: LoginForm
-    },
-    {
-        path: "/register",
-        component: RegistrationForm
     }
 ];
 

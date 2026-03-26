@@ -22,8 +22,8 @@
         // calculate useless sum over lower and upper values
         // to trigger computed dependency tracking before sleep
         const _seed = computation.transient.seed;
-        const _mcRuns = computation.persisted.mcRuns;
-        const _histogramBins = computation.persisted.histogramBins;
+        const _mcRuns = computation.persisted.frontend.mcRuns;
+        const _histogramBins = computation.persisted.frontend.histogramBins;
         const _estimateSum = graph.computedEstimateNodes.reduce((p, n) => p + n.function.lower + n.function.upper, 0);
     };
 
@@ -71,7 +71,7 @@
 
             const histogramData = await common.getMultiHistogramDataFromTensors(
                 typedTensors.value.map(t => t.tensor),
-                computation.persisted.histogramBins
+                computation.persisted.frontend.histogramBins
             );
 
             return {

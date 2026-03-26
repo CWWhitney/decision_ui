@@ -1,9 +1,11 @@
 <script setup lang="ts">
     import LazySlider from "@/components/form/LazySlider.vue";
     import TopMenuItem from "@/components/menu/TopMenuItem.vue";
+    import { useAccountStore } from "@/state/account";
     import { useComputationStore } from "@/state/computation";
 
     const computation = useComputationStore();
+    const account = useAccountStore();
 </script>
 
 <template>
@@ -14,17 +16,34 @@
             </div>
             <div class="sliderItems">
                 <span>Monte Carlo Runs</span>
-                <LazySlider v-model="computation.persisted.mcRuns" min="1000" step="1000" max="100000" hide-details />
-                <span>{{ computation.persisted.mcRuns }}</span>
+                <LazySlider
+                    v-model="computation.persisted.frontend.mcRuns"
+                    min="1000"
+                    step="1000"
+                    max="100000"
+                    hide-details
+                />
+                <span>{{ computation.persisted.frontend.mcRuns }}</span>
 
                 <span>Histogram Bins</span>
-                <LazySlider v-model="computation.persisted.histogramBins" min="10" step="10" max="200" hide-details />
-                <span>{{ computation.persisted.histogramBins }}</span>
+                <LazySlider
+                    v-model="computation.persisted.frontend.histogramBins"
+                    min="10"
+                    step="10"
+                    max="200"
+                    hide-details
+                />
+                <span>{{ computation.persisted.frontend.histogramBins }}</span>
             </div>
             <v-list-item class="gpuAccelerationToggle" @click="computation.toggleGpuAcceleration">
                 <template #title>Use GPU acceleration (if available)</template>
                 <template #append>
-                    <v-switch v-model="computation.persisted.gpuAcceleration" color="primary" hide-details inset />
+                    <v-switch
+                        v-model="computation.persisted.frontend.gpuAcceleration"
+                        color="primary"
+                        hide-details
+                        inset
+                    />
                 </template>
             </v-list-item>
             <TopMenuItem title="Recalculate Frontend" shortcut="CTRL + 2" @click="computation.triggerRecalculation" />
@@ -34,14 +53,31 @@
             </div>
             <div class="sliderItems">
                 <span>Monte Carlo Runs</span>
-                <v-slider min="1000" step="1000" max="100000" hide-details disabled />
-                <span>10000</span>
+                <LazySlider
+                    v-model="computation.persisted.backend.mcRuns"
+                    min="1000"
+                    step="1000"
+                    max="100000"
+                    hide-details
+                />
+                <span>{{ computation.persisted.backend.mcRuns }}</span>
 
                 <span>Histogram Bins</span>
-                <v-slider min="10" step="10" max="200" hide-details disabled />
-                <span>50</span>
+                <LazySlider
+                    v-model="computation.persisted.backend.histogramBins"
+                    min="10"
+                    step="10"
+                    max="200"
+                    hide-details
+                />
+                <span>{{ computation.persisted.backend.histogramBins }}</span>
             </div>
-            <TopMenuItem title="Run in R Backend" shortcut="CTRL + 3" disabled @click="console.log('test')" />
+            <TopMenuItem
+                title="Run in R Backend"
+                shortcut="CTRL + 3"
+                :disabled="!account.isLoggedIn"
+                @click="console.log('test')"
+            />
         </v-list>
     </v-card>
 </template>

@@ -299,9 +299,15 @@ export const getAppleAgroforestExampleModelFile = (): ModelFileState => {
             lastModified: `${new Date().toUTCString()}`
         },
         computation: {
-            mcRuns: 10000,
-            histogramBins: 40,
-            gpuAcceleration: true
+            frontend: {
+                mcRuns: 10000,
+                histogramBins: 40,
+                gpuAcceleration: true
+            },
+            backend: {
+                mcRuns: 10000,
+                histogramBins: 40
+            }
         },
         editor: {
             locked: false,

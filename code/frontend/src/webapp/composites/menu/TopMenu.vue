@@ -15,7 +15,7 @@
 
     const route = useRoute();
     const isEditorRoute = route.name == "editor";
-    const isEditorOrAnalyzeRoute = route.name == "editor" || route.name == "analyze";
+    const runMenuEnabled = route.name == "editor" || route.name == "analyze" || route.name == "code";
 </script>
 
 <template>
@@ -62,8 +62,8 @@
                                 <v-btn
                                     v-bind="props"
                                     text="Run"
-                                    :disabled="!isEditorOrAnalyzeRoute"
-                                    :variant="!isEditorOrAnalyzeRoute ? 'plain' : 'elevated'"
+                                    :disabled="!runMenuEnabled"
+                                    :variant="!runMenuEnabled ? 'plain' : 'elevated'"
                                 ></v-btn>
                             </template>
                             <TopRunMenu />
@@ -92,7 +92,7 @@
                                         ? account.persisted.username
                                         : 'Account'
                                 "
-                                variant="plain"
+                                :variant="account.isLoggedIn ? 'text' : 'elevated'"
                             ></v-btn>
                         </template>
                         <TopAccountMenu />

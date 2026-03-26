@@ -6,7 +6,7 @@
     const computation = useComputationStore();
 
     watch(
-        () => computation.persisted.gpuAcceleration,
+        () => computation.persisted.frontend.gpuAcceleration,
         gpuAcceleration => {
             tensorflowReady().then(async () => {
                 if (gpuAcceleration) {

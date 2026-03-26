@@ -2,7 +2,7 @@ import { useEditorStore } from "./editor";
 import { useComputationStore } from "./computation";
 import { useGraphStore } from "./graph";
 import { useMetadataStore } from "./metadata";
-import { useRCodeStore } from "./rcode";
+import { useRStore } from "./r";
 import { useSaveModelDialogStore } from "./save_model_dialog";
 import { useOpenModelDialogStore } from "./open_model";
 import { useAiSupportDialogStore } from "./ai_support";
@@ -14,7 +14,7 @@ export const resetState = () => {
     const editor = useEditorStore();
     const computation = useComputationStore();
     const metadata = useMetadataStore();
-    const rcode = useRCodeStore();
+    const rcode = useRStore();
     const aiSupportDialog = useAiSupportDialogStore();
     const openModelDialog = useOpenModelDialogStore();
     const saveModelDialog = useSaveModelDialogStore();

@@ -1,10 +1,10 @@
 import { generateVariableName } from "../../compute";
 import { Position, Size } from "../../editor/layout";
-import { Node, NodeId, SubgraphId } from "./base";
+import { AbstractNode, Node, NodeId, SubgraphId } from "./base";
 import { getDefaultFunctionState, getDefaultNodeSize, getDefaultNodeStyleState } from "./default";
-import { NodeFunctionType } from "./function";
+import { NodeFunctionType, RESULT_FUNCTION_TYPE, ResultNodeFunctionState } from "./function";
 import { NodeStyleType } from "./style";
-import { NodeType } from "./type";
+import { NodeType, VARIABLE_NODE_TYPE, VariableNodeType } from "./type";
 
 export type NodeByIdMap = Map<NodeId, Node>;
 
@@ -62,4 +62,18 @@ export const getNewNode = (
             autoConnect: true
         }
     } as Node;
+};
+
+export const getResultNodes = (nodes: Node[]) => {
+    return nodes.filter(n => n.type == VARIABLE_NODE_TYPE && n.function.type == RESULT_FUNCTION_TYPE) as AbstractNode<
+        VariableNodeType,
+        ResultNodeFunctionState,
+        any
+    >[];
+};
+
+export const getResultVariables = (nodes: Node[]) => {
+    return getResultNodes(nodes).map(
+        n => (n as AbstractNode<VariableNodeType, ResultNodeFunctionState, any>).function.variable
+    );
 };

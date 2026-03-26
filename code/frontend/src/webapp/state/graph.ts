@@ -123,23 +123,7 @@ export const useGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
     const getComputedVariableDependencies: (nodeId: common.NodeId) => common.VariableDependencies =
         makeSafeComputedGetterByKey((nodeId: common.NodeId) => {
             const node = getComputedNode(nodeId);
-            try {
-                if (
-                    node.function.type == common.OPERATION_FUNCTION_TYPE ||
-                    node.function.type == common.RESULT_FUNCTION_TYPE
-                ) {
-                    return evaluateExpressionForVariableDependencies(node.function.expression);
-                } else if (node.function.type == common.LOOP_FUNCTION_TYPE) {
-                    return [
-                        ...evaluateExpressionForVariableDependencies(node.function.iterationsExpression),
-                        ...evaluateExpressionForVariableDependencies(node.function.initExpression),
-                        ...evaluateExpressionForVariableDependencies(node.function.loopExpression)
-                    ].filter(v => v !== "previous" && v !== "i");
-                }
-                return [];
-            } catch {
-                return [];
-            }
+            return common.getVariableDependenciesForNode(node, evaluateExpressionForVariableDependencies);
         });
 
     const getComputedExpressionMatches: (nodeId: common.NodeId) => common.NodeFunctionExpressionMatches =
@@ -164,7 +148,7 @@ export const useGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
                 getComputedTypedTensor,
                 {
                     seed: computationStore.transient.seed,
-                    mcRuns: computationStore.persisted.mcRuns
+                    mcRuns: computationStore.persisted.frontend.mcRuns
                 } as common.ComputationContext
             );
             console.log(`calculated tensor for node ${nodeId} in ${+new Date() - started}ms`);

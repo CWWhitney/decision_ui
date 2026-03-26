@@ -45,7 +45,7 @@
             <TypedTensorVisualization
                 :node-title="node.visualization.title"
                 :tt="computedTypedTensorResult.value"
-                :bins="computation.persisted.histogramBins"
+                :bins="computation.persisted.frontend.histogramBins"
             />
         </div>
         <div v-if="computedTypedTensorResult && computedTypedTensorResult.type == COMPUTED_RESULT_ERROR_TYPE">

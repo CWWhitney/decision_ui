@@ -38,7 +38,7 @@ export const getModelsApi = () => {
     // add a new model for a user
     app.post("/model", authenticateRoute, validateJsonBody(common.AddModelRequestSchema), async (req, res) => {
         const userId = req.authenticatedUserId;
-        const { modelfile } = req.body;
+        const { modelfile } = req.body as common.AddModelRequestBody;
 
         const models = await listModelsForUser(userId);
         if (models.length > MAX_MODELS_PER_USER) {
