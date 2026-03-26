@@ -34,7 +34,7 @@ export const generateCalculateResultHistogramRequest = () => {
             (response: AxiosResponse) => {
                 if (response.status === 200) {
                     const responseData = response.data as common.CalculateResultHistogramResult;
-                    if (responseData.execution.exitcode == 0) {
+                    if (responseData.data && responseData.execution.exitcode == 0) {
                         return onSuccess(responseData.data);
                     } else {
                         return onFailed(responseData.execution);
@@ -48,6 +48,12 @@ export const generateCalculateResultHistogramRequest = () => {
             },
             (error: AxiosError) => {
                 console.error(`unknown axios error`, error);
+                if (error.response?.data) {
+                    const data = error.response?.data as common.ErrorResponseBody;
+                    if (data && data.error) {
+                        return onError(data.error);
+                    }
+                }
                 return onError(error.message);
             }
         );

@@ -1,12 +1,10 @@
 <script setup lang="ts">
     import JSZip from "jszip";
     import FileSaver from "file-saver";
-    import { useGraphStore } from "@/state/graph";
-    import * as common from "@decision-support-ui/common";
     import { TOOLTIP_OPEN_DELAY } from "@/common/constants";
-    import { useAccountStore } from "@/state/account";
     import { type RExecutionStatus } from "@/state/r";
     import RRunButton from "@/components/r/RRunButton.vue";
+    import RHint from "./RHint.vue";
 
     const props = withDefaults(
         defineProps<{
@@ -14,11 +12,11 @@
             description: string;
             status: RExecutionStatus;
             run: () => void;
+            canRun: boolean;
+            estimatesCsv: string;
         }>(),
         {}
     );
-    const graph = useGraphStore();
-    const account = useAccountStore();
 
     const saveZip = () => {
         if (props.code == null) {
@@ -28,10 +26,7 @@
         const zip = new JSZip();
 
         zip.file("script.R", props.code);
-        zip.file(
-            "estimates.csv",
-            common.convertEstimatesToCSV(common.generateEstimatesTableFromGraph(graph.state.nodes))
-        );
+        zip.file("estimates.csv", props.estimatesCsv);
         zip.generateAsync({ type: "blob" }).then(function (content) {
             FileSaver.saveAs(content, "model.zip");
         });
@@ -67,22 +62,20 @@
                             <v-btn
                                 v-if="props.code !== null"
                                 v-bind="tooltipProps"
-                                prepend-icon="mdi-folder-download-outline"
+                                prepend-icon="mdi-tray-arrow-down"
                                 text="Download"
                                 @click.prevent="saveZip"
                             />
                         </template>
                         <span>Download as ZIP</span>
                     </v-tooltip>
-                    <RRunButton :run="() => props.run()" :disabled="!account.isLoggedIn" :status="status" />
+                    <RRunButton :run="() => props.run()" :disabled="!canRun" :status="status" />
                 </v-btn-group>
             </template>
         </v-toolbar>
 
         <highlightjs v-if="props.code !== null" language="r" :autodetect="false" :code="props.code" class="code" />
-        <div v-else>
-            <v-alert type="info" variant="outlined"> Please add at least one result node to you model! </v-alert>
-        </div>
+        <RHint />
     </div>
 </template>
 

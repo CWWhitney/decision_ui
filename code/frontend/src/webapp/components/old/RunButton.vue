@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import { ref, useTemplateRef } from "vue";
 
-    import ExecutionErrorDialog from "./ExecutionErrorDialog.vue";
+    import ExecutionErrorDialog from "../../composites/rcode/RErrorDialog.vue";
 
     import clean_model_json from "../../helper/clean_model_json";
 

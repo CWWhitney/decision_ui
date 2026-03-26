@@ -3,6 +3,7 @@
     import RRunButton from "@/components/r/RRunButton.vue";
     import { type RExecutionStatus } from "@/state/r";
     import { transposeArray, type CalculateResultHistogramData } from "@decision-support-ui/common";
+    import RHint from "./RHint.vue";
 
     withDefaults(
         defineProps<{
@@ -16,23 +17,36 @@
 </script>
 
 <template>
-    <div v-if="data" class="resultHistogramContainer">
-        <MultiHistogramChart
-            :bins="data.bins"
-            :counts="transposeArray(data.counts)"
-            :labels="data.variables"
-            title="test"
-        />
+    <div v-if="data" class="mainContainer">
+        <div class="resultHistogramContainer">
+            <MultiHistogramChart
+                :bins="data.bins"
+                :counts="transposeArray(data.counts)"
+                :labels="data.variables"
+                title="test"
+            />
+        </div>
     </div>
     <div v-else class="otherContainer">
         <div v-if="canRun" class="runContainer">
             <RRunButton :run="run" :status="status" label="Run Code" />
         </div>
-        <v-alert v-else type="info" variant="outlined"> Add at least one result node. </v-alert>
+        <RHint />
     </div>
 </template>
 
 <style lang="scss" scoped>
+    .mainContainer {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .toolbar {
+        background-color: transparent;
+    }
+
     .resultHistogramContainer {
         display: flex;
         flex-grow: 1;

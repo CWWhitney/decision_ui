@@ -24,6 +24,7 @@ export const getRApi = () => {
                 const responseData = await generateAndExecuteResultHistogramScript(graph, computation);
                 return res.status(200).json(responseData);
             } catch (e) {
+                logger.error("unexpected error calculating result histogram", e);
                 return res.status(500).json({
                     error: e.message
                 } as common.ErrorResponseBody);

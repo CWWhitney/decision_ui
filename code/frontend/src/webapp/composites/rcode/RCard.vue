@@ -4,13 +4,23 @@
     import RCodeTab from "./RCodeTab.vue";
     import { useRStore } from "@/state/r";
     import RDataTab from "./RDataTab.vue";
+    import { useAccountStore } from "@/state/account";
+    import * as common from "@decision-support-ui/common";
+    import { useGraphStore } from "@/state/graph";
+    import RErrorDialog from "./RErrorDialog.vue";
 
     const rStore = useRStore();
+    const account = useAccountStore();
+    const graph = useGraphStore();
 
     const activeVariantTab = ref<string>("histogram");
     const activeDisplayTab = ref<string>("code");
 
     const combinedActiveTab = computed(() => `${activeVariantTab.value}+${activeDisplayTab.value}`);
+
+    const estimatesCsv = computed(() =>
+        common.convertEstimatesToCSV(common.generateEstimatesTableFromGraph(graph.state.nodes))
+    );
 
     const runResultHistogram = () => {
         console.log("runResultHistogram");
@@ -67,17 +77,20 @@
                             <RCodeTab
                                 :status="rStore.state.resultHistogram.status"
                                 :code="rStore.computedRHistogramCode"
+                                :estimates-csv="estimatesCsv"
                                 :run="runResultHistogram"
+                                :can-run="!!rStore.computedRHistogramCode && account.isLoggedIn"
                                 description="The R script that corresponds to the model and plots result variables in a histogram:"
                             />
                         </v-tabs-window-item>
                         <v-tabs-window-item value="histogram+data">
                             <RDataTab
+                                description="Calculated bins and counts for the result histogram:"
                                 :data="resultHistogramDataTable"
                                 :run="runResultHistogram"
                                 :status="rStore.state.resultHistogram.status"
                                 :columns="['bins', ...(rStore.state.resultHistogram.data?.variables ?? [])]"
-                                :can-run="!!rStore.computedRHistogramCode"
+                                :can-run="!!rStore.computedRHistogramCode && account.isLoggedIn"
                             />
                         </v-tabs-window-item>
                         <v-tabs-window-item value="histogram+diagram">
@@ -85,14 +98,16 @@
                                 :data="rStore.state.resultHistogram.data"
                                 :run="runResultHistogram"
                                 :status="rStore.state.resultHistogram.status"
-                                :can-run="!!rStore.computedRHistogramCode"
+                                :can-run="!!rStore.computedRHistogramCode && account.isLoggedIn"
                             />
                         </v-tabs-window-item>
                         <v-tabs-window-item value="evpi+code">
                             <RCodeTab
                                 :status="rStore.state.resultHistogram.status"
                                 :code="rStore.computedREvpiCode"
+                                :estimates-csv="estimatesCsv"
                                 :run="runResultHistogram"
+                                :can-run="!!rStore.computedRHistogramCode && account.isLoggedIn"
                                 description="The R script that implements the EVPI (Expected Value of Perfect Information) analysis:"
                             />
                         </v-tabs-window-item>
@@ -101,6 +116,7 @@
             </div>
         </v-card-text>
     </v-card>
+    <RErrorDialog />
 </template>
 
 <style lang="scss" scoped>

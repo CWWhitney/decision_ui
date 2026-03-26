@@ -29,6 +29,10 @@ interface RStoreState {
         data: string | null;
         error: string | null;
     };
+    errorDialog: {
+        show: boolean;
+        execution: common.RExecutionState | null;
+    };
 }
 
 const getDefaultState = (): RStoreState => {
@@ -43,6 +47,10 @@ const getDefaultState = (): RStoreState => {
             estimates: null,
             data: null,
             error: null
+        },
+        errorDialog: {
+            show: false,
+            execution: null
         }
     };
 };
@@ -139,7 +147,8 @@ export const useRStore = defineStore(R_STORE_ID, () => {
                 onFailed: (execution: common.RExecutionState) => {
                     state.value.resultHistogram.status = R_EXECUTION_FAILED;
                     state.value.resultHistogram.execution = execution;
-                    // TODO: show model execution error dialog
+                    state.value.errorDialog.show = true;
+                    state.value.errorDialog.execution = execution;
                 },
                 onError: message => {
                     state.value.resultHistogram.status = R_EXECUTION_FAILED;

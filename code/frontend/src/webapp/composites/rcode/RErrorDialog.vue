@@ -1,44 +1,29 @@
 <script setup lang="ts">
-    import type { ExecutionError } from "../../rest/models";
-    import { ref } from "vue";
+    import { useRStore } from "@/state/r";
 
-    const show_dialog = ref<boolean>(false);
-    const execution_error = ref<ExecutionError | null>(null);
-
-    defineExpose({
-        showDialog: (error: ExecutionError) => {
-            execution_error.value = error;
-            show_dialog.value = true;
-        }
-    });
+    const rStore = useRStore();
 </script>
 
 <template>
-    <v-dialog v-model="show_dialog" class="executionErrorDialog">
+    <v-dialog v-model="rStore.state.errorDialog.show" class="executionErrorDialog">
         <v-card max-width="50em">
             <v-card-title class="text-h5"> Model Execution Error </v-card-title>
             <v-card-text>
                 <v-list lines="two">
-                    <v-list-item title="Reason" :subtitle="execution_error?.reason" />
-                    <v-list-item title="Estimates">
+                    <v-list-item title="R Output">
                         <template #subtitle>
-                            <highlightjs language="txt" :code="execution_error?.estimates || ''" />
-                        </template>
-                    </v-list-item>
-                    <v-list-item title="R-Script">
-                        <template #subtitle>
-                            <highlightjs language="r" :code="execution_error?.r_script || ''" />
+                            <highlightjs language="text" :code="rStore.state.errorDialog.execution?.stdout || ''" />
                         </template>
                     </v-list-item>
                     <v-list-item title="R Error Output">
                         <template #subtitle>
-                            <highlightjs language="txt" :code="execution_error?.stderr || ''" />
+                            <highlightjs language="txt" :code="rStore.state.errorDialog.execution?.stderr || ''" />
                         </template>
                     </v-list-item>
                 </v-list>
             </v-card-text>
             <v-card-actions>
-                <v-btn color="primary" variant="text" @click="show_dialog = false"> Got It </v-btn>
+                <v-btn color="primary" variant="text" @click="rStore.state.errorDialog.show = false"> Got It </v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>

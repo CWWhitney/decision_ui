@@ -2,6 +2,7 @@ import { parse } from "csv-parse";
 
 import * as common from "@decision-support-ui/common";
 import { executeRScript } from "./execute";
+import { logger } from "../logging";
 
 export const generateAndExecuteResultHistogramScript = async (
     graph: common.Graph,
@@ -26,10 +27,8 @@ export const generateAndExecuteResultHistogramScript = async (
 
     const executionResult = await executeRScript(generateRScript, estimatesCsv);
 
-    const data = await parseResultHistogramCsv(executionResult.resultsCsv);
-
     return {
-        data,
+        data: executionResult.resultsCsv ? await parseResultHistogramCsv(executionResult.resultsCsv) : null,
         execution: executionResult.execution
     } as common.CalculateResultHistogramResponseBody;
 };
@@ -45,7 +44,7 @@ export const parseResultHistogramCsv = async (csv: string) => {
                 encoding: "utf8"
             },
             (err, records) => {
-                if (err) {
+                if (err || records.length <= 1) {
                     return reject(err);
                 }
                 return resolve({

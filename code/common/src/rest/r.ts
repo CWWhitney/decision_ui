@@ -55,7 +55,7 @@ export const CalculateResultHistogramDataSchema: Schema = {
 };
 
 export interface CalculateResultHistogramResult {
-    data: CalculateResultHistogramData;
+    data: CalculateResultHistogramData | null;
     execution: RExecutionState;
 }
 
@@ -68,7 +68,7 @@ export const CalculateResultHistogramResponseSchema: Schema = {
         {
             type: "object",
             properties: {
-                data: CalculateResultHistogramDataSchema,
+                data: { oneOf: [CalculateResultHistogramDataSchema, { type: "null" }] },
                 execution: RExcecutionSchema
             },
             required: ["data", "execution"],
