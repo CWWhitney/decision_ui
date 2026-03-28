@@ -29,7 +29,7 @@ You can remove the application from the Windows settings page called `Apps & fea
 
 ### Backup
 
-You may create a backup of your data (user accounts and models) by copying the file `decision-support-ui-backend.db`
+You may create a backup of your data (user accounts and models) by copying the file `decision-support-ui.db`
 from the directory `%APPDATA%\decision-support-ui`.
 
 ![Backup Database](./backup-database.webp)

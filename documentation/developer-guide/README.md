@@ -66,7 +66,7 @@ On MacOS, there is no self-contained pre-built version of R that can be packaged
 
 The following environment variables will be considered when running the server:
 
-- `DSUI_DATABASE_PATH=./data/decision-support-ui-backend.db` \
+- `DSUI_DATABASE_PATH=./data/decision-support-ui.db` \
   path to the sqlite database file
 - `DSUI_R_SCRIPT_PATH=Rscript` \
   path to the `Rscript` or `Rscript.exe` binary

@@ -49,6 +49,7 @@ linux:
     - AppImage
   maintainer: electronjs.org
   category: Utility
+  executableName: decision-support-ui
 appImage:
   artifactName: decision-support-ui-v${version}.${ext}
 npmRebuild: false

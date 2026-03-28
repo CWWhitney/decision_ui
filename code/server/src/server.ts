@@ -7,9 +7,20 @@ import * as cors from "cors";
 
 import { logger } from "./logging";
 import { getRestApi } from "./rest";
+import { loadDatabase } from "./state/database";
 
-export const startServer = (port: number, databasePath: string = null, corsOrigins: string[] = []) => {
+export const startServer = async ({
+    port = 8080,
+    databasePath = "data/database.sqlite",
+    corsOrigins = ["http://localhost:5173"]
+}: {
+    port?: number;
+    databasePath?: string;
+    corsOrigins?: string[];
+} = {}) => {
     logger.info("starting web server");
+
+    const database = await loadDatabase(databasePath);
 
     // setup express
     const app = express();

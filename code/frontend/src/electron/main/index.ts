@@ -30,16 +30,16 @@ const findPort = async (): Promise<number> => {
 /**
  * Returns the file path to the sqlite database file (considering the operating system file system layout).
  *
- * On Windows: %APPDATA%\decision-support-ui\decision-support-ui-backend.db
- * On Linux: $XDG_CONFIG_HOME/decision-support-ui/decision-support-ui-backend.db
- * On Mac: ~/Library/Application Support/decision-support-ui/decision-support-ui-backend.db
+ * On Windows: %APPDATA%\decision-support-ui\decision-support-ui.db
+ * On Linux: $XDG_CONFIG_HOME/decision-support-ui/decision-support-ui.db
+ * On Mac: ~/Library/Application Support/decision-support-ui/decision-support-ui.db
  *
  * See: https://www.electronjs.org/docs/latest/api/app#appgetpathname
  *
  * @returns the file path to the sqlite database file
  */
 const getDatabasePath = () => {
-    return path.join(app.getPath("userData"), "decision-support-ui-backend.db");
+    return path.join(app.getPath("userData"), "decision-support-ui.db");
 };
 
 /**
@@ -86,9 +86,15 @@ const createWindow = async (backendPort: number) => {
  * Run the electron app.
  */
 const run = async () => {
+    // simplify data directory to "decision-support-ui", which would otherwise default to "@decision-support-ui/frontend"
+    app.setPath("userData", path.join(app.getPath("appData"), "decision-support-ui"));
     const backendPort = await findPort();
     const databasePath = getDatabasePath();
-    const cleanupServer = startServer(backendPort, databasePath, ["http://localhost:5173"]);
+    const cleanupServer = await startServer({
+        port: backendPort,
+        databasePath,
+        corsOrigins: ["http://localhost:5173"]
+    });
 
     app.whenReady().then(() => {
         // Set app user model id for windows

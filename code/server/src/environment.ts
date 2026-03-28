@@ -1,6 +1,6 @@
 export const DSUI_LOG_LEVEL = process.env.DSUI_LOG_LEVEL ?? "INFO";
 
-export const DSUI_DATABASE_PATH = process.env.DSUI_DATABASE_PATH ?? "./decision-support-ui-backend.db";
+export const DSUI_DATABASE_PATH = process.env.DSUI_DATABASE_PATH ?? "./decision-support-ui.db";
 
 export const DSUI_R_SCRIPT_PATH = process.env.DSUI_R_SCRIPT_PATH ?? "Rscript";
 

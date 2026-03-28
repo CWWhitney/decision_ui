@@ -9,14 +9,6 @@ import {
     HasManyGetAssociationsMixin
 } from "sequelize";
 
-const sequelize = new Sequelize({
-    dialect: "sqlite",
-    storage: "data/database.sqlite",
-    define: {
-        freezeTableName: true
-    }
-});
-
 export class UserTable extends Model<InferAttributes<UserTable>, InferCreationAttributes<UserTable>> {
     declare id: CreationOptional<number>;
     declare username: string;
@@ -25,24 +17,6 @@ export class UserTable extends Model<InferAttributes<UserTable>, InferCreationAt
     declare updatedAt: CreationOptional<Date>;
     declare getModels: HasManyGetAssociationsMixin<ModelTable>;
 }
-
-UserTable.init(
-    {
-        id: {
-            type: DataTypes.INTEGER,
-            autoIncrement: true,
-            primaryKey: true
-        },
-        username: DataTypes.STRING,
-        password: DataTypes.STRING,
-        createdAt: DataTypes.DATE,
-        updatedAt: DataTypes.DATE
-    },
-    {
-        sequelize,
-        tableName: "user"
-    }
-);
 
 export class ModelTable extends Model<InferAttributes<ModelTable>, InferCreationAttributes<ModelTable>> {
     declare id: CreationOptional<number>;
@@ -54,31 +28,59 @@ export class ModelTable extends Model<InferAttributes<ModelTable>, InferCreation
     declare file: string;
 }
 
-ModelTable.init(
-    {
-        id: {
-            type: DataTypes.INTEGER,
-            autoIncrement: true,
-            primaryKey: true
+export const loadDatabase = async (path: string) => {
+    const sequelize = new Sequelize({
+        dialect: "sqlite",
+        storage: path,
+        define: {
+            freezeTableName: true
+        }
+    });
+
+    UserTable.init(
+        {
+            id: {
+                type: DataTypes.INTEGER,
+                autoIncrement: true,
+                primaryKey: true
+            },
+            username: DataTypes.STRING,
+            password: DataTypes.STRING,
+            createdAt: DataTypes.DATE,
+            updatedAt: DataTypes.DATE
         },
-        name: DataTypes.STRING,
-        description: DataTypes.STRING,
-        createdAt: DataTypes.DATE,
-        updatedAt: DataTypes.DATE,
-        file: DataTypes.JSONB
-    },
-    {
-        sequelize,
-        tableName: "model"
-    }
-);
+        {
+            sequelize,
+            tableName: "user"
+        }
+    );
 
-UserTable.hasMany(ModelTable, {
-    sourceKey: "id",
-    foreignKey: "userId",
-    as: "models"
-});
+    ModelTable.init(
+        {
+            id: {
+                type: DataTypes.INTEGER,
+                autoIncrement: true,
+                primaryKey: true
+            },
+            name: DataTypes.STRING,
+            description: DataTypes.STRING,
+            createdAt: DataTypes.DATE,
+            updatedAt: DataTypes.DATE,
+            file: DataTypes.JSONB
+        },
+        {
+            sequelize,
+            tableName: "model"
+        }
+    );
 
-(async () => {
+    UserTable.hasMany(ModelTable, {
+        sourceKey: "id",
+        foreignKey: "userId",
+        as: "models"
+    });
+
     await sequelize.sync();
-})();
+
+    return { UserTable, ModelTable, sequelize };
+};
