@@ -7,6 +7,8 @@ yarn-debug.log*
 yarn-error.log*
 /test/unit/coverage/
 public/static/documentation
+resources/R
+resources/download
 data
 
 # Editor directories and files

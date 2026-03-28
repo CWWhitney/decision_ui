@@ -8,16 +8,15 @@
     "module": "build/esm/src/index.js",
     "types": "build/esm/src/index.d.ts",
     "scripts": {
-        "build": "rm -rf build && npm run build-ohm && npm run build-esm && npm run build-cjs",
-        "build-esm": "rm -rf build/esm && tsc -p tsconfig.esm.json",
-        "build-cjs": "rm -rf build/cjs && tsc -p tsconfig.cjs.json",
-        "build-ohm": "ohm generateBundles --withTypes --esm 'src/**/*.ohm'",
+        "build": "npm run build-ohm && npm run build-esm && npm run build-cjs",
+        "build-esm": "tsc -p tsconfig.esm.json",
+        "build-cjs": "tsc -p tsconfig.cjs.json",
+        "build-ohm": "ohm generateBundles --withTypes --esm \"src/**/*.ohm\"",
         "watch": "concurrently -c auto -n ohm,esm,cjs \"npm run watch-ohm\" \"npm run watch-esm\" \"npm run watch-cjs\"",
         "watch-esm": "tsc -p tsconfig.esm.json --watch --preserveWatchOutput",
         "watch-cjs": "tsc -p tsconfig.cjs.json --watch --preserveWatchOutput",
         "watch-ohm": "nodemon -w ./src -e ohm -x npm run build-ohm",
-        "lint": "eslint .",
-        "clean": "rm -rf node_modules && rm -rf build"
+        "lint": "eslint ."
     },
     "dependencies": {
         "ajv": "^8.18.0",

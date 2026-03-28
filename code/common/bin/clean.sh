@@ -2,4 +2,5 @@
 
 cd "$(dirname "$0")/../"
 
-npm run clean
+rm -rf node_modules 
+rm -rf build
