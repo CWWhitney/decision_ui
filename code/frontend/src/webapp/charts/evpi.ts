@@ -1,6 +1,6 @@
 import { Chart, type ChartDataset } from "chart.js";
 
-import { CHART_COLORS, getDefaultHistogramLegend } from "../common";
+import { CHART_COLORS, getDefaultHistogramLegend } from "./common";
 
 const TEXT_COLOR = "rgba(50, 50, 50, 1.0)";
 const GRID_COLOR = "rgba(155, 155, 155, 0.2)";
@@ -8,23 +8,23 @@ const GRID_COLOR = "rgba(155, 155, 155, 0.2)";
 export const drawEvpiBoxChart = (
     chart: Chart<"bar"> | null,
     ctx: CanvasRenderingContext2D,
-    evpi: { [estimate: string]: { [result: string]: number } },
+    data: { [estimate: string]: { [result: string]: number } },
     device_pixel_ratio: number = 1.0
 ): Chart<"bar"> => {
     if (chart) chart.destroy();
 
-    const estimate_variables = Object.keys(evpi);
-    const result_variables = Object.keys(evpi[Object.keys(evpi)[0]]);
+    const estimateVariables = Object.keys(data);
+    const resultVariables = Object.keys(data[estimateVariables[0]!] ?? {});
 
     return new Chart<"bar">(ctx, {
         type: "bar",
 
         data: {
-            labels: estimate_variables,
-            datasets: result_variables.map((r, idx) => {
+            labels: estimateVariables,
+            datasets: resultVariables.map((r, idx) => {
                 return {
                     label: r,
-                    data: estimate_variables.map(e => evpi[e][r]) as number[],
+                    data: estimateVariables.map(e => data[e]![r]) as number[],
                     backgroundColor: CHART_COLORS[idx % CHART_COLORS.length]
                 } as ChartDataset<"bar", any>;
             })

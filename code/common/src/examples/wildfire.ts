@@ -1093,7 +1093,9 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
             },
             backend: {
                 mcRuns: 10000,
-                histogramBins: 40
+                histogramBins: 40,
+                evpiMcRuns: 1000,
+                maxRuntime: 10
             }
         },
         editor: {

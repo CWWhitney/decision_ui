@@ -3,7 +3,7 @@ import { useGraphStore } from "./graph";
 
 import * as common from "@decision-support-ui/common";
 import { computed, ref } from "vue";
-import { generateCalculateResultHistogramRequest } from "@/rest/r";
+import { generateCalculateEvpiRequest, generateCalculateResultHistogramRequest } from "@/rest/r";
 import { useAccountStore } from "./account";
 import { useErrorDialogStore } from "./error_dialog";
 import { useComputationStore } from "./computation";
@@ -21,17 +21,16 @@ interface RStoreState {
     resultHistogram: {
         status: RExecutionStatus;
         data: common.CalculateResultHistogramData | null;
-        execution: common.RExecutionState | null;
+        error: common.RExecutionError | null;
     };
     evpi: {
-        script: string | null;
-        estimates: string | null;
-        data: string | null;
-        error: string | null;
+        status: RExecutionStatus;
+        data: common.CalculateEvpiData | null;
+        error: common.RExecutionError | null;
     };
     errorDialog: {
         show: boolean;
-        execution: common.RExecutionState | null;
+        error: common.RExecutionError | null;
     };
 }
 
@@ -40,17 +39,16 @@ const getDefaultState = (): RStoreState => {
         resultHistogram: {
             status: R_EXECUTION_PENDING,
             data: null,
-            execution: null
+            error: null
         },
         evpi: {
-            script: null,
-            estimates: null,
+            status: R_EXECUTION_PENDING,
             data: null,
             error: null
         },
         errorDialog: {
             show: false,
-            execution: null
+            error: null
         }
     };
 };
@@ -58,6 +56,7 @@ const getDefaultState = (): RStoreState => {
 export const useRStore = defineStore(R_STORE_ID, () => {
     const getRCodeForExpression = common.getExpressionRCodeGenerator();
     const doCalculateResultHistogramRequest = generateCalculateResultHistogramRequest();
+    const doCalculateEvpiRequest = generateCalculateEvpiRequest();
 
     const account = useAccountStore();
     const errorDialog = useErrorDialogStore();
@@ -122,19 +121,24 @@ export const useRStore = defineStore(R_STORE_ID, () => {
                 resultVariables,
                 "estimates.csv",
                 "results.csv",
-                computation.persisted.backend.mcRuns
+                computation.persisted.backend.evpiMcRuns
             );
         }
 
         return null;
     });
 
+    const openExecutionErrorDialog = (error: common.RExecutionError) => {
+        state.value.errorDialog.show = true;
+        state.value.errorDialog.error = error;
+    };
+
     const calculateResultHistogram = () => {
         const accessToken = account.transient.accessToken;
         if (accessToken) {
             state.value.resultHistogram.status = R_EXECUTION_IN_PROGRESS;
             state.value.resultHistogram.data = null;
-            state.value.resultHistogram.execution = null;
+            state.value.resultHistogram.error = null;
 
             doCalculateResultHistogramRequest({
                 accessToken,
@@ -144,11 +148,10 @@ export const useRStore = defineStore(R_STORE_ID, () => {
                     state.value.resultHistogram.status = R_EXECUTION_SUCCESS;
                     state.value.resultHistogram.data = data;
                 },
-                onFailed: (execution: common.RExecutionState) => {
+                onFailed: (error: common.RExecutionError) => {
                     state.value.resultHistogram.status = R_EXECUTION_FAILED;
-                    state.value.resultHistogram.execution = execution;
-                    state.value.errorDialog.show = true;
-                    state.value.errorDialog.execution = execution;
+                    state.value.resultHistogram.error = error;
+                    openExecutionErrorDialog(error);
                 },
                 onError: message => {
                     state.value.resultHistogram.status = R_EXECUTION_FAILED;
@@ -156,6 +159,38 @@ export const useRStore = defineStore(R_STORE_ID, () => {
                         `Calculating Result Histogram Failed`,
                         `There was a technical error while calculating the result histogram. ` +
                             `Please report this as a bug.`,
+                        message
+                    );
+                }
+            });
+        }
+    };
+
+    const calculateEvpi = () => {
+        const accessToken = account.transient.accessToken;
+        if (accessToken) {
+            state.value.evpi.status = R_EXECUTION_IN_PROGRESS;
+            state.value.evpi.data = null;
+            state.value.evpi.error = null;
+
+            doCalculateEvpiRequest({
+                accessToken,
+                graph: graph.state,
+                computation: computation.persisted.backend,
+                onSuccess: (data: common.CalculateEvpiData) => {
+                    state.value.evpi.status = R_EXECUTION_SUCCESS;
+                    state.value.evpi.data = data;
+                },
+                onFailed: (error: common.RExecutionError) => {
+                    state.value.evpi.status = R_EXECUTION_FAILED;
+                    state.value.evpi.error = error;
+                    openExecutionErrorDialog(error);
+                },
+                onError: message => {
+                    state.value.evpi.status = R_EXECUTION_FAILED;
+                    errorDialog.openDialog(
+                        `Calculating EVPI Failed`,
+                        `There was a technical error while calculating the EVPI. ` + `Please report this as a bug.`,
                         message
                     );
                 }
@@ -182,6 +217,7 @@ export const useRStore = defineStore(R_STORE_ID, () => {
         computedRHistogramCode,
         computedREvpiCode,
         calculateResultHistogram,
+        calculateEvpi,
         reset
     };
 });

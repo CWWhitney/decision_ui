@@ -3,6 +3,7 @@ import { parse } from "csv-parse";
 import * as common from "@decision-support-ui/common";
 import { executeRScript } from "./execute";
 import { logger } from "../logging";
+import { DSUI_R_MAX_RUNTIME } from "../environment";
 
 export const generateAndExecuteResultHistogramScript = async (
     graph: common.Graph,
@@ -24,12 +25,13 @@ export const generateAndExecuteResultHistogramScript = async (
 
     const rows = common.generateEstimatesTableFromGraph(graph.nodes);
     const estimatesCsv = common.convertEstimatesToCSV(rows);
+    const timeout = Math.min(DSUI_R_MAX_RUNTIME, computation.maxRuntime);
 
-    const executionResult = await executeRScript(generateRScript, estimatesCsv);
+    const executionResult = await executeRScript(generateRScript, estimatesCsv, timeout);
 
     return {
         data: executionResult.resultsCsv ? await parseResultHistogramCsv(executionResult.resultsCsv) : null,
-        execution: executionResult.execution
+        error: executionResult.error
     } as common.CalculateResultHistogramResponseBody;
 };
 

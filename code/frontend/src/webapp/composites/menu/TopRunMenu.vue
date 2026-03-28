@@ -71,6 +71,20 @@
                     hide-details
                 />
                 <span>{{ computation.persisted.backend.histogramBins }}</span>
+
+                <span>EVPI Mc Runs</span>
+                <LazySlider
+                    v-model="computation.persisted.backend.evpiMcRuns"
+                    min="1000"
+                    step="500"
+                    max="10000"
+                    hide-details
+                />
+                <span>{{ computation.persisted.backend.evpiMcRuns }}</span>
+
+                <span>Runtime (seconds)</span>
+                <LazySlider v-model="computation.persisted.backend.maxRuntime" min="1" step="1" max="30" hide-details />
+                <span>{{ computation.persisted.backend.maxRuntime }}</span>
             </div>
             <TopMenuItem
                 title="Run in R Backend"

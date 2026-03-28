@@ -10,14 +10,24 @@
             <v-card-title class="text-h5"> Model Execution Error </v-card-title>
             <v-card-text>
                 <v-list lines="two">
+                    <v-list-item title="Reason">
+                        <template #subtitle>
+                            <highlightjs language="text" :code="rStore.state.errorDialog.error?.reason || ''" />
+                        </template>
+                    </v-list-item>
                     <v-list-item title="R Output">
                         <template #subtitle>
-                            <highlightjs language="text" :code="rStore.state.errorDialog.execution?.stdout || ''" />
+                            <highlightjs language="text" :code="rStore.state.errorDialog.error?.stdout || ''" />
                         </template>
                     </v-list-item>
                     <v-list-item title="R Error Output">
                         <template #subtitle>
-                            <highlightjs language="txt" :code="rStore.state.errorDialog.execution?.stderr || ''" />
+                            <highlightjs language="txt" :code="rStore.state.errorDialog.error?.stderr || ''" />
+                        </template>
+                    </v-list-item>
+                    <v-list-item title="R Exit Code">
+                        <template #subtitle>
+                            <highlightjs language="txt" :code="rStore.state.errorDialog.error?.exitcode || ''" />
                         </template>
                     </v-list-item>
                 </v-list>

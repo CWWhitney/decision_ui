@@ -1,26 +1,39 @@
 import { mkdtempSync, readFileSync, rmdirSync, rmSync, writeFileSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
-import { exec } from "child_process";
+import { exec, ExecException } from "child_process";
 import { DSUI_R_SCRIPT_PATH, DSUI_R_MAX_RUNTIME } from "../environment";
 import { logger } from "../logging";
 import * as common from "@decision-support-ui/common";
 
 interface RExecutionCsvResult {
     resultsCsv: string;
-    execution: common.RExecutionState;
+    error: common.RExecutionError | null;
 }
 
-const asyncExecuteR = async (rScriptFilepath: string, resultsCsvFilepath: string) => {
+const asyncExecuteR = async (rScriptFilepath: string, resultsCsvFilepath: string, timeout: number) => {
+    logger.debug(`execute Rscript`);
     return new Promise<RExecutionCsvResult>(resolve => {
         exec(
             `${DSUI_R_SCRIPT_PATH} ${rScriptFilepath}`,
-            { timeout: DSUI_R_MAX_RUNTIME * 1000 },
-            (error, stdout, stderr) => {
+            { timeout: timeout * 1000 },
+            (error: ExecException, stdout, stderr) => {
+                logger.debug("Rscript finished");
                 if (error) {
+                    if (error.killed) {
+                        return resolve({
+                            resultsCsv: null,
+                            error: {
+                                reason: `timeout of ${timeout} seconds reached`,
+                                stdout,
+                                stderr,
+                                exitcode: error.code
+                            }
+                        });
+                    }
                     return resolve({
                         resultsCsv: null,
-                        execution: { stdout, stderr, exitcode: error.code }
+                        error: { reason: error.message, stdout, stderr, exitcode: error.code }
                     });
                 }
 
@@ -28,7 +41,7 @@ const asyncExecuteR = async (rScriptFilepath: string, resultsCsvFilepath: string
 
                 return resolve({
                     resultsCsv,
-                    execution: { stdout, stderr, exitcode: 0 }
+                    error: null
                 });
             }
         );
@@ -37,9 +50,9 @@ const asyncExecuteR = async (rScriptFilepath: string, resultsCsvFilepath: string
 
 export const executeRScript = async (
     generateRScript: (estimatesCsvFilepath: string, resultsCsvFilepath: string) => string,
-    estimates_csv: string
+    estimates_csv: string,
+    timeout: number
 ): Promise<RExecutionCsvResult> => {
-    logger.debug(`execute Rscript`);
     let directory: string | null = null;
     let rScriptFilepath: string | null = null;
     let estimatesCsvFilepath: string | null = null;
@@ -55,10 +68,12 @@ export const executeRScript = async (
 
         const rScript = generateRScript(estimatesCsvFilepath, resultsCsvFilepath);
 
+        logger.debug(`execute generated RScript:\n\n${rScript}\n\n`);
+
         writeFileSync(rScriptFilepath, rScript, { encoding: "utf-8", flush: true });
         writeFileSync(estimatesCsvFilepath, estimates_csv, { encoding: "utf-8", flush: true });
 
-        return await asyncExecuteR(rScriptFilepath, resultsCsvFilepath);
+        return await asyncExecuteR(rScriptFilepath, resultsCsvFilepath, timeout);
     } finally {
         if (rScriptFilepath) {
             rmSync(rScriptFilepath, { force: true });

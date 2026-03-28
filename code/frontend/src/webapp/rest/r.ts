@@ -19,7 +19,7 @@ export const generateCalculateResultHistogramRequest = () => {
         graph: common.Graph;
         computation: common.BackendComputationState;
         onSuccess?: (data: common.CalculateResultHistogramData) => void;
-        onFailed?: (execution: common.RExecutionState) => void;
+        onFailed?: (execution: common.RExecutionError) => void;
         onError?: (error: string) => void;
     }) => {
         return validateResponse(
@@ -34,16 +34,71 @@ export const generateCalculateResultHistogramRequest = () => {
             (response: AxiosResponse) => {
                 if (response.status === 200) {
                     const responseData = response.data as common.CalculateResultHistogramResult;
-                    if (responseData.data && responseData.execution.exitcode == 0) {
+                    if (responseData.data && !responseData.error) {
                         return onSuccess(responseData.data);
                     } else {
-                        return onFailed(responseData.execution);
+                        return onFailed(responseData.error);
                     }
                 }
-                return onError(`unknown success status '${response.status}' while adding model`);
+                return onError(`unknown success status '${response.status}' after calculating result histogram`);
             },
             (message: string) => {
                 console.error(`validation error while calculating result histogram:\n\n${message}`);
+                return onError(message);
+            },
+            (error: AxiosError) => {
+                console.error(`unknown axios error`, error);
+                if (error.response?.data) {
+                    const data = error.response?.data as common.ErrorResponseBody;
+                    if (data && data.error) {
+                        return onError(data.error);
+                    }
+                }
+                return onError(error.message);
+            }
+        );
+    };
+};
+
+export const generateCalculateEvpiRequest = () => {
+    const validateResponse = validateAxiosResponse(common.CalculateEvpiResponseSchema);
+    return async ({
+        accessToken,
+        graph,
+        computation,
+        onSuccess = () => {},
+        onFailed = () => {},
+        onError = () => {}
+    }: {
+        accessToken: string;
+        graph: common.Graph;
+        computation: common.BackendComputationState;
+        onSuccess?: (data: common.CalculateEvpiData) => void;
+        onFailed?: (error: common.RExecutionError) => void;
+        onError?: (error: string) => void;
+    }) => {
+        return validateResponse(
+            axios.post(
+                (await getBackendBaseURL()) + "/api/r/calculate_evpi",
+                { graph, computation } as common.CalculateResultHistogramRequestBody,
+                {
+                    headers: { "Content-Type": "application/json", [BEARER_HEADER]: `Bearer ${accessToken}` },
+                    timeout: DSUI_R_MAX_RUNTIME
+                }
+            ),
+            (response: AxiosResponse) => {
+                if (response.status === 200) {
+                    const responseData = response.data as common.CalculateEvpiResult;
+                    if (responseData.data && !responseData.error) {
+                        return onSuccess(responseData.data);
+                    } else {
+                        return onFailed(responseData.error);
+                    }
+                }
+                return onError(`unknown success status '${response.status}' after calculating evpi`);
+            },
+            (message: string) => {
+                console.error(`validation error while calculating evpi:\n\n${message}`);
                 return onError(message);
             },
             (error: AxiosError) => {

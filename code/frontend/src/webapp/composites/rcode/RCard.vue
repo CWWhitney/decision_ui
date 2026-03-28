@@ -8,6 +8,7 @@
     import * as common from "@decision-support-ui/common";
     import { useGraphStore } from "@/state/graph";
     import RErrorDialog from "./RErrorDialog.vue";
+    import REvpiDiagramTab from "./REvpiDiagramTab.vue";
 
     const rStore = useRStore();
     const account = useAccountStore();
@@ -22,23 +23,58 @@
         common.convertEstimatesToCSV(common.generateEstimatesTableFromGraph(graph.state.nodes))
     );
 
-    const runResultHistogram = () => {
-        console.log("runResultHistogram");
-        rStore.calculateResultHistogram();
-    };
-
     const resultHistogramDataTable = computed(() => {
         const data = rStore.state.resultHistogram.data;
         if (!data) {
             return null;
         }
-        console.log("result histogram data: ", data);
         return data.bins.map((bin, idx) => {
             return {
                 bins: bin,
                 ...Object.fromEntries(data.variables.map((v, i) => [v, data.counts[idx]![i]]))
             };
         }) as { [header: string]: any }[];
+    });
+
+    const evpiDataTable = computed(() => {
+        const data = rStore.state.evpi.data;
+        if (!data) {
+            return null;
+        }
+        const estimateVariables = Object.keys(data);
+        if (!estimateVariables) {
+            return null;
+        }
+        const resultVariables = Object.keys(data[estimateVariables[0]!] ?? {});
+        if (!resultVariables) {
+            return null;
+        }
+
+        return estimateVariables.map(estimateVariable => {
+            return {
+                variables: estimateVariable,
+                ...Object.fromEntries(
+                    resultVariables.map(resultVariable => [resultVariable, data[estimateVariable]![resultVariable]])
+                )
+            };
+        }) as { [header: string]: any }[];
+    });
+
+    const evpiTableColumns = computed(() => {
+        const data = rStore.state.evpi.data;
+        if (!data) {
+            return null;
+        }
+        const estimateVariables = Object.keys(data);
+        if (!estimateVariables) {
+            return null;
+        }
+        const resultVariables = Object.keys(data[estimateVariables[0]!] ?? {});
+        if (!resultVariables) {
+            return null;
+        }
+
+        return ["variables", ...resultVariables];
     });
 </script>
 
@@ -78,7 +114,7 @@
                                 :status="rStore.state.resultHistogram.status"
                                 :code="rStore.computedRHistogramCode"
                                 :estimates-csv="estimatesCsv"
-                                :run="runResultHistogram"
+                                :run="() => rStore.calculateResultHistogram()"
                                 :can-run="!!rStore.computedRHistogramCode && account.isLoggedIn"
                                 description="The R script that corresponds to the model and plots result variables in a histogram:"
                             />
@@ -87,7 +123,7 @@
                             <RDataTab
                                 description="Calculated bins and counts for the result histogram:"
                                 :data="resultHistogramDataTable"
-                                :run="runResultHistogram"
+                                :run="() => rStore.calculateResultHistogram()"
                                 :status="rStore.state.resultHistogram.status"
                                 :columns="['bins', ...(rStore.state.resultHistogram.data?.variables ?? [])]"
                                 :can-run="!!rStore.computedRHistogramCode && account.isLoggedIn"
@@ -96,19 +132,37 @@
                         <v-tabs-window-item value="histogram+diagram">
                             <RHistogramTab
                                 :data="rStore.state.resultHistogram.data"
-                                :run="runResultHistogram"
+                                :run="() => rStore.calculateResultHistogram()"
                                 :status="rStore.state.resultHistogram.status"
                                 :can-run="!!rStore.computedRHistogramCode && account.isLoggedIn"
                             />
                         </v-tabs-window-item>
                         <v-tabs-window-item value="evpi+code">
                             <RCodeTab
-                                :status="rStore.state.resultHistogram.status"
+                                :status="rStore.state.evpi.status"
                                 :code="rStore.computedREvpiCode"
                                 :estimates-csv="estimatesCsv"
-                                :run="runResultHistogram"
-                                :can-run="!!rStore.computedRHistogramCode && account.isLoggedIn"
-                                description="The R script that implements the EVPI (Expected Value of Perfect Information) analysis:"
+                                :run="() => rStore.calculateEvpi()"
+                                :can-run="!!rStore.computedREvpiCode && account.isLoggedIn"
+                                description="The R script that calculates the EVPI (Expected Value of Perfect Information):"
+                            />
+                        </v-tabs-window-item>
+                        <v-tabs-window-item value="evpi+data">
+                            <RDataTab
+                                description="Calculated EVPI for each result variable:"
+                                :data="evpiDataTable"
+                                :run="() => rStore.calculateEvpi()"
+                                :status="rStore.state.evpi.status"
+                                :columns="evpiTableColumns"
+                                :can-run="!!rStore.computedREvpiCode && account.isLoggedIn"
+                            />
+                        </v-tabs-window-item>
+                        <v-tabs-window-item value="evpi+diagram">
+                            <REvpiDiagramTab
+                                :status="rStore.state.evpi.status"
+                                :run="() => rStore.calculateEvpi()"
+                                :can-run="!!rStore.computedREvpiCode && account.isLoggedIn"
+                                :data="rStore.state.evpi.data"
                             />
                         </v-tabs-window-item>
                     </v-tabs-window>

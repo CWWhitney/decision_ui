@@ -26,7 +26,7 @@
 </script>
 
 <template>
-    <div>
+    <div class="alertContainer">
         <v-alert v-if="!!computationError" type="error" variant="outlined">{{ computationError }}</v-alert>
         <v-alert v-else-if="noResultNodes" type="info" variant="outlined"
             >You need to add at least one result node to your model.</v-alert
@@ -36,3 +36,9 @@
         >
     </div>
 </template>
+
+<style lang="scss" scoped>
+    .alertContainer {
+        margin-bottom: 1em;
+    }
+</style>

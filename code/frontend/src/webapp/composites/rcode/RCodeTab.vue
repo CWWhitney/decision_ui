@@ -74,8 +74,8 @@
             </template>
         </v-toolbar>
 
-        <highlightjs v-if="props.code !== null" language="r" :autodetect="false" :code="props.code" class="code" />
         <RHint />
+        <highlightjs v-if="props.code !== null" language="r" :autodetect="false" :code="props.code" class="code" />
     </div>
 </template>
 

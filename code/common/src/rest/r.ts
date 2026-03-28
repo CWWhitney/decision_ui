@@ -19,21 +19,23 @@ export const CalculateResultHistogramRequestSchema: Schema = {
     additionalProperties: false
 };
 
-export interface RExecutionState {
+export interface RExecutionError {
+    reason: string;
     stdout: string;
     stderr: string;
     exitcode: number;
 }
 
-export const RExcecutionSchema: Schema = {
-    title: "RExcecutionSchema",
+export const RExcecutionErrorSchema: Schema = {
+    title: "RExcecutionErrorSchema",
     type: "object",
     properties: {
+        reason: { type: "string" },
         stdout: { type: "string" },
         stderr: { type: "string" },
-        exitcode: { type: "integer" }
+        exitcode: { oneOf: [{ type: "integer" }, { type: "null" }] }
     },
-    required: ["stdout", "stderr", "exitcode"],
+    required: ["reason", "stdout", "stderr", "exitcode"],
     additionalProperties: false
 };
 
@@ -56,7 +58,7 @@ export const CalculateResultHistogramDataSchema: Schema = {
 
 export interface CalculateResultHistogramResult {
     data: CalculateResultHistogramData | null;
-    execution: RExecutionState;
+    error: RExecutionError;
 }
 
 export type CalculateResultHistogramResponseBody = CalculateResultHistogramResult | ErrorResponseBody;
@@ -68,10 +70,86 @@ export const CalculateResultHistogramResponseSchema: Schema = {
         {
             type: "object",
             properties: {
-                data: { oneOf: [CalculateResultHistogramDataSchema, { type: "null" }] },
-                execution: RExcecutionSchema
+                data: CalculateResultHistogramDataSchema,
+                error: { type: "null" }
             },
-            required: ["data", "execution"],
+            required: ["data", "error"],
+            additionalProperties: false
+        },
+        {
+            type: "object",
+            properties: {
+                data: { type: "null" },
+                error: RExcecutionErrorSchema
+            },
+            required: ["data", "error"],
+            additionalProperties: false
+        },
+        ErrorResponseSchema
+    ]
+};
+
+export interface CalculateEvpiRequestBody {
+    graph: Graph;
+    computation: BackendComputationState;
+}
+
+export const CalculateEvpiRequestSchema: Schema = {
+    title: "CalculateEvpiRequestSchema",
+    type: "object",
+    properties: {
+        graph: GraphSchema,
+        computation: BackendComputationSchema
+    },
+    required: ["graph", "computation"],
+    additionalProperties: false
+};
+
+export interface CalculateEvpiData {
+    [estimateVariable: string]: {
+        [resultVariable: string]: number;
+    };
+}
+
+export const CalculateEvpiDataSchema: Schema = {
+    type: "object",
+    patternProperties: {
+        "^.*$": {
+            type: "object",
+            patternProperties: {
+                "^.*$": { type: "number" }
+            }
+        }
+    }
+};
+
+export interface CalculateEvpiResult {
+    data: CalculateEvpiData | null;
+    error: RExecutionError;
+}
+
+export type CalculateEvpiResponseBody = CalculateEvpiResult | ErrorResponseBody;
+
+export const CalculateEvpiResponseSchema: Schema = {
+    title: "CalculateEvpiResponseSchema",
+    type: "object",
+    oneOf: [
+        {
+            type: "object",
+            properties: {
+                data: CalculateEvpiDataSchema,
+                error: { type: "null" }
+            },
+            required: ["data", "error"],
+            additionalProperties: false
+        },
+        {
+            type: "object",
+            properties: {
+                data: { type: "null" },
+                error: RExcecutionErrorSchema
+            },
+            required: ["data", "error"],
             additionalProperties: false
         },
         ErrorResponseSchema

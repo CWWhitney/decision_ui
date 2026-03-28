@@ -9,6 +9,8 @@ export interface FrontendComputationState {
 export interface BackendComputationState {
     mcRuns: number;
     histogramBins: number;
+    evpiMcRuns: number;
+    maxRuntime: number;
 }
 
 export interface ComputationFileState {
@@ -30,9 +32,11 @@ export const BackendComputationSchema: Schema = {
     type: "object",
     properties: {
         mcRuns: { type: "number" },
-        histogramBins: { type: "number" }
+        histogramBins: { type: "number" },
+        evpiMcRuns: { type: "number" },
+        maxRuntime: { type: "number" }
     },
-    required: ["mcRuns", "histogramBins"]
+    required: ["mcRuns", "histogramBins", "evpiMcRuns"]
 };
 
 export const ComputationFileSchema: Schema = {
