@@ -1,7 +1,6 @@
 <script lang="ts" setup>
     import DebouncedNumberInput from "@/components/form/DebouncedNumberInput.vue";
     import HelpHintWrapper from "@/components/form/HelpHintWrapper.vue";
-    import { DETERMINISTIC_DISTRIBUTION } from "@/editor/distributions";
     import * as common from "@decision-support-ui/common";
 
     const node = defineModel<common.EstimateNode>({
@@ -28,7 +27,7 @@
     </HelpHintWrapper>
     <template v-if="node.function.isModifiable">
         <h4>Options</h4>
-        <template v-if="node.function.distribution != DETERMINISTIC_DISTRIBUTION">
+        <template v-if="node.function.distribution != common.DETERMINISTIC_DISTRIBUTION_TYPE">
             <p class="noTopMargin">Choose an interval of allowed values for both lower and upper bounds:</p>
             <p class="noTopMargin">Lower Bound (5%-Quantile)</p>
             <HelpHintWrapper to="/help/user-interface/model-editor">

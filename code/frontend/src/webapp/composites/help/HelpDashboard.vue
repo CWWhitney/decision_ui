@@ -5,9 +5,9 @@
     import { useRoute } from "vue-router";
     import { computedAsync } from "@vueuse/core";
 
-    import WorkspaceCard from "../layout/CardContainer.vue";
     import markdownit from "markdown-it";
     import markdownit_replace_link from "markdown-it-replace-link";
+    import CardContainer from "@/components/layout/CardContainer.vue";
 
     const HELP_BASE_PATH = "#/help";
 
@@ -100,7 +100,7 @@
 </script>
 
 <template>
-    <WorkspaceCard>
+    <CardContainer>
         <v-card color="white" elevation="1" rounded class="card">
             <v-card-text>
                 <v-breadcrumbs :items="breadcrumbs" class="breadcrumbs">
@@ -111,7 +111,7 @@
                 <div class="markdown" v-html="markdown" />
             </v-card-text>
         </v-card>
-    </WorkspaceCard>
+    </CardContainer>
 </template>
 
 <style scoped lang="scss">

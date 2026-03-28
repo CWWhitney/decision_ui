@@ -1,7 +1,7 @@
 <script setup lang="ts">
-    import NetworkErrorSnackbar from "./components/old/NetworkErrorSnackbar.vue";
     import GlobalDialogs from "./composites/global/GlobalDialogs.vue";
     import GlobalShortcuts from "./composites/global/GlobalShortcuts.vue";
+    import GlobalSnackbar from "./composites/global/GlobalSnackbar.vue";
     import GlobalTensorflowSetup from "./composites/global/GlobalTensorflowSetup.vue";
 </script>
 
@@ -11,7 +11,7 @@
         <GlobalShortcuts />
         <GlobalDialogs />
         <GlobalTensorflowSetup />
-        <NetworkErrorSnackbar />
+        <GlobalSnackbar />
     </v-app>
 </template>
 
