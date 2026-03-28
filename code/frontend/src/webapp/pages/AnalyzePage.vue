@@ -1,9 +1,9 @@
 <script setup lang="ts">
-    import TopMenu from "@/composites/menu/TopMenu.vue";
-    import LeftNavigation from "@/composites/menu/LeftNavigation.vue";
-    import CardContainer from "@/components/layout/CardContainer.vue";
-    import EstimatesSlidersList from "@/composites/analyze/EstimatesSlidersList.vue";
-    import ResultDiagramTabs from "@/composites/analyze/ResultDiagramTabs.vue";
+    import TopMenu from "../composites/menu/TopMenu.vue";
+    import LeftNavigation from "../composites/menu/LeftNavigation.vue";
+    import CardContainer from "../components/layout/CardContainer.vue";
+    import EstimatesSlidersList from "../composites/analyze/EstimatesSlidersList.vue";
+    import ResultDiagramTabs from "../composites/analyze/ResultDiagramTabs.vue";
 </script>
 
 <template>

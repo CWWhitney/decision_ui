@@ -1,14 +1,16 @@
 <script lang="ts" setup>
-    import { sleep } from "@/common/async";
-    import { catchForComputedResult, COMPUTED_RESULT_ERROR_TYPE } from "@/common/computed";
-    import { UI_REFRESH_SLEEP_TIMEOUT } from "@/common/constants";
-    import MultiHistogramChart from "@/components/charts/MultiHistogramChart.vue";
-    import { useComputationStore } from "@/state/computation";
-    import { useGraphStore } from "@/state/graph";
-    import { useMetadataStore } from "@/state/metadata";
-    import * as common from "@decision-support-ui/common";
     import { computedAsync } from "@vueuse/core";
     import { computed, ref } from "vue";
+    import * as common from "@decision-support-ui/common";
+
+    import { sleep } from "../../common/async";
+    import { catchForComputedResult, COMPUTED_RESULT_ERROR_TYPE } from "../../common/computed";
+    import { UI_REFRESH_SLEEP_TIMEOUT } from "../../common/constants";
+    import { useComputationStore } from "../../state/computation";
+    import { useGraphStore } from "../../state/graph";
+    import { useMetadataStore } from "../../state/metadata";
+
+    import MultiHistogramChart from "../../components/charts/MultiHistogramChart.vue";
 
     const metadata = useMetadataStore();
     const graph = useGraphStore();

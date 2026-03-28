@@ -1,9 +1,11 @@
 <script lang="ts" setup>
-    import RRunButton from "@/components/r/RRunButton.vue";
-    import { type RExecutionStatus } from "@/state/r";
     import { type CalculateEvpiData } from "@decision-support-ui/common";
+
+    import RRunButton from "../../components/r/RRunButton.vue";
+    import { type RExecutionStatus } from "../../state/r";
+    import EvpiBoxChart from "../../components/charts/EvpiBoxChart.vue";
+
     import RHint from "./RHint.vue";
-    import EvpiBoxChart from "@/components/charts/EvpiBoxChart.vue";
 
     withDefaults(
         defineProps<{

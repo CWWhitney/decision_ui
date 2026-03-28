@@ -1,4 +1,5 @@
 <script setup lang="ts">
+    import { ref, watch } from "vue";
     import {
         VueFlow,
         useVueFlow,
@@ -14,10 +15,11 @@
 
     import * as common from "@decision-support-ui/common";
 
-    import { useGraphStore } from "@/state/graph";
-    import { useNodeEditDialogStore } from "@/state/node_edit";
-    import { ref, watch } from "vue";
-    import { useEditorStore } from "@/state/editor";
+    import { useGraphStore } from "../../state/graph";
+    import { useNodeEditDialogStore } from "../../state/node_edit";
+
+    import { useEditorStore } from "../../state/editor";
+    import { EDITOR_GRID_DISTANCE } from "../../common/constants";
 
     import FlowNode from "./graph/FlowNode.vue";
     import FlowEdge from "./graph/FlowEdge.vue";
@@ -25,7 +27,6 @@
     import EditorToolbar from "./EditorToolbar.vue";
     import EditorShortcuts from "./EditorShortcuts.vue";
     import EditorSubgraphIndicator from "./EditorSubgraphIndicator.vue";
-    import { EDITOR_GRID_DISTANCE } from "@/common/constants";
 
     const graph = useGraphStore();
     const editor = useEditorStore();

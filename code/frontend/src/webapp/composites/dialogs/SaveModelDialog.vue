@@ -3,10 +3,10 @@
         SAVE_MODEL_TO_ACCOUNT_TAB,
         SAVE_MODEL_TO_FILE_TAB,
         useSaveModelDialogStore
-    } from "@/state/save_model_dialog";
+    } from "../../state/save_model_dialog";
 
-    import { useAccountStore } from "@/state/account";
-    import { useMetadataStore } from "@/state/metadata";
+    import { useAccountStore } from "../../state/account";
+    import { useMetadataStore } from "../../state/metadata";
 
     const account = useAccountStore();
     const metadata = useMetadataStore();

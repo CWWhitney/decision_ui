@@ -1,12 +1,13 @@
 <script setup lang="ts">
-    import TopMenuItem from "@/components/menu/TopMenuItem.vue";
-    import { useEditorStore } from "@/state/editor";
-    import { useGraphStore } from "@/state/graph";
-    import { generateInsertGraphFromClipboard, saveGraphFileToClipboard } from "@/state/io";
-    import type { Position } from "@decision-support-ui/common";
     import { useVueFlow } from "@vue-flow/core";
     import { computed } from "vue";
     import { useRoute } from "vue-router";
+    import type { Position } from "@decision-support-ui/common";
+
+    import TopMenuItem from "../../components/menu/TopMenuItem.vue";
+    import { useEditorStore } from "../../state/editor";
+    import { useGraphStore } from "../../state/graph";
+    import { generateInsertGraphFromClipboard, saveGraphFileToClipboard } from "../../state/io";
 
     const {
         removeSelectedElements,

@@ -1,10 +1,12 @@
 <script setup lang="ts">
     import type { Chart } from "chart.js";
     import { onBeforeUnmount, onMounted, onUpdated, ref, useTemplateRef } from "vue";
+
     import { drawHistogramChart } from "../../charts/histogram";
     import { downloadChart } from "../../charts/download";
+    import { CHART_DOWNLOAD_DPR } from "../../common/constants";
+
     import ChartDownloadButtons from "./ChartDownloadButtons.vue";
-    import { CHART_DOWNLOAD_DPR } from "@/common/constants";
 
     const { bins, counts, label } = defineProps<{ bins: number[]; counts: number[]; label: string }>();
 

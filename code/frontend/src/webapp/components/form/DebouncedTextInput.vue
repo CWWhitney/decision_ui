@@ -1,10 +1,8 @@
 <script setup lang="ts">
-    /**
-     * Functions Tab of the Node Edit Dialog for Nodes with Operation or Result Function Type
-     */
-    import { USER_INPUT_DEBOUNCE_TIME } from "@/common/constants";
-    import { debounce } from "@decision-support-ui/common";
     import { ref, watch } from "vue";
+    import { debounce } from "@decision-support-ui/common";
+
+    import { USER_INPUT_DEBOUNCE_TIME } from "../../common/constants";
 
     const model = defineModel<string>({
         required: true

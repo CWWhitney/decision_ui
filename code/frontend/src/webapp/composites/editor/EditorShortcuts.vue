@@ -1,10 +1,11 @@
 <script setup lang="ts">
-    import { useEditorStore } from "@/state/editor";
-    import { useGraphStore } from "@/state/graph";
-    import { generateInsertGraphFromClipboard, saveGraphFileToClipboard } from "@/state/io";
-    import type { Position } from "@decision-support-ui/common";
-    import { useVueFlow } from "@vue-flow/core";
     import { onMounted, onUnmounted } from "vue";
+    import { useVueFlow } from "@vue-flow/core";
+    import type { Position } from "@decision-support-ui/common";
+
+    import { useEditorStore } from "../../state/editor";
+    import { useGraphStore } from "../../state/graph";
+    import { generateInsertGraphFromClipboard, saveGraphFileToClipboard } from "../../state/io";
 
     const {
         addSelectedNodes,

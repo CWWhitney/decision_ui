@@ -1,11 +1,12 @@
 <script setup lang="ts">
-    import { useGraphStore } from "@/state/graph";
-    import * as common from "@decision-support-ui/common";
+    import { computed } from "vue";
     import { useVueFlow, type Rect, type XYPosition } from "@vue-flow/core";
+    import * as common from "@decision-support-ui/common";
+
+    import { useGraphStore } from "../../state/graph";
 
     import FlowNodeBox from "../../components/editor/graph/FlowNodeBox.vue";
-    import { useEditorStore } from "@/state/editor";
-    import { computed } from "vue";
+    import { useEditorStore } from "../../state/editor";
 
     const {
         fitView,

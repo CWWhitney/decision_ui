@@ -1,7 +1,8 @@
 <script setup lang="ts">
-    import TopMenuItem from "@/components/menu/TopMenuItem.vue";
     import { useRouter } from "vue-router";
-    import { useAiSupportDialogStore } from "@/state/ai_support";
+
+    import TopMenuItem from "../../components/menu/TopMenuItem.vue";
+    import { useAiSupportDialogStore } from "../../state/ai_support";
 
     const router = useRouter();
     const aiSupportDialog = useAiSupportDialogStore();

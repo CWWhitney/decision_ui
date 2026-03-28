@@ -1,15 +1,14 @@
 <script setup lang="ts">
-    import { loadModelFileToState } from "@/state/io";
+    import * as common from "@decision-support-ui/common";
+
+    import { loadModelFileToState } from "../../state/io";
     import {
         OPEN_MODEL_FROM_ACCOUNT_TAB,
         OPEN_MODEL_FROM_EXAMPLE_TAB,
         OPEN_MODEL_FROM_FILE_TAB,
         useOpenModelDialogStore
-    } from "@/state/open_model";
-
-    import * as common from "@decision-support-ui/common";
-
-    import { useAccountStore } from "@/state/account";
+    } from "../../state/open_model";
+    import { useAccountStore } from "../../state/account";
 
     const account = useAccountStore();
     const openModelDialog = useOpenModelDialogStore();

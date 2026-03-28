@@ -1,10 +1,9 @@
 <script setup lang="ts">
-    /**
-     * Functions Tab of the Node Edit Dialog for Nodes with Operation or Result Function Type
-     */
-    import { USER_INPUT_DEBOUNCE_TIME } from "@/common/constants";
-    import { getExpressionError, debounce } from "@decision-support-ui/common";
     import { computed, nextTick, ref, shallowRef, watch } from "vue";
+    import { getExpressionError, debounce } from "@decision-support-ui/common";
+
+    import { USER_INPUT_DEBOUNCE_TIME } from "../../../common/constants";
+
     import ExpressionToolbarButton from "./ExpressionToolbarButton.vue";
     import ChanceEventExpressionDialog from "../dialogs/ChanceEventExpressionDialog.vue";
     import ValueVarierExpressionDialog from "../dialogs/ValueVarierExpressionDialog.vue";

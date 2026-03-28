@@ -1,7 +1,7 @@
 <script setup lang="ts">
-    import TopMenuItem from "@/components/menu/TopMenuItem.vue";
-    import { useAccountStore } from "@/state/account";
-    import { useLoginDialogStore } from "@/state/account/login_dialog";
+    import TopMenuItem from "../../components/menu/TopMenuItem.vue";
+    import { useAccountStore } from "../../state/account";
+    import { useLoginDialogStore } from "../../state/account/login_dialog";
 
     const account = useAccountStore();
     const loginDialog = useLoginDialogStore();

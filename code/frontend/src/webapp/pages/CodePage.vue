@@ -1,8 +1,8 @@
 <script setup lang="ts">
-    import TopMenu from "@/composites/menu/TopMenu.vue";
-    import LeftNavigation from "@/composites/menu/LeftNavigation.vue";
-    import CardContainer from "@/components/layout/CardContainer.vue";
-    import RCard from "@/composites/rcode/RCard.vue";
+    import TopMenu from "../composites/menu/TopMenu.vue";
+    import LeftNavigation from "../composites/menu/LeftNavigation.vue";
+    import CardContainer from "../components/layout/CardContainer.vue";
+    import RCard from "../composites/rcode/RCard.vue";
 </script>
 
 <template>

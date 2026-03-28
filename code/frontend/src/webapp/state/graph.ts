@@ -8,7 +8,7 @@ import { useRefHistory } from "@vueuse/core";
 import * as common from "@decision-support-ui/common";
 
 import { useComputationStore } from "./computation";
-import { makeSafeComputedGetterByKey } from "@/common/computed";
+import { makeSafeComputedGetterByKey } from "../common/computed";
 import { useValidatedSessionStorage } from "./io";
 
 export const FLOW_GRAPH_STORE_ID = "graph";

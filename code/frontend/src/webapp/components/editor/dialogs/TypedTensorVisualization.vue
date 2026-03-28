@@ -1,16 +1,17 @@
 <script setup lang="ts">
     import * as common from "@decision-support-ui/common";
     import * as tf from "@tensorflow/tfjs";
+
     import { computedAsync } from "@vueuse/core";
-    import { ref } from "vue";
+    import { computed, ref } from "vue";
 
     import DeterministicValueChart from "../../charts/DeterministicValueChart.vue";
     import ProbabilisticValueChart from "../../charts/ProbabilisticValueChart.vue";
     import DeterministicSeriesChart from "../../charts/DeterministicSeriesChart.vue";
     import ProbabilisticSeriesBoxPlotChart from "../../charts/ProbabilisticSeriesBoxPlotChart.vue";
-    import { computed } from "vue";
-    import { sleep } from "@/common/async";
-    import { UI_REFRESH_SLEEP_TIMEOUT } from "@/common/constants";
+
+    import { sleep } from "../../../common/async";
+    import { UI_REFRESH_SLEEP_TIMEOUT } from "../../../common/constants";
 
     const { nodeTitle, tt, bins } = defineProps<{
         nodeTitle: string;

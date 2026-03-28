@@ -1,5 +1,6 @@
 <script setup lang="ts">
     import { computed, ref } from "vue";
+    import * as common from "@decision-support-ui/common";
 
     import {
         NODE_EDIT_DATA_TAB,
@@ -9,17 +10,17 @@
         NODE_EDIT_STYLE_TAB,
         NODE_EDIT_ANALYZE_TAB,
         useNodeEditDialogStore
-    } from "@/state/node_edit";
+    } from "../../../state/node_edit";
 
-    import * as common from "@decision-support-ui/common";
-    import { useGraphStore } from "@/state/graph";
+    import { useGraphStore } from "../../../state/graph";
 
     import NodeEditGeneralTab from "../../../components/editor/dialogs/NodeEditGeneralTab.vue";
+    import NodeEditStyleTab from "../../../components/editor/dialogs/NodeEditStyleTab.vue";
+    import NodeEditAnalyzeTab from "../../../components/editor/dialogs/NodeEditAnalyzeTab.vue";
+
     import NodeEditFunctionTab from "./NodeEditFunctionTab.vue";
     import NodeEditDebugTab from "./NodeEditDebugTab.vue";
     import NodeEditDataTab from "./NodeEditDataTab.vue";
-    import NodeEditStyleTab from "../../../components/editor/dialogs/NodeEditStyleTab.vue";
-    import NodeEditAnalyzeTab from "@/components/editor/dialogs/NodeEditAnalyzeTab.vue";
 
     const nodeEditDialog = useNodeEditDialogStore();
     const graph = useGraphStore();

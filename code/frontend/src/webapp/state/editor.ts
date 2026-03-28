@@ -9,8 +9,9 @@ import {
 } from "@vue-flow/core";
 
 import * as common from "@decision-support-ui/common";
+
 import { useGraphStore } from "./graph";
-import { getHandlePositions } from "@/common/layout";
+import { getHandlePositions } from "../common/layout";
 import { useValidatedSessionStorage } from "./io";
 
 export const EDITOR_STORE_ID = "editor";

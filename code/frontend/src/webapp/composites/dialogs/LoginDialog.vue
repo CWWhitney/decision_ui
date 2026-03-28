@@ -1,8 +1,8 @@
 <script lang="ts" setup>
     import { computed, ref } from "vue";
-
-    import { useLoginDialogStore } from "@/state/account/login_dialog";
     import { USERNAME_REGEX_PATTERN } from "@decision-support-ui/common";
+
+    import { useLoginDialogStore } from "../../state/account/login_dialog";
 
     const loginDialog = useLoginDialogStore();
 

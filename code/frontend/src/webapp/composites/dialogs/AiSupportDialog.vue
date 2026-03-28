@@ -1,11 +1,12 @@
 <script setup lang="ts">
-    import { useAiSupportDialogStore } from "@/state/ai_support";
     import { ref } from "vue";
+    import * as common from "@decision-support-ui/common";
+
+    import { useAiSupportDialogStore } from "../../state/ai_support";
     import AI_PROMPT_TOOL_DESCRIPTION from "../../../../resources/ai_prompt/tool_description.md?raw";
     import AI_PROMPT_GRAMMAR from "../../../../resources/ai_prompt/grammar.md?raw";
     import AI_PROMPT_RESPONSE from "../../../../resources/ai_prompt/response.md?raw";
-    import { useGraphStore } from "@/state/graph";
-    import * as common from "@decision-support-ui/common";
+    import { useGraphStore } from "../../state/graph";
 
     const aiSupportDialog = useAiSupportDialogStore();
     const graph = useGraphStore();

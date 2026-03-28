@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import DebouncedTextInput from "@/components/form/DebouncedTextInput.vue";
+    import DebouncedTextInput from "../../form/DebouncedTextInput.vue";
     import {
         COLLECTION_NODE_TYPE,
         ESTIMATE_FUNCTION_TYPE,

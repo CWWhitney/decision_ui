@@ -1,9 +1,10 @@
 <script lang="ts" setup>
-    import { useGraphStore } from "@/state/graph";
     import { computed } from "vue";
     import * as common from "@decision-support-ui/common";
-    import { catchForComputedResult, COMPUTED_RESULT_ERROR_TYPE } from "@/common/computed";
-    import { useAccountStore } from "@/state/account";
+
+    import { catchForComputedResult, COMPUTED_RESULT_ERROR_TYPE } from "../../common/computed";
+    import { useGraphStore } from "../../state/graph";
+    import { useAccountStore } from "../../state/account";
 
     const graph = useGraphStore();
     const account = useAccountStore();

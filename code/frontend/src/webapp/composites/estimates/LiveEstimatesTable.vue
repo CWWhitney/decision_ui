@@ -2,7 +2,8 @@
     import { computed, useTemplateRef } from "vue";
     import FileSaver from "file-saver";
     import * as common from "@decision-support-ui/common";
-    import { useGraphStore } from "@/state/graph";
+
+    import { useGraphStore } from "../../state/graph";
 
     const graph = useGraphStore();
 

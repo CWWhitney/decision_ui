@@ -1,9 +1,9 @@
 <script setup lang="ts">
-    import TopMenu from "@/composites/menu/TopMenu.vue";
-    import LeftNavigation from "@/composites/menu/LeftNavigation.vue";
+    import TopMenu from "../composites/menu/TopMenu.vue";
+    import LeftNavigation from "../composites/menu/LeftNavigation.vue";
     import WorkspaceCards from "../components/layout/CardContainer.vue";
-    import DebouncedTextInput from "@/components/form/DebouncedTextInput.vue";
-    import { useMetadataStore } from "@/state/metadata";
+    import DebouncedTextInput from "../components/form/DebouncedTextInput.vue";
+    import { useMetadataStore } from "../state/metadata";
 
     const metadata = useMetadataStore();
 </script>

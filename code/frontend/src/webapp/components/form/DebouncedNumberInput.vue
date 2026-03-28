@@ -1,7 +1,8 @@
 <script setup lang="ts">
-    import { USER_INPUT_DEBOUNCE_TIME } from "@/common/constants";
-    import { debounce } from "@decision-support-ui/common";
     import { ref, watch } from "vue";
+    import { debounce } from "@decision-support-ui/common";
+
+    import { USER_INPUT_DEBOUNCE_TIME } from "../../common/constants";
 
     const model = defineModel<number>({
         required: true

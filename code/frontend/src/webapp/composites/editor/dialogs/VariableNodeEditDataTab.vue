@@ -1,17 +1,19 @@
 <script setup lang="ts">
-    import { useGraphStore } from "@/state/graph";
-    import { type Node } from "@decision-support-ui/common";
-    import TypedTensorVisualization from "@/components/editor/dialogs/TypedTensorVisualization.vue";
-    import { useComputationStore } from "@/state/computation";
-    import { computedAsync } from "@vueuse/core";
-    import { sleep } from "@/common/async";
-    import { UI_REFRESH_SLEEP_TIMEOUT } from "@/common/constants";
     import { ref } from "vue";
+    import { computedAsync } from "@vueuse/core";
+    import { type Node } from "@decision-support-ui/common";
+
+    import { useGraphStore } from "../../../state/graph";
+    import { useComputationStore } from "../../../state/computation";
+    import { sleep } from "../../../common/async";
+    import { UI_REFRESH_SLEEP_TIMEOUT } from "../../../common/constants";
     import {
         catchForComputedResult,
         COMPUTED_RESULT_ERROR_TYPE,
         COMPUTED_RESULT_SUCCESS_TYPE
-    } from "@/common/computed";
+    } from "../../../common/computed";
+
+    import TypedTensorVisualization from "../../../components/editor/dialogs/TypedTensorVisualization.vue";
 
     const node = defineModel<Node>({ required: true });
     const graphStore = useGraphStore();

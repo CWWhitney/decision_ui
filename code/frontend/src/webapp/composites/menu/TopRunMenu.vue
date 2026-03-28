@@ -1,8 +1,8 @@
 <script setup lang="ts">
-    import LazySlider from "@/components/form/LazySlider.vue";
-    import TopMenuItem from "@/components/menu/TopMenuItem.vue";
-    import { useAccountStore } from "@/state/account";
-    import { useComputationStore } from "@/state/computation";
+    import LazySlider from "../../components/form/LazySlider.vue";
+    import TopMenuItem from "../../components/menu/TopMenuItem.vue";
+    import { useAccountStore } from "../../state/account";
+    import { useComputationStore } from "../../state/computation";
 
     const computation = useComputationStore();
     const account = useAccountStore();

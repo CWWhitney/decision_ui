@@ -3,7 +3,7 @@ import { useGraphStore } from "./graph";
 
 import * as common from "@decision-support-ui/common";
 import { computed, ref } from "vue";
-import { generateCalculateEvpiRequest, generateCalculateResultHistogramRequest } from "@/rest/r";
+import { generateCalculateEvpiRequest, generateCalculateResultHistogramRequest } from "../rest/r";
 import { useAccountStore } from "./account";
 import { useErrorDialogStore } from "./error_dialog";
 import { useComputationStore } from "./computation";

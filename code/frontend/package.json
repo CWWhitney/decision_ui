@@ -24,6 +24,7 @@
         "@codemirror/autocomplete": "6.20.1",
         "@codemirror/state": "^6.5.4",
         "@decision-support-ui/common": "file:../common",
+        "@decision-support-ui/server": "file:../server",
         "@electron-toolkit/preload": "^3.0.2",
         "@electron-toolkit/utils": "^4.0.0",
         "@highlightjs/vue-plugin": "^2.1.0",

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-    import DebouncedNumberInput from "@/components/form/DebouncedNumberInput.vue";
-    import HelpHintWrapper from "@/components/form/HelpHintWrapper.vue";
+    import DebouncedNumberInput from "../../form/DebouncedNumberInput.vue";
+    import HelpHintWrapper from "../../form/HelpHintWrapper.vue";
     import * as common from "@decision-support-ui/common";
 
     const node = defineModel<common.EstimateNode>({

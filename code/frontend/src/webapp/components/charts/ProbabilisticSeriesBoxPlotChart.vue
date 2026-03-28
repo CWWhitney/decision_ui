@@ -1,11 +1,13 @@
 <script setup lang="ts">
     import type { Chart } from "chart.js";
     import { onBeforeUnmount, onMounted, onUpdated, ref, useTemplateRef } from "vue";
+    import type { BoxPlotPoint } from "@decision-support-ui/common";
+
     import { drawProbabilisticSeriesBoxPlotChart } from "../../charts/boxplot";
     import { downloadChart } from "../../charts/download";
+    import { CHART_DOWNLOAD_DPR } from "../../common/constants";
+
     import ChartDownloadButtons from "./ChartDownloadButtons.vue";
-    import type { BoxPlotPoint } from "@decision-support-ui/common";
-    import { CHART_DOWNLOAD_DPR } from "@/common/constants";
 
     const { label, boxPlotData } = defineProps<{ label: string; boxPlotData: BoxPlotPoint[] }>();
 

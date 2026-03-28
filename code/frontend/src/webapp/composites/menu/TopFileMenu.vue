@@ -1,8 +1,8 @@
 <script setup lang="ts">
-    import TopMenuItem from "@/components/menu/TopMenuItem.vue";
-    import { resetState } from "@/state";
-    import { useOpenModelDialogStore } from "@/state/open_model";
-    import { useSaveModelDialogStore } from "@/state/save_model_dialog";
+    import TopMenuItem from "../../components/menu/TopMenuItem.vue";
+    import { resetState } from "../../state";
+    import { useOpenModelDialogStore } from "../../state/open_model";
+    import { useSaveModelDialogStore } from "../../state/save_model_dialog";
 
     const openModelDialog = useOpenModelDialogStore();
     const saveModelDialog = useSaveModelDialogStore();

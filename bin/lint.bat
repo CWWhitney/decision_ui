@@ -1,11 +1,11 @@
-@ECHO OFF 
+@ECHO OFF
 setlocal
 
 REM change to root directory
 CD /D "%~dp0/../"
 
-REM lint backend
-call code\backend\bin\lint.bat
+REM lint common
+call code\common\bin\lint.bat
 
 REM lint frontend
 call code\frontend\bin\lint.bat

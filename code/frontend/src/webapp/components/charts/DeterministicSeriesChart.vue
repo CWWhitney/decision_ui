@@ -4,7 +4,7 @@
     import { drawProbabilisticSeriesChart } from "../../charts/series";
     import ChartDownloadButtons from "./ChartDownloadButtons.vue";
     import { downloadChart } from "../../charts/download";
-    import { CHART_DOWNLOAD_DPR } from "@/common/constants";
+    import { CHART_DOWNLOAD_DPR } from "../../common/constants";
 
     const { values, label } = defineProps<{ values: number[]; label: string }>();
 

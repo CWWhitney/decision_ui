@@ -1,7 +1,8 @@
 <script setup lang="ts">
-    import { useComputationStore } from "@/state/computation";
     import { getBackend, setBackend, ready as tensorflowReady, ENV as tensorflowENV } from "@tensorflow/tfjs";
     import { watch } from "vue";
+
+    import { useComputationStore } from "../../state/computation";
 
     const computation = useComputationStore();
 

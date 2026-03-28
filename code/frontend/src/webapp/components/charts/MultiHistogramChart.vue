@@ -4,7 +4,7 @@
     import { drawMultiHistogramChart } from "../../charts/histogram";
     import { downloadChart } from "../../charts/download";
     import ChartDownloadButtons from "./ChartDownloadButtons.vue";
-    import { CHART_DOWNLOAD_DPR } from "@/common/constants";
+    import { CHART_DOWNLOAD_DPR } from "../../common/constants";
 
     const { bins, counts, labels, title } = defineProps<{
         bins: number[];

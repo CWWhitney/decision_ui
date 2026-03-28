@@ -1,11 +1,11 @@
 import * as common from "@decision-support-ui/common";
-
 import { ref, watch } from "vue";
 import { defineStore } from "pinia";
+
 import { downloadModelFile, loadModelFileToState, uploadFile } from "./io";
 import { useErrorDialogStore } from "./error_dialog";
 import { useAccountStore } from "./account";
-import { generateDeleteModelRequest, generateGetModelRequest, generateListModelsRequest } from "@/rest/models";
+import { generateDeleteModelRequest, generateGetModelRequest, generateListModelsRequest } from "../rest/models";
 import { useSaveModelDialogStore } from "./save_model_dialog";
 
 export const OPEN_MODEL_FROM_ACCOUNT_TAB = "account";

@@ -1,6 +1,7 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
-import { generateAddModelRequest, generateUpdateModelRequest } from "@/rest/models";
+
+import { generateAddModelRequest, generateUpdateModelRequest } from "../rest/models";
 import { useAccountStore } from "./account";
 import { downloadModelFile, getModelFileFromState } from "./io";
 import { useErrorDialogStore } from "./error_dialog";

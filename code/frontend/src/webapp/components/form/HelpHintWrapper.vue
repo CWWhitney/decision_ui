@@ -1,6 +1,7 @@
 <script setup lang="ts">
-    import { TOOLTIP_CLOSE_DELAY, TOOLTIP_OPEN_DELAY } from "@/common/constants";
     import type { RouteLocationAsPathGeneric, RouteLocationAsRelativeGeneric } from "vue-router";
+
+    import { TOOLTIP_CLOSE_DELAY, TOOLTIP_OPEN_DELAY } from "../../common/constants";
 
     const props = defineProps<{
         to?: string | RouteLocationAsPathGeneric | RouteLocationAsRelativeGeneric | undefined;

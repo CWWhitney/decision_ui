@@ -1,11 +1,11 @@
-@ECHO OFF 
+@ECHO OFF
 setlocal
 
 REM change to root directory
 CD /D "%~dp0/../"
 
-REM install backend
-call code\backend\bin\install.bat
+REM install common
+call code\common\bin\install.bat
 
 REM install frontend
 call code\frontend\bin\install.bat

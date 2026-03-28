@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { useRStore } from "@/state/r";
+    import { useRStore } from "../../state/r";
 
     const rStore = useRStore();
 </script>

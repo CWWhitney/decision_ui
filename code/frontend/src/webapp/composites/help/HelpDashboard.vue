@@ -7,7 +7,7 @@
 
     import markdownit from "markdown-it";
     import markdownit_replace_link from "markdown-it-replace-link";
-    import CardContainer from "@/components/layout/CardContainer.vue";
+    import CardContainer from "../../components/layout/CardContainer.vue";
 
     const HELP_BASE_PATH = "#/help";
 

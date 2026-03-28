@@ -1,3 +1,7 @@
+import { defineStore } from "pinia";
+import { computed, ref } from "vue";
+import type { Schema } from "ajv";
+
 import * as common from "@decision-support-ui/common";
 
 import {
@@ -5,12 +9,9 @@ import {
     generateDoRegisterRequest,
     generateDoRefreshRequest,
     generateDoLogoutRequest
-} from "@/rest/authentication";
-import { registerUnauthorizedInterceptor } from "@/rest/interceptors";
-import { defineStore } from "pinia";
-import { computed, ref } from "vue";
+} from "../../rest/authentication";
+import { registerUnauthorizedInterceptor } from "../../rest/interceptors";
 import { useErrorDialogStore } from "../error_dialog";
-import type { Schema } from "ajv";
 import { useValidatedSessionStorage } from "../io";
 
 const ACCOUNT_STORE_ID = "account";

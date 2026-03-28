@@ -1,9 +1,11 @@
 <script setup lang="ts">
     import JSZip from "jszip";
     import FileSaver from "file-saver";
-    import { TOOLTIP_OPEN_DELAY } from "@/common/constants";
-    import { type RExecutionStatus } from "@/state/r";
-    import RRunButton from "@/components/r/RRunButton.vue";
+
+    import { TOOLTIP_OPEN_DELAY } from "../../common/constants";
+    import { type RExecutionStatus } from "../../state/r";
+    import RRunButton from "../../components/r/RRunButton.vue";
+
     import RHint from "./RHint.vue";
 
     const props = withDefaults(

@@ -1,7 +1,8 @@
 <script setup lang="ts">
-    import EstimateSlider from "@/components/estimates/EstimateSlider.vue";
-    import { useGraphStore } from "@/state/graph";
     import { computed } from "vue";
+
+    import EstimateSlider from "../../components/estimates/EstimateSlider.vue";
+    import { useGraphStore } from "../../state/graph";
 
     const graph = useGraphStore();
 

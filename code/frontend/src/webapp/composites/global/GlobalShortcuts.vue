@@ -1,10 +1,11 @@
 <script setup lang="ts">
-    import { resetState } from "@/state";
-    import { useComputationStore } from "@/state/computation";
-    import { useOpenModelDialogStore } from "@/state/open_model";
-    import { useSaveModelDialogStore } from "@/state/save_model_dialog";
     import { onMounted, onUnmounted } from "vue";
     import { useRouter } from "vue-router";
+
+    import { resetState } from "../../state";
+    import { useComputationStore } from "../../state/computation";
+    import { useOpenModelDialogStore } from "../../state/open_model";
+    import { useSaveModelDialogStore } from "../../state/save_model_dialog";
 
     const openModelDialog = useOpenModelDialogStore();
     const saveModelDialog = useSaveModelDialogStore();

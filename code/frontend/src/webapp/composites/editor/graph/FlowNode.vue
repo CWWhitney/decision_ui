@@ -1,23 +1,22 @@
 <script setup lang="ts">
-    import FlowNodeBox from "@/components/editor/graph/FlowNodeBox.vue";
+    import { Position, Handle, useVueFlow } from "@vue-flow/core";
+    import type { NodeProps } from "@vue-flow/core";
+    import { NodeResizer } from "@vue-flow/node-resizer";
+    import { NodeToolbar } from "@vue-flow/node-toolbar";
+    import { computed } from "vue";
+    import * as common from "@decision-support-ui/common";
+
     import {
         NODE_EDIT_DATA_TAB,
         NODE_EDIT_FUNCTION_TAB,
         NODE_EDIT_GENERAL_TAB,
         NODE_EDIT_STYLE_TAB,
         useNodeEditDialogStore
-    } from "@/state/node_edit";
-    import { useEditorStore } from "@/state/editor";
-    import { useGraphStore } from "@/state/graph";
+    } from "../../../state/node_edit";
+    import { useEditorStore } from "../../../state/editor";
+    import { useGraphStore } from "../../../state/graph";
 
-    import * as common from "@decision-support-ui/common";
-
-    import { Position, Handle, useVueFlow } from "@vue-flow/core";
-    import type { NodeProps } from "@vue-flow/core";
-    import { NodeResizer } from "@vue-flow/node-resizer";
-    import { NodeToolbar } from "@vue-flow/node-toolbar";
-
-    import { computed } from "vue";
+    import FlowNodeBox from "../../../components/editor/graph/FlowNodeBox.vue";
 
     const { getSelectedNodes, removeNodes } = useVueFlow();
     const nodeEditDialog = useNodeEditDialogStore();

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { TOOLTIP_CLOSE_DELAY, TOOLTIP_OPEN_DELAY } from "@/common/constants";
+    import { TOOLTIP_CLOSE_DELAY, TOOLTIP_OPEN_DELAY } from "../../../common/constants";
 
     const props = defineProps<{
         label?: string;

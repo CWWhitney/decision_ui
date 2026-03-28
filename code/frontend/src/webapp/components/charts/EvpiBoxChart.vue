@@ -1,11 +1,13 @@
 <script setup lang="ts">
     import type { Chart } from "chart.js";
     import { onBeforeUnmount, onMounted, onUpdated, ref, useTemplateRef } from "vue";
-    import { downloadChart } from "../../charts/download";
-    import ChartDownloadButtons from "./ChartDownloadButtons.vue";
-    import { CHART_DOWNLOAD_DPR } from "@/common/constants";
     import type { CalculateEvpiData } from "@decision-support-ui/common";
-    import { drawEvpiBoxChart } from "@/charts/evpi";
+
+    import { downloadChart } from "../../charts/download";
+    import { CHART_DOWNLOAD_DPR } from "../../common/constants";
+    import { drawEvpiBoxChart } from "../..//charts/evpi";
+
+    import ChartDownloadButtons from "./ChartDownloadButtons.vue";
 
     const { data, title } = defineProps<{
         data: CalculateEvpiData;

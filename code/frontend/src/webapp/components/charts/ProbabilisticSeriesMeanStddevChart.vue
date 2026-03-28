@@ -1,10 +1,12 @@
 <script setup lang="ts">
     import type { Chart } from "chart.js";
     import { onBeforeUnmount, onMounted, onUpdated, ref, useTemplateRef } from "vue";
+
     import { drawProbabilisticSeriesChart } from "../../charts/series";
     import { downloadChart } from "../../charts/download";
+    import { CHART_DOWNLOAD_DPR } from "../../common/constants";
+
     import ChartDownloadButtons from "./ChartDownloadButtons.vue";
-    import { CHART_DOWNLOAD_DPR } from "@/common/constants";
 
     const { means, stddevs, label } = defineProps<{ means: number[]; stddevs: number[]; label: string }>();
 

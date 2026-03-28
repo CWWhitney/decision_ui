@@ -1,12 +1,14 @@
 <script setup lang="ts">
+    import { useRouter } from "vue-router";
+
     import InresLogo from "../../../resources/images/inres.webp";
     import UniBonnLogo from "../../../resources/images/uni-bonn.webp";
     import NifamLogo from "../../../resources/images/nifam.webp";
     import FundingLogo from "../../../resources/images/funding.webp";
     import DsuiLogo from "../../../resources/images/logo_large.svg";
-    import { useRouter } from "vue-router";
-    import { OPEN_MODEL_FROM_EXAMPLE_TAB, useOpenModelDialogStore } from "@/state/open_model";
-    import { useLoginDialogStore } from "@/state/account/login_dialog";
+
+    import { OPEN_MODEL_FROM_EXAMPLE_TAB, useOpenModelDialogStore } from "../state/open_model";
+    import { useLoginDialogStore } from "../state/account/login_dialog";
 
     const router = useRouter();
     const openModelDialog = useOpenModelDialogStore();

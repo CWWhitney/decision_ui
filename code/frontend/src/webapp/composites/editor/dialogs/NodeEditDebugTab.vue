@@ -1,13 +1,13 @@
 <script setup lang="ts">
-    import { memory } from "@tensorflow/tfjs";
-
-    import { useGraphStore } from "@/state/graph";
-    import * as common from "@decision-support-ui/common";
     import { computed } from "vue";
     import { computedAsync } from "@vueuse/core";
-    import { sleep } from "@/common/async";
-    import { catchForComputedResult, COMPUTED_RESULT_SUCCESS_TYPE } from "@/common/computed";
-    import { UI_REFRESH_SLEEP_TIMEOUT } from "@/common/constants";
+    import { memory } from "@tensorflow/tfjs";
+    import * as common from "@decision-support-ui/common";
+
+    import { useGraphStore } from "../../../state/graph";
+    import { sleep } from "../../../common/async";
+    import { catchForComputedResult, COMPUTED_RESULT_SUCCESS_TYPE } from "../../../common/computed";
+    import { UI_REFRESH_SLEEP_TIMEOUT } from "../../../common/constants";
 
     const node = defineModel<common.Node>({ required: true });
     const graphStore = useGraphStore();

@@ -1,6 +1,11 @@
 <script setup lang="ts">
-    import { TOOLTIP_OPEN_DELAY } from "@/common/constants";
-    import { R_EXECUTION_FAILED, R_EXECUTION_IN_PROGRESS, R_EXECUTION_SUCCESS, type RExecutionStatus } from "@/state/r";
+    import { TOOLTIP_OPEN_DELAY } from "../../common/constants";
+    import {
+        R_EXECUTION_FAILED,
+        R_EXECUTION_IN_PROGRESS,
+        R_EXECUTION_SUCCESS,
+        type RExecutionStatus
+    } from "../../state/r";
 
     const props = withDefaults(
         defineProps<{

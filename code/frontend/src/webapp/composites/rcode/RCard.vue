@@ -1,12 +1,14 @@
 <script lang="ts" setup>
     import { computed, ref } from "vue";
+    import * as common from "@decision-support-ui/common";
+
+    import { useRStore } from "../../state/r";
+    import { useAccountStore } from "../../state/account";
+    import { useGraphStore } from "../../state/graph";
+
+    import RDataTab from "./RDataTab.vue";
     import RHistogramTab from "./RResultHistogramTab.vue";
     import RCodeTab from "./RCodeTab.vue";
-    import { useRStore } from "@/state/r";
-    import RDataTab from "./RDataTab.vue";
-    import { useAccountStore } from "@/state/account";
-    import * as common from "@decision-support-ui/common";
-    import { useGraphStore } from "@/state/graph";
     import RErrorDialog from "./RErrorDialog.vue";
     import REvpiDiagramTab from "./REvpiDiagramTab.vue";
 

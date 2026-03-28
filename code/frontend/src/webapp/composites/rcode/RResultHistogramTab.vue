@@ -1,8 +1,10 @@
 <script lang="ts" setup>
-    import MultiHistogramChart from "@/components/charts/MultiHistogramChart.vue";
-    import RRunButton from "@/components/r/RRunButton.vue";
-    import { type RExecutionStatus } from "@/state/r";
     import { transposeArray, type CalculateResultHistogramData } from "@decision-support-ui/common";
+
+    import { type RExecutionStatus } from "../../state/r";
+
+    import MultiHistogramChart from "../../components/charts/MultiHistogramChart.vue";
+    import RRunButton from "../../components/r/RRunButton.vue";
     import RHint from "./RHint.vue";
 
     withDefaults(

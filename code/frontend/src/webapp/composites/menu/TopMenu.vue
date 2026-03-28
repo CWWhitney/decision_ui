@@ -1,14 +1,16 @@
 <script lang="ts" setup>
+    import { useRoute } from "vue-router";
+
+    import { useMetadataStore } from "../../state/metadata";
+    import { useAccountStore } from "../../state/account";
+
+    import TopHelpMenu from "./TopHelpMenu.vue";
+    import TopRunMenu from "./TopRunMenu.vue";
+    import TopAccountMenu from "./TopAccountMenu.vue";
     import DsuiLogo from "../../../../resources/images/logo.svg";
     import TopFileMenu from "./TopFileMenu.vue";
     import TopEditMenu from "./TopEditMenu.vue";
     import TopViewMenu from "./TopViewMenu.vue";
-    import { useMetadataStore } from "@/state/metadata";
-    import { useRoute } from "vue-router";
-    import TopHelpMenu from "./TopHelpMenu.vue";
-    import TopRunMenu from "./TopRunMenu.vue";
-    import TopAccountMenu from "./TopAccountMenu.vue";
-    import { useAccountStore } from "@/state/account";
 
     const metadata = useMetadataStore();
     const account = useAccountStore();

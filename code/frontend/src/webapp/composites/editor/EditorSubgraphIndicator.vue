@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-    import { useEditorStore } from "@/state/editor";
+    import { useEditorStore } from "../../state/editor";
 
     const editor = useEditorStore();
 </script>
