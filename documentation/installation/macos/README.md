@@ -37,7 +37,7 @@ Now, you can start the decision support user interface with the following comman
 ```
 podman run \
     --rm -it \
-    -v $(pwd):/root/workspace/code/backend/data \
+    -v $(pwd):/root/workspace/code/server/data \
     -p 8080:8080 \
     -e DSUI_SECRET=default_secret \
     docker.io/knopflogik/inres_decision-support-ui_server:latest

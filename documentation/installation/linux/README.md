@@ -15,7 +15,7 @@ You can run the server container with the following command:
 ```
 podman run \
     --rm -it \
-    -v $(pwd):/root/workspace/code/backend/data:Z \
+    -v $(pwd):/root/workspace/code/server/data:Z \
     -p 8080:8080 \
     -e DSUI_SECRET=default_secret \
     docker.io/knopflogik/inres_decision-support-ui_server:latest
@@ -27,7 +27,7 @@ The following arguments can to be provided:
   delete the container after stopping it
 - `-it` \
   run container as an interactive terminal
-- `-v /path/to/some/directory:/root/workspace/code/backend/data` \
+- `-v /path/to/some/directory:/root/workspace/code/server/data` \
   mount the data directory such that models are stored permanently on the host machine
   (append `:Z` on Linux distributions with [SELinux](https://en.wikipedia.org/wiki/Security-Enhanced_Linux))
 - `-e DSUI_SECRET=default_secret` \

@@ -46,8 +46,8 @@ You may also install the decision support user interface from its source code. T
 
 ### Install R and the decisionSupport package
 
-You can use the batch script `code/backend/bin/install-r.bat`. It will download and install R and the decisionSupport
-CRAN package in the directory `code/backend/resources/R`.
+You can use the batch script `code/frontend/bin/install-r.bat`. It will download and install R and the decisionSupport
+CRAN package in the directory `code/frontend/resources/R`.
 
 ### Install Python
 
