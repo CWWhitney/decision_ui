@@ -1,10 +1,10 @@
 import * as path from "path";
-import * as fs from "fs";
 import * as net from "net";
-import * as child_process from "child_process";
 
 import { app, shell, BrowserWindow, ipcMain } from "electron";
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
+
+import { startServer } from "@decision-support-ui/server";
 
 /**
  * Returns a random free port to be used for the node server.
@@ -28,29 +28,6 @@ const findPort = async (): Promise<number> => {
 };
 
 /**
- * Return the file path to the backend executable.
- *
- * @returns path to backend executable
- */
-const getBackendPath = () => {
-    const resourcesDir = is.dev
-        ? path.join(__dirname, "../../../../resources")
-        : path.join(__dirname, "../../../../../app.asar.unpacked/resources");
-
-    const backendDir = path.join(resourcesDir, "decision-support-ui-backend");
-    const pythonExecutableFile =
-        process.platform === "win32" ? "decision-support-ui-backend.exe" : "decision-support-ui-backend";
-    const pythonExecutable = path.join(backendDir, pythonExecutableFile);
-
-    if (!fs.existsSync(pythonExecutable)) {
-        console.warn(`Could not find python backend executable at '${pythonExecutable}', continue anyway`);
-        return null;
-    }
-
-    return pythonExecutable;
-};
-
-/**
  * Returns the file path to the sqlite database file (considering the operating system file system layout).
  *
  * On Windows: %APPDATA%\decision-support-ui\decision-support-ui-backend.db
@@ -63,33 +40,6 @@ const getBackendPath = () => {
  */
 const getDatabasePath = () => {
     return path.join(app.getPath("userData"), "decision-support-ui-backend.db");
-};
-
-/**
- * Starts the python backend if possible.
- *
- * @param port the port for the REST api of the backend
- * @returns the backend process or null
- */
-const startBackend = (port: number) => {
-    const databasePath = getDatabasePath();
-    const backendPath = getBackendPath();
-
-    if (backendPath) {
-        const backendProcess = child_process.spawn(
-            backendPath,
-            ["-p", "" + port, "--host", "127.0.0.1", "-s", databasePath],
-            { cwd: path.dirname(backendPath) }
-        );
-
-        // forward stdout and stderr to electron process
-        backendProcess.stdout.pipe(process.stdout);
-        backendProcess.stderr.pipe(process.stderr);
-
-        return backendProcess;
-    }
-
-    return null;
 };
 
 /**
@@ -137,7 +87,8 @@ const createWindow = async (backendPort: number) => {
  */
 const run = async () => {
     const backendPort = await findPort();
-    const backendProcess = startBackend(backendPort);
+    const databasePath = getDatabasePath();
+    const cleanupServer = startServer(backendPort, databasePath, ["http://localhost:5173"]);
 
     app.whenReady().then(() => {
         // Set app user model id for windows
@@ -167,17 +118,12 @@ const run = async () => {
     app.on("window-all-closed", () => {
         if (process.platform !== "darwin") {
             app.quit();
+            cleanupServer();
         }
     });
 
     app.on("quit", () => {
-        if (backendProcess !== null) {
-            try {
-                backendProcess.kill();
-            } catch {
-                // ignore any errors and hope for the best
-            }
-        }
+        cleanupServer();
     });
 };
 

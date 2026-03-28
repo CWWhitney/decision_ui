@@ -60,7 +60,7 @@
                     </v-btn>
                 </div>
                 <div>
-                    <v-btn to="/login" class="menuButton" variant="outlined" @click="onLoginClick">
+                    <v-btn class="menuButton" variant="outlined" @click="onLoginClick">
                         <template #prepend>
                             <v-icon size="32px"> mdi-login </v-icon>
                         </template>

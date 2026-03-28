@@ -3,11 +3,12 @@ import * as express from "express";
 import * as compress from "compression";
 import * as http from "http";
 import * as nocache from "nocache";
+import * as cors from "cors";
 
 import { logger } from "./logging";
 import { getRestApi } from "./rest";
 
-export const startServer = (port: number) => {
+export const startServer = (port: number, databasePath: string = null, corsOrigins: string[] = []) => {
     logger.info("starting web server");
 
     // setup express
@@ -23,6 +24,14 @@ export const startServer = (port: number) => {
 
     // enable json parsing
     app.use(express.json());
+
+    // enable cors protected
+    app.use(
+        cors({
+            origin: corsOrigins,
+            credentials: true
+        })
+    );
 
     app.use("/api", getRestApi());
 
