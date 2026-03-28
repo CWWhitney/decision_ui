@@ -33,7 +33,12 @@ const asyncExecuteR = async (rScriptFilepath: string, resultsCsvFilepath: string
                     }
                     return resolve({
                         resultsCsv: null,
-                        error: { reason: error.message, stdout, stderr, exitcode: error.code }
+                        error: {
+                            reason: `Rscript failed with non-zero exit code`,
+                            stdout,
+                            stderr,
+                            exitcode: error.code
+                        }
                     });
                 }
 

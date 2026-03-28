@@ -6,15 +6,11 @@
 
 <template>
     <v-dialog v-model="rStore.state.errorDialog.show" class="executionErrorDialog">
-        <v-card max-width="50em">
+        <v-card max-width="90%">
             <v-card-title class="text-h5"> Model Execution Error </v-card-title>
             <v-card-text>
                 <v-list lines="two">
-                    <v-list-item title="Reason">
-                        <template #subtitle>
-                            <highlightjs language="text" :code="rStore.state.errorDialog.error?.reason || ''" />
-                        </template>
-                    </v-list-item>
+                    <v-list-item title="Reason" :subtitle="rStore.state.errorDialog.error?.reason" />
                     <v-list-item title="R Output">
                         <template #subtitle>
                             <highlightjs language="text" :code="rStore.state.errorDialog.error?.stdout || ''" />
@@ -25,11 +21,7 @@
                             <highlightjs language="txt" :code="rStore.state.errorDialog.error?.stderr || ''" />
                         </template>
                     </v-list-item>
-                    <v-list-item title="R Exit Code">
-                        <template #subtitle>
-                            <highlightjs language="txt" :code="rStore.state.errorDialog.error?.exitcode || ''" />
-                        </template>
-                    </v-list-item>
+                    <v-list-item title="R Exit Code" :subtitle="`${rStore.state.errorDialog.error?.exitcode}`" />
                 </v-list>
             </v-card-text>
             <v-card-actions>
@@ -46,8 +38,9 @@
             margin: 0 auto;
         }
 
-        .v-card-text {
+        :deep(.v-card-text) {
             overflow: auto;
+            padding: 0 !important;
         }
 
         pre {

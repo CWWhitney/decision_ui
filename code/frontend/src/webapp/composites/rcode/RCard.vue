@@ -82,6 +82,8 @@
     <v-card color="white" elevation="1" rounded class="rCard">
         <v-card-text>
             <div class="variantTabs">
+                <h3>R Backend</h3>
+
                 <v-tabs v-model="activeVariantTab" color="primary" align-tabs="center">
                     <v-tab value="histogram">Result Histogram</v-tab>
                     <v-tab value="evpi">EVPI</v-tab>
@@ -195,6 +197,13 @@
     .variantTabs {
         margin-bottom: 0.5em;
         display: flex;
+        align-items: center;
+
+        h3 {
+            font-size: 20px;
+            margin-left: 0.75em;
+            font-weight: 500;
+        }
 
         :deep(.v-tabs) {
             flex-grow: 1;
@@ -210,6 +219,7 @@
 
     .displayTabs {
         width: 10em;
+        margin-top: 1em;
         margin-left: 1em;
         margin-right: 1em;
     }
