@@ -11,29 +11,28 @@ Welcome to the Decision Support UI! In this section, we will go through every st
 ## Create an Account and Login
 
 To use the full potential of the Decision Support UI, you should create an account. Your account allows you to
-save, load and evaluate models. Otherwise, you cannot generate the result diagram for your model.
+save, load and evaluate models with the R backend.
 
-You can create an account by clicking on the "Create a free account!" link on the login page:
+You can create an account by clicking on "Login or Register" from the account menu in the top right corner:
 
 ![Register an Account](./register-account.webp)
 
-You need to provide both an email address and password. However, the email address does not need to exist.
-You can use any email address to create an account. The Decision Support UI will not send a confirmation email.
+You need to provide both a username and password.
 
 In case you use the desktop version, all data is stored on your computer. In case you use the Decision Support UI with
-a browser, the email address, password and your models are stored on the respective server owned by the company or
+a browser, the username, password and your models are stored on the respective server owned by the company or
 institution that provides the server.
 
-Once you registered an account, you may log in with the same email address and password.
+Once you registered an account, you may log in with the same username and password.
 
 ## Load an Example Model
 
-After you logged in, you will be greeted with a list of existing models. Of course, in the beginning, you will not
-have created any models yet. However, you can load an example model by selecting the "Examples" tab:
+After you logged in, you may load your models from the file menu in the top left corner. Of course, in the beginning,
+you will not have created any models yet. However, you can load an example model by selecting the "From Examples" tab:
 
 ![List of Example Models](./example-model-list.webp)
 
-Start with the first example model by clicking on the entry "1. Minimal Model". Loading a model will open the model
+Start with the first example model by clicking on the entry "Minimal". Loading a model will open the model
 editor. Here you can inspect the model, modify it, save it, evaluate it, add notes, and so on:
 
 ![Model Editor](./model-editor.webp)
@@ -43,8 +42,8 @@ that describes every detail.
 
 ## Run a Monte Carlo Simulation
 
-The minimal example model consists of a single input variable called "Estimate Node" and a single output variable
-called "Result Node". This simple example does not make sense yet in the context of comparing multiple outcomes of a
+The minimal example model consists of a single input variable called "Estimate" and a single output variable
+called "Result". This simple example does not make sense yet in the context of comparing multiple outcomes of a
 decision, but can be used to test that you can evaluate a model by running a Monte Carlo simulation.
 
 Click on the blue rocket button in the bottom-right corner to start the Monte Carlo simulation. After a few seconds,

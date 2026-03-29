@@ -1,5 +1,5 @@
 import axios, { AxiosError, type AxiosResponse } from "axios";
-import { getBackendBaseURL, REQUEST_TIMEOUT, validateAxiosResponse } from "./common";
+import { getBackendBaseURL, validateAxiosResponse } from "./common";
 import {
     LoginResponseSchema,
     LogoutResponseSchema,
@@ -8,6 +8,8 @@ import {
     type LoginRequestBody,
     type RefreshRequestBody
 } from "@decision-support-ui/common";
+
+import { DSUI_REQUEST_TIMEOUT } from "../common/constants";
 
 export const generateDoLoginRequest = () => {
     const validateResponse = validateAxiosResponse(LoginResponseSchema);
@@ -31,7 +33,7 @@ export const generateDoLoginRequest = () => {
                 { username, password } as LoginRequestBody,
                 {
                     headers: { "Content-Type": "application/json" },
-                    timeout: REQUEST_TIMEOUT
+                    timeout: DSUI_REQUEST_TIMEOUT
                 }
             ),
             (response: AxiosResponse) => {
@@ -72,7 +74,7 @@ export const generateDoRefreshRequest = () => {
         return validateResponse(
             axios.post((await getBackendBaseURL()) + "/api/auth/jwt/refresh", { refreshToken } as RefreshRequestBody, {
                 headers: { "Content-Type": "application/json" },
-                timeout: REQUEST_TIMEOUT
+                timeout: DSUI_REQUEST_TIMEOUT
             }),
             (response: AxiosResponse) => {
                 if (response.status === 200) {
@@ -104,7 +106,7 @@ export const generateDoLogoutRequest = () => {
                 { refreshToken },
                 {
                     headers: { "Content-Type": "application/json" },
-                    timeout: REQUEST_TIMEOUT
+                    timeout: DSUI_REQUEST_TIMEOUT
                 }
             ),
             () => {
@@ -141,7 +143,7 @@ export const generateDoRegisterRequest = () => {
                 { username, password },
                 {
                     headers: { "Content-Type": "application/json" },
-                    timeout: REQUEST_TIMEOUT
+                    timeout: DSUI_REQUEST_TIMEOUT
                 }
             ),
             (response: AxiosResponse) => {

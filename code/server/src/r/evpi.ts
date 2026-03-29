@@ -2,7 +2,7 @@ import { parse } from "csv-parse";
 
 import * as common from "@decision-support-ui/common";
 import { executeRScript } from "./execute";
-import { DSUI_R_MAX_RUNTIME } from "../environment";
+import { DSUI_R_MAX_RUNTIME } from "../constants";
 
 export const generateAndExecuteEvpiScript = async (
     graph: common.Graph,

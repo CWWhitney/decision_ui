@@ -1,7 +1,8 @@
 import axios, { AxiosError, type AxiosResponse } from "axios";
 
 import * as common from "@decision-support-ui/common";
-import { BEARER_HEADER, getBackendBaseURL, validateAxiosResponse } from "./common";
+import { getBackendBaseURL, validateAxiosResponse } from "./common";
+import { DSUI_BEARER_HEADER } from "../common/constants";
 
 export const DSUI_R_MAX_RUNTIME = parseInt(import.meta.env.VITE_DSUI_R_MAX_RUNTIME) || 30000;
 
@@ -27,7 +28,7 @@ export const generateCalculateResultHistogramRequest = () => {
                 (await getBackendBaseURL()) + "/api/r/calculate_result_histogram",
                 { graph, computation } as common.CalculateResultHistogramRequestBody,
                 {
-                    headers: { "Content-Type": "application/json", [BEARER_HEADER]: `Bearer ${accessToken}` },
+                    headers: { "Content-Type": "application/json", [DSUI_BEARER_HEADER]: `Bearer ${accessToken}` },
                     timeout: DSUI_R_MAX_RUNTIME
                 }
             ),
@@ -82,7 +83,7 @@ export const generateCalculateEvpiRequest = () => {
                 (await getBackendBaseURL()) + "/api/r/calculate_evpi",
                 { graph, computation } as common.CalculateResultHistogramRequestBody,
                 {
-                    headers: { "Content-Type": "application/json", [BEARER_HEADER]: `Bearer ${accessToken}` },
+                    headers: { "Content-Type": "application/json", [DSUI_BEARER_HEADER]: `Bearer ${accessToken}` },
                     timeout: DSUI_R_MAX_RUNTIME
                 }
             ),

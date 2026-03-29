@@ -17,7 +17,8 @@ podman run \
     --rm -it \
     -v $(pwd):/root/workspace/code/server/data:Z \
     -p 8080:8080 \
-    -e DSUI_SECRET=default_secret \
+    -e DSUI_ACCESS_TOKEN_SECRET=some_secret \
+    -e DSUI_REFRESH_TOKEN_SECRET=another_secret \
     docker.io/knopflogik/inres_decision-support-ui_server:latest
 ```
 
@@ -30,9 +31,12 @@ The following arguments can to be provided:
 - `-v /path/to/some/directory:/root/workspace/code/server/data` \
   mount the data directory such that models are stored permanently on the host machine
   (append `:Z` on Linux distributions with [SELinux](https://en.wikipedia.org/wiki/Security-Enhanced_Linux))
-- `-e DSUI_SECRET=default_secret` \
-  specify a custom secret (random characters, similar to a password) to ensure that the application can securely
-  encrypt login data
+- `-e DSUI_ACCESS_TOKEN_SECRET=some_secret` \
+  specify a custom access token secret (random characters, similar to a password) to ensure that the application can
+  securely encrypt login data
+- `-e DSUI_REFRESH_TOKEN_SECRET=another_secret` \
+  specify a custom refresh token secret (random characters, similar to a password) to ensure that the application can
+  securely encrypt login data
 
 Additional environment variables are described in the "Developers Guide" section.
 
@@ -46,7 +50,7 @@ You can stop the application by typing `CTRL + C` in the terminal.
 To build the container image yourself, download the source code from GitHub:
 
 ```
-git clone https://github.com/johanneskopton/decision_ui.git
+git clone https://github.com/CWWhitney/decision_ui.git
 ```
 
 You can find the necessary files in the directory `deployment/staging`. For performance reasons, the Dockerfile is
@@ -71,11 +75,10 @@ replace the last parameter with `localhost/decision-support-ui/server:latest`.
 
 ## Installation from Source
 
-In all other scenarios, you may also install the decision support user interface from its source code. There are three
+In all other scenarios, you may also install the decision support user interface from its source code. There are two
 main requirements:
 
-- [Python 3](https://www.python.org) (tested with v3.13.0)
-- [Node.js](https://nodejs.org/) (tested with v22.11.0)
+- [Node.js](https://nodejs.org/) (tested with v24.14.1)
 - [R](https://www.r-project.org/) (tested with v4.4.2)
 
 ### Install R and the `decisionSupport` package
@@ -100,11 +103,6 @@ library(readr);
 library(decisionSupport);
 ```
 
-### Install Python
-
-For Python, please follow the official [installation instructions](https://docs.python.org/3/using/index.html).
-Make sure that the `python` command is available in your terminal.
-
 ### Install Node.js
 
 For Node.js, please follow the official [installation instructions](https://nodejs.org/en/download). Make sure that the
@@ -120,7 +118,7 @@ npm install -g concurrently
 Download the source code from GitHub:
 
 ```
-git clone https://github.com/johanneskopton/decision_ui.git
+git clone https://github.com/CWWhitney/decision_ui.git
 ```
 
 Install further software libraries (python packages and Javascript libraries) by executing the bash script

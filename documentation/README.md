@@ -10,4 +10,4 @@ This documentation is divided into the following sections:
 
 ## Feedback
 
-Please add a [new issue](https://github.com/johanneskopton/decision_ui/issues) on GitHub.
+Please add a [new issue](https://github.com/CWWhitney/decision_ui/issues) on GitHub.

@@ -8,7 +8,7 @@ You may install the software either:
 ## Desktop Setup
 
 In order to install the Decision Support UI as a desktop application, please download and run the latest Windows
-installation wizard executable from the [releases page](https://github.com/johanneskopton/decision_ui/releases) on
+installation wizard executable from the [releases page](https://github.com/CWWhitney/decision_ui/releases) on
 GitHub (e.g., the file `decision-support-ui-X.X.X-setup.exe`).
 
 ![GitHub releases page](./github-releases-page.webp)
@@ -38,22 +38,15 @@ from the directory `%APPDATA%\decision-support-ui`.
 
 ## Installation from Source
 
-You may also install the decision support user interface from its source code. There are three main requirements:
+You may also install the decision support user interface from its source code. There are two main requirements:
 
-- [Python 3](https://www.python.org) (tested with v3.13.0)
-- [Node.js](https://nodejs.org/) (tested with v22.11.0)
+- [Node.js](https://nodejs.org/) (tested with v24.14.1)
 - [R](https://www.r-project.org/) (tested with v4.4.2)
 
 ### Install R and the decisionSupport package
 
 You can use the batch script `code/frontend/bin/install-r.bat`. It will download and install R and the decisionSupport
 CRAN package in the directory `code/frontend/resources/R`.
-
-### Install Python
-
-For Python, please follow the official [installation instructions](https://docs.python.org/3/using/index.html). During
-the setup, make sure to select the option that the `python` command is added to the `PATH` environment and available in
-your terminal.
 
 ### Install Node.js
 
@@ -78,9 +71,8 @@ Otherwise, follow the official [installation instructions](https://git-scm.com/d
 Download the source code from GitHub via Git by executing the following command in a terminal:
 
 ```
-git clone https://github.com/johanneskopton/decision_ui.git
+git clone https://github.com/CWWhitney/decision_ui.git
 cd decision_ui
-git checkout knopflogik-improvements
 ```
 
 Install further software libraries (python packages and Javascript libraries) by executing the Windows batch file

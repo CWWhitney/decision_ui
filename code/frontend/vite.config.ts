@@ -1,5 +1,4 @@
 import { resolve } from "path";
-import { fileURLToPath, URL } from "node:url";
 
 import childProcess from "child_process";
 import vue from "@vitejs/plugin-vue";
@@ -55,11 +54,6 @@ export default defineConfig({
             targets: ["defaults", "not IE 11"]
         })
     ],
-    resolve: {
-        alias: {
-            "@": fileURLToPath(new URL("./src/webapp", import.meta.url))
-        }
-    },
     define: {
         "import.meta.env.VITE_APP_VERSION": JSON.stringify(commitHash)
     }

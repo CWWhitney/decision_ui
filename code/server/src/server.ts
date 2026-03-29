@@ -8,7 +8,13 @@ import * as cors from "cors";
 import { logger } from "./logging";
 import { getRestApi } from "./rest";
 import { loadDatabase } from "./state/database";
-import { DSUI_CORS_HEADERS, DSUI_CORS_METHODS, DSUI_CORS_ORIGINS, DSUI_DATABASE_PATH, DSUI_R_SCRIPT_PATH } from "./environment";
+import {
+    DSUI_CORS_HEADERS,
+    DSUI_CORS_METHODS,
+    DSUI_CORS_ORIGINS,
+    DSUI_DATABASE_PATH,
+    DSUI_R_SCRIPT_PATH
+} from "./constants";
 
 export const startServer = async ({
     port = 8080,
@@ -45,7 +51,9 @@ export const startServer = async ({
 
     // enable cors protected
     if (corsOrigins.includes("*")) {
-        logger.warn("CORS is disabled via wildcard origin '*', please set correct origin with environment variable DSUI_CORS_ORIGINS!");
+        logger.warn(
+            "CORS is disabled via wildcard origin '*', please set correct origin with environment variable DSUI_CORS_ORIGINS!"
+        );
     }
     app.use(
         cors({

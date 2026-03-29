@@ -3,7 +3,7 @@ import { parse } from "csv-parse";
 import * as common from "@decision-support-ui/common";
 import { executeRScript } from "./execute";
 import { logger } from "../logging";
-import { DSUI_R_MAX_RUNTIME } from "../environment";
+import { DSUI_R_MAX_RUNTIME } from "../constants";
 
 export const generateAndExecuteResultHistogramScript = async (
     graph: common.Graph,

@@ -52,7 +52,7 @@
         // got to github (ctrl + b)
         if ((e.ctrlKey || e.metaKey) && e.key === "b") {
             e.preventDefault();
-            window.open("https://github.com/johanneskopton/decision_ui/issues", "_blank");
+            window.open("https://github.com/CWWhitney/decision_ui/issues", "_blank");
         }
 
         // trigger recalculation (ctrl + 2)

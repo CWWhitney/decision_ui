@@ -9,8 +9,9 @@ import {
     type ModelFileState,
     type UpdateModelRequestBody
 } from "@decision-support-ui/common";
-import { BEARER_HEADER, getBackendBaseURL, REQUEST_TIMEOUT, validateAxiosResponse } from "./common";
+import { getBackendBaseURL, validateAxiosResponse } from "./common";
 import axios, { AxiosError, type AxiosResponse } from "axios";
+import { DSUI_BEARER_HEADER, DSUI_REQUEST_TIMEOUT } from "../common/constants";
 
 export const generateListModelsRequest = () => {
     const validateResponse = validateAxiosResponse(ListModelsResponseSchema);
@@ -26,9 +27,9 @@ export const generateListModelsRequest = () => {
         return validateResponse(
             axios.get((await getBackendBaseURL()) + "/api/models/for_user", {
                 headers: {
-                    [BEARER_HEADER]: `Bearer ${accessToken}`
+                    [DSUI_BEARER_HEADER]: `Bearer ${accessToken}`
                 },
-                timeout: REQUEST_TIMEOUT
+                timeout: DSUI_REQUEST_TIMEOUT
             }),
             (response: AxiosResponse) => {
                 if (response.status === 200) {
@@ -65,8 +66,8 @@ export const generateAddModelRequest = () => {
     }) => {
         return validateResponse(
             axios.post((await getBackendBaseURL()) + "/api/models/model", { modelfile } as AddModelRequestBody, {
-                headers: { "Content-Type": "application/json", [BEARER_HEADER]: `Bearer ${accessToken}` },
-                timeout: REQUEST_TIMEOUT
+                headers: { "Content-Type": "application/json", [DSUI_BEARER_HEADER]: `Bearer ${accessToken}` },
+                timeout: DSUI_REQUEST_TIMEOUT
             }),
             (response: AxiosResponse) => {
                 if (response.status === 200) {
@@ -104,8 +105,8 @@ export const generateGetModelRequest = () => {
     }) => {
         return validateResponse(
             axios.get((await getBackendBaseURL()) + `/api/models/model/${modelId}`, {
-                headers: { "Content-Type": "application/json", [BEARER_HEADER]: `Bearer ${accessToken}` },
-                timeout: REQUEST_TIMEOUT
+                headers: { "Content-Type": "application/json", [DSUI_BEARER_HEADER]: `Bearer ${accessToken}` },
+                timeout: DSUI_REQUEST_TIMEOUT
             }),
             (response: AxiosResponse) => {
                 if (response.status === 200) {
@@ -140,8 +141,8 @@ export const generateDeleteModelRequest = () => {
     }) => {
         return validateResponse(
             axios.delete((await getBackendBaseURL()) + `/api/models/model/${modelId}`, {
-                headers: { "Content-Type": "application/json", [BEARER_HEADER]: `Bearer ${accessToken}` },
-                timeout: REQUEST_TIMEOUT
+                headers: { "Content-Type": "application/json", [DSUI_BEARER_HEADER]: `Bearer ${accessToken}` },
+                timeout: DSUI_REQUEST_TIMEOUT
             }),
             (response: AxiosResponse) => {
                 if (response.status === 200) {
@@ -181,8 +182,8 @@ export const generateUpdateModelRequest = () => {
                 (await getBackendBaseURL()) + `/api/models/model/${modelId}`,
                 { modelfile } as UpdateModelRequestBody,
                 {
-                    headers: { "Content-Type": "application/json", [BEARER_HEADER]: `Bearer ${accessToken}` },
-                    timeout: REQUEST_TIMEOUT
+                    headers: { "Content-Type": "application/json", [DSUI_BEARER_HEADER]: `Bearer ${accessToken}` },
+                    timeout: DSUI_REQUEST_TIMEOUT
                 }
             ),
             (response: AxiosResponse) => {

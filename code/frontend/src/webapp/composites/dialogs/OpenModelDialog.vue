@@ -26,6 +26,8 @@
     };
 
     const EXAMPLE_MODEL_FILES: common.ModelFileState[] = [
+        common.getMinimalExampleModelFile(),
+        common.getMultipleResultsExampleModelFile(),
         common.getAppleAgroforestExampleModelFile(),
         common.getWildfireExampleModelFile()
     ];

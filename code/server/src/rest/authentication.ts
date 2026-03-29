@@ -8,20 +8,19 @@ import { v4 as uuidv4 } from "uuid";
 import { addUser, findUserByUsername } from "../state/queries";
 import { logger } from "../logging";
 import { validateJsonBody } from "./common";
+import {
+    DSUI_ACCESS_TOKEN_EXPIRY,
+    DSUI_ACCESS_TOKEN_SECRET,
+    DSUI_BCRYPT_SALT_ROUNDS,
+    DSUI_BEARER_HEADER,
+    DSUI_REFRESH_TOKEN_EXPIRY,
+    DSUI_REFRESH_TOKEN_SECRET
+} from "../constants";
 
-const BEARER_HEADER = process.env.VITE_BEARER_HEADER || "Authorization";
-
-const BCRYPT_SALT_ROUNDS = parseInt(process.env.BCRYPT_SALT_ROUNDS) || 10;
-const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || "default";
-const ACCESS_TOKEN_EXPIRY = process.env.ACCESS_TOKEN_EXPIRY || "5m";
-
-const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || "default";
-const REFRESH_TOKEN_EXPIRY = process.env.REFRESH_TOKEN_EXPIRY || "24h";
-
-if (ACCESS_TOKEN_SECRET == "default") {
+if (DSUI_ACCESS_TOKEN_SECRET == "default") {
     logger.warn("Please specify a unique access token secret using the env variable ACCESS_TOKEN_SECRET!");
 }
-if (REFRESH_TOKEN_SECRET == "default") {
+if (DSUI_REFRESH_TOKEN_SECRET == "default") {
     logger.warn("Please specify a unique refresh token secret using the env variable REFRESH_TOKEN_SECRET!");
 }
 
@@ -38,19 +37,19 @@ interface RefreshToken {
 }
 
 const generateAccessToken = (id: number) => {
-    return jwt.sign({ id, uuid: uuidv4() } as AccessToken, ACCESS_TOKEN_SECRET, {
-        expiresIn: ACCESS_TOKEN_EXPIRY as any
+    return jwt.sign({ id, uuid: uuidv4() } as AccessToken, DSUI_ACCESS_TOKEN_SECRET, {
+        expiresIn: DSUI_ACCESS_TOKEN_EXPIRY as any
     });
 };
 
 const generateRefreshToken = (id: number) => {
-    return jwt.sign({ id, uuid: uuidv4() } as RefreshToken, REFRESH_TOKEN_SECRET, {
-        expiresIn: REFRESH_TOKEN_EXPIRY as any
+    return jwt.sign({ id, uuid: uuidv4() } as RefreshToken, DSUI_REFRESH_TOKEN_SECRET, {
+        expiresIn: DSUI_REFRESH_TOKEN_EXPIRY as any
     });
 };
 
 const hashPassword = async (password: string) => {
-    return await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
+    return await bcrypt.hash(password, DSUI_BCRYPT_SALT_ROUNDS);
 };
 
 const verifyPassword = async (password: string, hash: string) => {
@@ -127,7 +126,7 @@ export const getAuthenticationApi = () => {
             return res.status(403).json(common.makeErrorResponseBody("invalid refresh token"));
         }
 
-        jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, (err: jwt.VerifyErrors | null, token: RefreshToken) => {
+        jwt.verify(refreshToken, DSUI_REFRESH_TOKEN_SECRET, (err: jwt.VerifyErrors | null, token: RefreshToken) => {
             if (err) {
                 logger.info(`jwt refresh token cannot be verified`, err);
                 return res.status(403).json(common.makeErrorResponseBody("invalid refresh token"));
@@ -164,7 +163,7 @@ declare module "express-serve-static-core" {
 }
 
 export const authenticateRoute = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const bearerHeader = req.get(BEARER_HEADER);
+    const bearerHeader = req.get(DSUI_BEARER_HEADER);
 
     if (!bearerHeader || !bearerHeader.startsWith("Bearer ")) {
         logger.error("received request for protected route without bearer token");
@@ -173,7 +172,7 @@ export const authenticateRoute = (req: express.Request, res: express.Response, n
 
     const accessToken = bearerHeader.split(" ")[1];
 
-    jwt.verify(accessToken, ACCESS_TOKEN_SECRET, (err: jwt.VerifyErrors | null, token: AccessToken) => {
+    jwt.verify(accessToken, DSUI_ACCESS_TOKEN_SECRET, (err: jwt.VerifyErrors | null, token: AccessToken) => {
         if (err) {
             logger.error("received request with invalid access token");
             return res.status(401).json(common.makeErrorResponseBody("invalid access token"));
