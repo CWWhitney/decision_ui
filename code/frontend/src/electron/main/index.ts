@@ -43,6 +43,24 @@ const getDatabasePath = () => {
 };
 
 /**
+ * Returns the file path to the Rscript executable.
+ * 
+ * On Windows: %APPDATA%\Local\Programs\decision-support-ui\resources\app.asar.unpacked\resources\R\bin\Rscript.exe
+ * Otherwise: Rscript
+ * @returns the filepath to the Rscript executable
+ */
+const getRscriptExecutablePath = () => {
+    console.error(`__dirname is ${__dirname}`);
+    console.error(`app.getPath('assets') is ${app.getPath("assets")}`);
+    console.error(`process.resourcesPath is ${process.resourcesPath}`);
+    if (process.platform == "win32") {
+        app.getAppPath()
+        return path.join(app.getPath("assets"), "resources/app.asar.unpacked/resources/R/bin/Rscript.exe");
+    }
+    return "Rscript";
+}
+
+/**
  * Create the electron window.
  *
  * @param backendPort the port for the backend REST api
@@ -88,12 +106,13 @@ const createWindow = async (backendPort: number) => {
 const run = async () => {
     // simplify data directory to "decision-support-ui", which would otherwise default to "@decision-support-ui/frontend"
     app.setPath("userData", path.join(app.getPath("appData"), "decision-support-ui"));
+
+    // start node server backend
     const backendPort = await findPort();
-    const databasePath = getDatabasePath();
     const cleanupServer = await startServer({
         port: backendPort,
-        databasePath,
-        corsOrigins: ["http://localhost:5173"]
+        databasePath: getDatabasePath(),
+        rScriptPath: getRscriptExecutablePath(),
     });
 
     app.whenReady().then(() => {

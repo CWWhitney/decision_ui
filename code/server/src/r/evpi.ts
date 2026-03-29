@@ -6,7 +6,8 @@ import { DSUI_R_MAX_RUNTIME } from "../environment";
 
 export const generateAndExecuteEvpiScript = async (
     graph: common.Graph,
-    computation: common.BackendComputationState
+    computation: common.BackendComputationState,
+    rScriptExecutablePath: string
 ) => {
     const resultVariables = common.getResultVariables(graph.nodes);
 
@@ -25,7 +26,7 @@ export const generateAndExecuteEvpiScript = async (
     const estimatesCsv = common.convertEstimatesToCSV(rows);
     const timeout = Math.min(DSUI_R_MAX_RUNTIME, computation.maxRuntime);
 
-    const executionResult = await executeRScript(generateRScript, estimatesCsv, timeout);
+    const executionResult = await executeRScript(rScriptExecutablePath, generateRScript, estimatesCsv, timeout);
 
     return {
         data: executionResult.resultsCsv ? await parseEvpiCsv(executionResult.resultsCsv) : null,

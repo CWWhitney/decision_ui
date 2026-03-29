@@ -13,7 +13,7 @@
         "resolveJsonModule": true,
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
-        "lib": ["ES2020", "DOM"]
+        "lib": ["ES2021", "DOM"]
     },
     "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.ohm-bundle.js", "unknown.d.ts"]
 }

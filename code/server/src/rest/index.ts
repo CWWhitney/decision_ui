@@ -4,12 +4,12 @@ import { getModelsApi } from "./models";
 import { getRApi } from "./r";
 import { Sequelize } from "sequelize";
 
-export const getRestApi = () => {
+export const getRestApi = ({ rScriptPath }: { rScriptPath: string }) => {
     const app = express();
 
     app.use("/auth", getAuthenticationApi());
     app.use("/models", getModelsApi());
-    app.use("/r", getRApi());
+    app.use("/r", getRApi({ rScriptPath }));
 
     return app;
 };

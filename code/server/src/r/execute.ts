@@ -2,7 +2,6 @@ import { mkdtempSync, readFileSync, rmdirSync, rmSync, writeFileSync } from "fs"
 import { tmpdir } from "os";
 import { join } from "path";
 import { exec, ExecException } from "child_process";
-import { DSUI_R_SCRIPT_PATH, DSUI_R_MAX_RUNTIME } from "../environment";
 import { logger } from "../logging";
 import * as common from "@decision-support-ui/common";
 
@@ -11,11 +10,11 @@ interface RExecutionCsvResult {
     error: common.RExecutionError | null;
 }
 
-const asyncExecuteR = async (rScriptFilepath: string, resultsCsvFilepath: string, timeout: number) => {
+const asyncExecuteR = async (rScriptExecutablePath: string, rScriptFilepath: string, resultsCsvFilepath: string, timeout: number) => {
     logger.debug(`execute Rscript`);
     return new Promise<RExecutionCsvResult>(resolve => {
         exec(
-            `${DSUI_R_SCRIPT_PATH} ${rScriptFilepath}`,
+            `${rScriptExecutablePath} ${rScriptFilepath}`,
             { timeout: timeout * 1000 },
             (error: ExecException, stdout, stderr) => {
                 logger.debug("Rscript finished");
@@ -54,6 +53,7 @@ const asyncExecuteR = async (rScriptFilepath: string, resultsCsvFilepath: string
 };
 
 export const executeRScript = async (
+    rScriptExecutablePath: string,
     generateRScript: (estimatesCsvFilepath: string, resultsCsvFilepath: string) => string,
     estimates_csv: string,
     timeout: number
@@ -78,7 +78,7 @@ export const executeRScript = async (
         writeFileSync(rScriptFilepath, rScript, { encoding: "utf-8", flush: true });
         writeFileSync(estimatesCsvFilepath, estimates_csv, { encoding: "utf-8", flush: true });
 
-        return await asyncExecuteR(rScriptFilepath, resultsCsvFilepath, timeout);
+        return await asyncExecuteR(rScriptExecutablePath, rScriptFilepath, resultsCsvFilepath, timeout);
     } finally {
         if (rScriptFilepath) {
             rmSync(rScriptFilepath, { force: true });

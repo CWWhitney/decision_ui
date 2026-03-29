@@ -11,3 +11,9 @@ export const DSUI_R_MAX_MCRUNS = parseInt(process.env.DSUI_R_MAX_MCRUNS ?? "1000
 export const DSUI_R_MAX_BINS = parseInt(process.env.DSUI_R_MAX_BINS ?? "200");
 
 export const DSUI_R_VALUE_PRECISION = parseInt(process.env.DSUI_R_VALUE_PRECISION ?? "5");
+
+export const DSUI_CORS_ORIGINS = process.env.DSUI_CORS_ORIGINS ?? "*"
+
+export const DSUI_CORS_METHODS = process.env.DSUI_CORS_METHODS ?? "GET,POST"
+
+export const DSUI_CORS_HEADERS = process.env.DSUI_CORS_HEADERS ?? "*"

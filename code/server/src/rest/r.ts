@@ -7,7 +7,7 @@ import { logger } from "../logging";
 import { generateAndExecuteResultHistogramScript } from "../r/result_histogram";
 import { generateAndExecuteEvpiScript } from "../r/evpi";
 
-export const getRApi = () => {
+export const getRApi = ({ rScriptPath }: { rScriptPath: string }) => {
     const app = express();
 
     // calculate result histogram by executing model in r
@@ -20,7 +20,7 @@ export const getRApi = () => {
             const { graph, computation } = req.body as common.CalculateResultHistogramRequestBody;
 
             try {
-                const responseData = await generateAndExecuteResultHistogramScript(graph, computation);
+                const responseData = await generateAndExecuteResultHistogramScript(graph, computation, rScriptPath);
                 return res.status(200).json(responseData);
             } catch (e) {
                 logger.error("unexpected error calculating result histogram", e);
@@ -41,7 +41,7 @@ export const getRApi = () => {
             const { graph, computation } = req.body as common.CalculateEvpiRequestBody;
 
             try {
-                const responseData = await generateAndExecuteEvpiScript(graph, computation);
+                const responseData = await generateAndExecuteEvpiScript(graph, computation, rScriptPath);
                 return res.status(200).json(responseData);
             } catch (e) {
                 logger.error("unexpected error calculating evpi", e);

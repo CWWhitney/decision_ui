@@ -23,7 +23,7 @@ library(readr)
 library(decisionSupport)
 
 # load estmates from csv file
-input_estimates <- estimate_read_csv("${estimatesFilepath}")
+input_estimates <- estimate_read_csv("${estimatesFilepath.replaceAll("\\", "\\\\")}")
 
 # define model function based on variable nodes
 model_function <- function() {
@@ -49,7 +49,7 @@ counts <- lapply(mc["y"]$y, function(r) hist(r, breaks=bins, plot=FALSE)$counts)
 results <- data.frame(bins=head(bins, -1), counts)
 
 # write results to csv file
-write_csv(results, "${resultsFilepath}")
+write_csv(results, "${resultsFilepath.replaceAll("\\", "\\\\")}")
 `;
 };
 
@@ -65,7 +65,7 @@ library(readr)
 library(decisionSupport)
 
 # load estmates from csv file
-input_estimates <- estimate_read_csv("${estimatesFilepath}")
+input_estimates <- estimate_read_csv("${estimatesFilepath.replaceAll("\\", "\\\\")}")
 
 # define model function based on variable nodes
 model_function <- function() {
@@ -95,6 +95,6 @@ for (i in 1:length(evpi)){
 }
 
 # write EVPI results to csv file
-write_csv(evpi_res, "${resultsFilepath}")
+write_csv(evpi_res, "${resultsFilepath.replaceAll("\\", "\\\\")}")
 `;
 };
