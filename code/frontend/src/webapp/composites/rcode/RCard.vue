@@ -261,6 +261,9 @@
         flex-direction: column;
         width: 100%;
         height: 100%;
+        position: relative;
+        min-width: 0;
+        min-height: 0;
 
         :deep(.v-window),
         :deep(.v-window__container),

@@ -40,7 +40,7 @@
 </script>
 
 <template>
-    <div class="codeContainer">
+    <div class="tabContainer">
         <v-toolbar class="codeToolbar">
             <template #prepend>
                 <p>{{ props.description }}</p>
@@ -77,32 +77,50 @@
         </v-toolbar>
 
         <RHint />
-        <highlightjs v-if="props.code !== null" language="r" :autodetect="false" :code="props.code" class="code" />
+        <div class="codeContainer">
+            <highlightjs v-if="props.code !== null" language="r" :autodetect="false" :code="props.code" class="code" />
+        </div>
     </div>
 </template>
 
 <style scoped lang="scss">
-    .codeContainer {
+    .tabContainer {
         display: flex;
         flex-direction: column;
         width: 100%;
         height: 100%;
+    }
 
-        pre {
-            flex-grow: 1;
-            flex-shrink: 1;
+    .codeContainer {
+        display: flex;
+        overflow: hidden;
+
+        :deep(pre) {
+            width: 100%;
             margin: 0;
-            overflow-y: auto;
+            overflow: auto;
             border: 1px solid #ddd;
-            min-height: 2em;
             font-size: 11pt;
             font-family:
                 Roboto Mono,
                 monospace !important;
         }
+
+        :deep(code) {
+            overflow: visible;
+        }
     }
 
     .codeToolbar {
         background-color: transparent;
+    }
+
+    .toolbarContent {
+        min-width: 0;
+        min-height: 0;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 </style>
