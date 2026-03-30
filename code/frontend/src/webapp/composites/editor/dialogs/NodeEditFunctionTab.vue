@@ -113,6 +113,7 @@
                 v-model="
                     node as common.AbstractNode<common.VariableNodeType, common.LoopNodeFunctionState, any> //
                 "
+                :known-variables="knownVariables"
             />
         </div>
         <div v-if="node.function.type == common.RESULT_FUNCTION_TYPE">

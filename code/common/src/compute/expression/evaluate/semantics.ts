@@ -371,7 +371,7 @@ export const createTensorEvaluationSemantics = () => {
 
             const iteration = slice == "[i]" ? context.index.iteration : context.index.iteration - 1;
 
-            if (iteration < 0) {
+            if (iteration < 1) {
                 throw Error(`cannot apply index [i-1] within the initial expression`);
             }
 
@@ -379,7 +379,7 @@ export const createTensorEvaluationSemantics = () => {
                 return typedTensorValue({
                     ...seriesTT,
                     tensor: tf.squeeze(
-                        tf.slice2d(seriesTT.tensor as tf.Tensor2D, [0, iteration], [context.mcRuns, 1]),
+                        tf.slice2d(seriesTT.tensor as tf.Tensor2D, [0, iteration - 1], [context.mcRuns, 1]),
                         [1]
                     ),
                     isSeries: false
@@ -388,7 +388,7 @@ export const createTensorEvaluationSemantics = () => {
 
             return typedTensorValue({
                 ...seriesTT,
-                tensor: tf.squeeze(tf.slice1d(seriesTT.tensor as tf.Tensor1D, iteration, 1), [0]),
+                tensor: tf.squeeze(tf.slice1d(seriesTT.tensor as tf.Tensor1D, iteration - 1, 1), [0]),
                 isSeries: false
             });
         },

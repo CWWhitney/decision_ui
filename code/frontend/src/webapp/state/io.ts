@@ -16,7 +16,7 @@ export const getModelFileFromState = (): common.ModelFileState => {
     return {
         _schema: {
             name: common.MODEL_FILE_SCHEMA_NAME,
-            version: 1
+            version: common.MODEL_FILE_VERSION
         },
         graph: { ...graph.state },
         metadata: { ...metadata.state },
@@ -38,7 +38,7 @@ export const getGraphFileFromState = (selectedNodeIds: common.NodeId[]): common.
     return {
         _schema: {
             name: common.GRAPH_FILE_SCHEMA_NAME,
-            version: 1
+            version: common.GRAPH_FILE_VERSION
         },
         graph: {
             nodes: graph.state.nodes

@@ -46,18 +46,17 @@
             <template #default>
                 <ExpressionInput
                     v-model="node.function.initExpression"
-                    :empty-label="`Expression for Initial Value (i = 0) `"
-                    :filled-label="`${node.function.variable}[0] = `"
+                    :empty-label="`Expression for Initial Value (i = 1) `"
+                    :filled-label="`${node.function.variable}[1] = `"
                     :known-variables="props.knownVariables"
                 />
             </template>
             <template #tooltip>
                 <p>
-                    The initial expression defines the value of this variable at time step 1 (or index = 0). It is
-                    evaluated only once.
+                    The initial expression defines the value of this variable at time step 1. It is evaluated only once.
                 </p>
                 <p>
-                    This expression supports the loop index variable <code>i</code>, which is replace with the value 0.
+                    This expression supports the loop index variable <code>i</code>, which is replace with the value 1.
                     In addition, other time series variables defined in other loop nodes can be accessed using the index
                     notations <code>other[i]</code>.
                 </p>
@@ -67,20 +66,20 @@
             <template #default>
                 <ExpressionInput
                     v-model="node.function.loopExpression"
-                    :empty-label="`Expression for Iteration Value (i > 0)`"
+                    :empty-label="`Expression for Iteration Value (i > 1)`"
                     :filled-label="`${node.function.variable}[i] = `"
                     :known-variables="props.knownVariables"
                 />
             </template>
             <template #tooltip>
                 <p>
-                    The iteration expression is evaluated for every time step larger than 1 (or index > 0). It is
-                    evaluated multiple times and defines the value of this variable for indexes
-                    <code>i = 1,2,3 ... (iterations-1)</code>.
+                    The iteration expression is evaluated for every time step larger than 1. It is evaluated multiple
+                    times and defines the value of this variable for indexes
+                    <code>i = 2,3,4 ... (iterations-1)</code>.
                 </p>
                 <p>This expression supports two addtional variables:</p>
                 <ul>
-                    <li><code>i</code> is replaced with the current index value 1,2,3 ...</li>
+                    <li><code>i</code> is replaced with the current index value 2,3,4 ...</li>
                     <li>
                         <code>previous</code> is replaced with the value of the previous time step (otherwise known as
                         <code>variable[i-1]</code>)

@@ -6,6 +6,9 @@ import { EditorFileSchema, EditorFileState } from "./editor";
 import { ComputationFileSchema, ComputationFileState } from "./computation";
 
 export const MODEL_FILE_SCHEMA_NAME = "de.uni-bonn.decision-model/file";
+export const MODEL_FILE_VERSION = 2;
+
+export type ModelFileVersion = 2;
 export type ModelFileSchemaName = "de.uni-bonn.decision-model/file";
 
 export const ModelFileInfoSchema: Schema = {
@@ -19,7 +22,7 @@ export const ModelFileInfoSchema: Schema = {
 export interface ModelFileState {
     _schema: {
         name: ModelFileSchemaName;
-        version: number;
+        version: ModelFileVersion;
     };
     metadata: MetadataFileState;
     graph: Graph;
@@ -39,6 +42,9 @@ export const ModelFileSchema: Schema = {
 };
 
 export const GRAPH_FILE_SCHEMA_NAME = "de.uni-bonn.decision-model/graph";
+export const GRAPH_FILE_VERSION = 1;
+
+export type GraphFileVersion = 1;
 export type GraphFileSchemaName = "de.uni-bonn.decision-model/graph";
 
 export const GraphFileInfoSchema: Schema = {
@@ -52,7 +58,7 @@ export const GraphFileInfoSchema: Schema = {
 export interface GraphFileState {
     _schema: {
         name: GraphFileSchemaName;
-        version: number;
+        version: GraphFileVersion;
     };
     graph: Graph;
 }

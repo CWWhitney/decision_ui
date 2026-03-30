@@ -28,6 +28,8 @@
     const EXAMPLE_MODEL_FILES: common.ModelFileState[] = [
         common.getMinimalExampleModelFile(),
         common.getMultipleResultsExampleModelFile(),
+        common.getOperationsExampleModelFile(),
+        common.getDiscountExampleModelFile(),
         common.getAppleAgroforestExampleModelFile(),
         common.getWildfireExampleModelFile()
     ];

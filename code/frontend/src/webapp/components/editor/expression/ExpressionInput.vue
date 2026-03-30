@@ -381,7 +381,11 @@
                     size="small"
                     :click="() => (isIfDialogOpen = true)"
                 />
-                <IfExpressionDialog v-model="isIfDialogOpen" @submit="(e: string) => appendToExpression(e)" />
+                <IfExpressionDialog
+                    v-model="isIfDialogOpen"
+                    :known-variables="props.knownVariables"
+                    @submit="(e: string) => appendToExpression(e)"
+                />
                 <template v-for="(list, listIdx) in [LOGIC_OPERATORS]" :key="listIdx">
                     <ExpressionToolbarButton
                         v-for="(item, itemIdx) in list"
@@ -421,6 +425,7 @@
                 />
                 <ChanceEventExpressionDialog
                     v-model="isChanceEventDialogOpen"
+                    :known-variables="props.knownVariables"
                     @submit="(e: string) => appendToExpression(e)"
                 />
                 <ExpressionToolbarButton
@@ -432,6 +437,7 @@
                 />
                 <ValueVarierExpressionDialog
                     v-model="isValueVarierDialogOpen"
+                    :known-variables="props.knownVariables"
                     @submit="(e: string) => appendToExpression(e)"
                 />
                 <ExpressionToolbarButton
@@ -443,6 +449,7 @@
                 />
                 <DiscountExpressionDialog
                     v-model="isDiscountDialogOpen"
+                    :known-variables="props.knownVariables"
                     @submit="(e: string) => appendToExpression(e)"
                 />
                 <v-divider vertical />

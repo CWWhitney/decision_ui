@@ -251,18 +251,18 @@ export const getTypedTensorForLoopOperationNode = (
         const initTensor = evaluateExpressionMatch(expressionMatches.initExpressionMatch, {
             ...expressionContext,
             index: {
-                iteration: 0,
+                iteration: 1,
                 length: iterations
             },
             tensorByVariable: {
                 ...expressionContext.tensorByVariable,
-                i: getTypedTensorFromConstant(tf.scalar(0))
+                i: getTypedTensorFromConstant(tf.scalar(1))
             }
         });
         tensorList.push(initTensor);
 
         // evaluate iter expression in loop
-        for (let i = 1; i < iterations; i++) {
+        for (let i = 2; i <= iterations; i++) {
             const iterTensor = evaluateExpressionMatch(expressionMatches.loopExpressionMatch, {
                 ...expressionContext,
                 index: {
@@ -272,7 +272,7 @@ export const getTypedTensorForLoopOperationNode = (
                 tensorByVariable: {
                     ...expressionContext.tensorByVariable,
                     i: getTypedTensorFromConstant(tf.scalar(i)),
-                    previous: tensorList[i - 1]
+                    previous: tensorList[i - 2]
                 }
             });
             tensorList.push(iterTensor);
