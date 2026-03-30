@@ -17,8 +17,6 @@
 
     const route = useRoute();
     const isEditorRoute = route.name == "editor";
-    const runMenuEnabled =
-        route.name == "editor" || route.name == "analyze" || route.name == "r" || route.name == "rTabs";
 </script>
 
 <template>
@@ -65,7 +63,6 @@
                                 <v-btn
                                     v-bind="props"
                                     text="Run"
-                                    :disabled="!runMenuEnabled"
                                     :variant="!runMenuEnabled ? 'plain' : 'elevated'"
                                 ></v-btn>
                             </template>
