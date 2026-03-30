@@ -1,11 +1,16 @@
 import { Schema } from "ajv";
 import { Graph, GraphSchema } from "../graph";
-import { BackendComputationSchema, BackendComputationState } from "../io";
+import {
+    BackendEvpiComputationSchema,
+    BackendEvpiComputationState,
+    BackendResultHistogramComputationSchema,
+    BackendResultHistogramComputationState
+} from "../io";
 import { ErrorResponseBody, ErrorResponseSchema } from "./base";
 
 export interface CalculateResultHistogramRequestBody {
     graph: Graph;
-    computation: BackendComputationState;
+    computation: BackendResultHistogramComputationState;
 }
 
 export const CalculateResultHistogramRequestSchema: Schema = {
@@ -13,7 +18,7 @@ export const CalculateResultHistogramRequestSchema: Schema = {
     type: "object",
     properties: {
         graph: GraphSchema,
-        computation: BackendComputationSchema
+        computation: BackendResultHistogramComputationSchema
     },
     required: ["graph", "computation"],
     additionalProperties: false
@@ -91,7 +96,7 @@ export const CalculateResultHistogramResponseSchema: Schema = {
 
 export interface CalculateEvpiRequestBody {
     graph: Graph;
-    computation: BackendComputationState;
+    computation: BackendEvpiComputationState;
 }
 
 export const CalculateEvpiRequestSchema: Schema = {
@@ -99,7 +104,7 @@ export const CalculateEvpiRequestSchema: Schema = {
     type: "object",
     properties: {
         graph: GraphSchema,
-        computation: BackendComputationSchema
+        computation: BackendEvpiComputationSchema
     },
     required: ["graph", "computation"],
     additionalProperties: false

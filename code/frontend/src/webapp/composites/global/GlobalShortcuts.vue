@@ -6,10 +6,12 @@
     import { useComputationStore } from "../../state/computation";
     import { useOpenModelDialogStore } from "../../state/open_model";
     import { useSaveModelDialogStore } from "../../state/save_model_dialog";
+    import { useRStore } from "../../state/r";
 
     const openModelDialog = useOpenModelDialogStore();
     const saveModelDialog = useSaveModelDialogStore();
     const computation = useComputationStore();
+    const rStore = useRStore();
     const router = useRouter();
 
     const onKeyDown = (e: KeyboardEvent) => {
@@ -59,6 +61,20 @@
         if ((e.ctrlKey || e.metaKey) && e.key === "2") {
             e.preventDefault();
             computation.triggerRecalculation();
+        }
+
+        // trigger R result histogram calculation (ctrl + 3)
+        if ((e.ctrlKey || e.metaKey) && e.key === "3") {
+            e.preventDefault();
+            rStore.calculateResultHistogram();
+            router.push({ name: "rTabs", params: { variantTab: "histogram", displayTab: "diagram" } });
+        }
+
+        // trigger R evpi calculation (ctrl + 4)
+        if ((e.ctrlKey || e.metaKey) && e.key === "4") {
+            e.preventDefault();
+            rStore.calculateEvpi();
+            router.push({ name: "rTabs", params: { variantTab: "evpi", displayTab: "diagram" } });
         }
     };
 

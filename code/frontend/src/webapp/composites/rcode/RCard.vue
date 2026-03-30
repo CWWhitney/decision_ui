@@ -1,23 +1,37 @@
 <script lang="ts" setup>
-    import { computed, ref } from "vue";
+    import { computed } from "vue";
     import * as common from "@decision-support-ui/common";
 
     import { useRStore } from "../../state/r";
-    import { useAccountStore } from "../../state/account";
     import { useGraphStore } from "../../state/graph";
+    import { useComputationStore } from "../../state/computation";
 
     import RDataTab from "./RDataTab.vue";
     import RHistogramTab from "./RResultHistogramTab.vue";
     import RCodeTab from "./RCodeTab.vue";
     import RErrorDialog from "./RErrorDialog.vue";
     import REvpiDiagramTab from "./REvpiDiagramTab.vue";
+    import RSettingsTab from "./RSettingsTab.vue";
+    import { useRoute, useRouter } from "vue-router";
 
     const rStore = useRStore();
-    const account = useAccountStore();
     const graph = useGraphStore();
+    const computation = useComputationStore();
+    const route = useRoute();
+    const router = useRouter();
 
-    const activeVariantTab = ref<string>("histogram");
-    const activeDisplayTab = ref<string>("code");
+    const activeVariantTab = computed({
+        get: () => route.params.variantTab || "histogram",
+        set: newVariantTab => {
+            router.push({ name: "rTabs", params: { displayTab: activeDisplayTab.value, variantTab: newVariantTab } });
+        }
+    });
+    const activeDisplayTab = computed({
+        get: () => route.params.displayTab || "code",
+        set: newDisplayTab => {
+            router.push({ name: "rTabs", params: { variantTab: activeVariantTab.value, displayTab: newDisplayTab } });
+        }
+    });
 
     const combinedActiveTab = computed(() => `${activeVariantTab.value}+${activeDisplayTab.value}`);
 
@@ -109,6 +123,7 @@
                     <v-tab value="code">Code</v-tab>
                     <v-tab value="data">Data</v-tab>
                     <v-tab value="diagram">Diagram</v-tab>
+                    <v-tab value="settings">Settings</v-tab>
                 </v-tabs>
 
                 <div class="tabContents">
@@ -116,10 +131,10 @@
                         <v-tabs-window-item value="histogram+code">
                             <RCodeTab
                                 :status="rStore.state.resultHistogram.status"
-                                :code="rStore.computedRHistogramCode"
+                                :code="rStore.computedRResultHistogramCode"
                                 :estimates-csv="estimatesCsv"
                                 :run="() => rStore.calculateResultHistogram()"
-                                :can-run="!!rStore.computedRHistogramCode && account.isLoggedIn"
+                                :can-run="rStore.canCalculateResultHistogram"
                                 description="The R script that corresponds to the model and plots result variables in a histogram:"
                             />
                         </v-tabs-window-item>
@@ -130,7 +145,7 @@
                                 :run="() => rStore.calculateResultHistogram()"
                                 :status="rStore.state.resultHistogram.status"
                                 :columns="['bins', ...(rStore.state.resultHistogram.data?.variables ?? [])]"
-                                :can-run="!!rStore.computedRHistogramCode && account.isLoggedIn"
+                                :can-run="rStore.canCalculateResultHistogram"
                             />
                         </v-tabs-window-item>
                         <v-tabs-window-item value="histogram+diagram">
@@ -138,7 +153,15 @@
                                 :data="rStore.state.resultHistogram.data"
                                 :run="() => rStore.calculateResultHistogram()"
                                 :status="rStore.state.resultHistogram.status"
-                                :can-run="!!rStore.computedRHistogramCode && account.isLoggedIn"
+                                :can-run="rStore.canCalculateResultHistogram"
+                            />
+                        </v-tabs-window-item>
+                        <v-tabs-window-item value="histogram+settings">
+                            <RSettingsTab
+                                v-model="computation.persisted.backend.resultHistogram"
+                                :mc-runs="{ min: 1000, max: 100000, step: 1000 }"
+                                :histogram-bins="{ min: 10, max: 200, step: 10 }"
+                                :max-runtime="{ min: 1, max: 30, step: 1 }"
                             />
                         </v-tabs-window-item>
                         <v-tabs-window-item value="evpi+code">
@@ -147,7 +170,7 @@
                                 :code="rStore.computedREvpiCode"
                                 :estimates-csv="estimatesCsv"
                                 :run="() => rStore.calculateEvpi()"
-                                :can-run="!!rStore.computedREvpiCode && account.isLoggedIn"
+                                :can-run="rStore.canCalculateEvpi"
                                 description="The R script that calculates the EVPI (Expected Value of Perfect Information):"
                             />
                         </v-tabs-window-item>
@@ -158,15 +181,22 @@
                                 :run="() => rStore.calculateEvpi()"
                                 :status="rStore.state.evpi.status"
                                 :columns="evpiTableColumns"
-                                :can-run="!!rStore.computedREvpiCode && account.isLoggedIn"
+                                :can-run="rStore.canCalculateEvpi"
                             />
                         </v-tabs-window-item>
                         <v-tabs-window-item value="evpi+diagram">
                             <REvpiDiagramTab
                                 :status="rStore.state.evpi.status"
                                 :run="() => rStore.calculateEvpi()"
-                                :can-run="!!rStore.computedREvpiCode && account.isLoggedIn"
+                                :can-run="rStore.canCalculateEvpi"
                                 :data="rStore.state.evpi.data"
+                            />
+                        </v-tabs-window-item>
+                        <v-tabs-window-item value="evpi+settings">
+                            <RSettingsTab
+                                v-model="computation.persisted.backend.evpi"
+                                :mc-runs="{ min: 1000, max: 10000, step: 500 }"
+                                :max-runtime="{ min: 1, max: 30, step: 1 }"
                             />
                         </v-tabs-window-item>
                     </v-tabs-window>

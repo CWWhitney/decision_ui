@@ -4,8 +4,6 @@ import * as common from "@decision-support-ui/common";
 import { authenticateRoute } from "./authentication";
 import { addModel, getModel, listModelsForUser, removeModel, updateModel } from "../state/queries";
 import { validateJsonBody } from "./common";
-import { getCommonSeriesLengthFromTypedTensors } from "@decision-support-ui/common";
-import { logger } from "../logging";
 
 const MAX_MODELS_PER_USER = 100;
 
@@ -31,7 +29,7 @@ export const getModelsApi = () => {
 
         res.status(200).json({
             id: model.id,
-            modelfile: JSON.parse(model.file) as common.ModelFileState
+            modelfile: common.migrateModelFile(JSON.parse(model.file) as common.ModelFileState)
         } as common.GetModelResponseBody);
     });
 

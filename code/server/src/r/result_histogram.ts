@@ -7,7 +7,7 @@ import { DSUI_R_MAX_RUNTIME } from "../constants";
 
 export const generateAndExecuteResultHistogramScript = async (
     graph: common.Graph,
-    computation: common.BackendComputationState,
+    computation: common.BackendResultHistogramComputationState,
     rScriptExecutablePath: string
 ) => {
     const resultVariables = common.getResultVariables(graph.nodes);

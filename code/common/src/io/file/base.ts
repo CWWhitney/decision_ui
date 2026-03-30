@@ -19,7 +19,7 @@ export const ModelFileInfoSchema: Schema = {
 export interface ModelFileState {
     _schema: {
         name: ModelFileSchemaName;
-        version: 1;
+        version: number;
     };
     metadata: MetadataFileState;
     graph: Graph;
@@ -52,7 +52,7 @@ export const GraphFileInfoSchema: Schema = {
 export interface GraphFileState {
     _schema: {
         name: GraphFileSchemaName;
-        version: 1;
+        version: number;
     };
     graph: Graph;
 }

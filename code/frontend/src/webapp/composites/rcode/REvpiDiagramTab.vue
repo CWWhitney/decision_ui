@@ -25,8 +25,8 @@
         </div>
     </div>
     <div v-else class="otherContainer">
-        <div v-if="canRun" class="runContainer">
-            <RRunButton :run="run" :status="status" label="Run Code" />
+        <div class="runContainer">
+            <RRunButton :run="run" :status="status" :disabled="!canRun" label="Run Code" />
         </div>
         <RHint />
     </div>

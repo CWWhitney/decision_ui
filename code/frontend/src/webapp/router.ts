@@ -6,7 +6,7 @@ import WelcomePage from "./pages/WelcomePage.vue";
 import MetadataPage from "./pages/MetadataPage.vue";
 import AnalyzePage from "./pages/AnalyzePage.vue";
 import EstimatesTablePage from "./pages/EstimatesTablePage.vue";
-import CodePage from "./pages/CodePage.vue";
+import CodePage from "./pages/RPage.vue";
 
 const routes = [
     {
@@ -34,8 +34,13 @@ const routes = [
         component: EstimatesTablePage
     },
     {
-        path: "/code",
-        name: "code",
+        path: "/r",
+        name: "r",
+        component: CodePage
+    },
+    {
+        path: "/r/:variantTab/:displayTab",
+        name: "rTabs",
         component: CodePage
     },
     {

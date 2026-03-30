@@ -22,10 +22,15 @@ const getDefaultComputationState = (): common.ComputationFileState => {
             gpuAcceleration: true
         },
         backend: {
-            mcRuns: 10000,
-            histogramBins: 40,
-            evpiMcRuns: 1000,
-            maxRuntime: 10
+            resultHistogram: {
+                mcRuns: 10000,
+                histogramBins: 40,
+                maxRuntime: 10
+            },
+            evpi: {
+                mcRuns: 2000,
+                maxRuntime: 20
+            }
         }
     };
 };

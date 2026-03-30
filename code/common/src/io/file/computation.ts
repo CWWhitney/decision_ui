@@ -6,18 +6,6 @@ export interface FrontendComputationState {
     gpuAcceleration: boolean;
 }
 
-export interface BackendComputationState {
-    mcRuns: number;
-    histogramBins: number;
-    evpiMcRuns: number;
-    maxRuntime: number;
-}
-
-export interface ComputationFileState {
-    frontend: FrontendComputationState;
-    backend: BackendComputationState;
-}
-
 export const FrontendComputationSchema: Schema = {
     type: "object",
     properties: {
@@ -28,16 +16,54 @@ export const FrontendComputationSchema: Schema = {
     required: ["mcRuns", "histogramBins", "gpuAcceleration"]
 };
 
-export const BackendComputationSchema: Schema = {
+export interface BackendResultHistogramComputationState {
+    mcRuns: number;
+    histogramBins: number;
+    maxRuntime: number;
+}
+
+export const BackendResultHistogramComputationSchema: Schema = {
     type: "object",
     properties: {
         mcRuns: { type: "number" },
         histogramBins: { type: "number" },
-        evpiMcRuns: { type: "number" },
         maxRuntime: { type: "number" }
     },
-    required: ["mcRuns", "histogramBins", "evpiMcRuns"]
+    required: ["mcRuns", "histogramBins", "maxRuntime"]
 };
+
+export interface BackendEvpiComputationState {
+    mcRuns: number;
+    maxRuntime: number;
+}
+
+export const BackendEvpiComputationSchema: Schema = {
+    type: "object",
+    properties: {
+        mcRuns: { type: "number" },
+        maxRuntime: { type: "number" }
+    },
+    required: ["mcRuns", "maxRuntime"]
+};
+
+export interface BackendComputationState {
+    resultHistogram: BackendResultHistogramComputationState;
+    evpi: BackendEvpiComputationState;
+}
+
+export const BackendComputationSchema: Schema = {
+    type: "object",
+    properties: {
+        resultHistogram: BackendResultHistogramComputationSchema,
+        evpi: BackendEvpiComputationSchema
+    },
+    required: ["resultHistogram", "evpi"]
+};
+
+export interface ComputationFileState {
+    frontend: FrontendComputationState;
+    backend: BackendComputationState;
+}
 
 export const ComputationFileSchema: Schema = {
     type: "object",

@@ -1,11 +1,23 @@
 <script setup lang="ts">
+    import { useRouter } from "vue-router";
     import LazySlider from "../../components/form/LazySlider.vue";
     import TopMenuItem from "../../components/menu/TopMenuItem.vue";
-    import { useAccountStore } from "../../state/account";
     import { useComputationStore } from "../../state/computation";
+    import { useRStore } from "../../state/r";
 
     const computation = useComputationStore();
-    const account = useAccountStore();
+    const rStore = useRStore();
+    const router = useRouter();
+
+    const calculateResultHistogram = () => {
+        rStore.calculateResultHistogram();
+        router.push({ name: "rTabs", params: { variantTab: "histogram", displayTab: "diagram" } });
+    };
+
+    const calculateEvpi = () => {
+        rStore.calculateEvpi();
+        router.push({ name: "rTabs", params: { variantTab: "evpi", displayTab: "diagram" } });
+    };
 </script>
 
 <template>
@@ -51,46 +63,17 @@
             <div class="sectionHeader">
                 <h4>R Backend</h4>
             </div>
-            <div class="sliderItems">
-                <span>Monte Carlo Runs</span>
-                <LazySlider
-                    v-model="computation.persisted.backend.mcRuns"
-                    min="1000"
-                    step="1000"
-                    max="100000"
-                    hide-details
-                />
-                <span>{{ computation.persisted.backend.mcRuns }}</span>
-
-                <span>Histogram Bins</span>
-                <LazySlider
-                    v-model="computation.persisted.backend.histogramBins"
-                    min="10"
-                    step="10"
-                    max="200"
-                    hide-details
-                />
-                <span>{{ computation.persisted.backend.histogramBins }}</span>
-
-                <span>EVPI Mc Runs</span>
-                <LazySlider
-                    v-model="computation.persisted.backend.evpiMcRuns"
-                    min="1000"
-                    step="500"
-                    max="10000"
-                    hide-details
-                />
-                <span>{{ computation.persisted.backend.evpiMcRuns }}</span>
-
-                <span>Runtime (seconds)</span>
-                <LazySlider v-model="computation.persisted.backend.maxRuntime" min="1" step="1" max="30" hide-details />
-                <span>{{ computation.persisted.backend.maxRuntime }}</span>
-            </div>
             <TopMenuItem
-                title="Run in R Backend"
+                title="Calculate Result Histogram"
                 shortcut="CTRL + 3"
-                :disabled="!account.isLoggedIn"
-                @click="console.log('test')"
+                :disabled="!rStore.canCalculateResultHistogram"
+                @click="calculateResultHistogram"
+            />
+            <TopMenuItem
+                title="Calculate EVPI"
+                shortcut="CTRL + 4"
+                :disabled="!rStore.calculateEvpi"
+                @click="calculateEvpi"
             />
         </v-list>
     </v-card>

@@ -18,7 +18,7 @@ export const generateCalculateResultHistogramRequest = () => {
     }: {
         accessToken: string;
         graph: common.Graph;
-        computation: common.BackendComputationState;
+        computation: common.BackendResultHistogramComputationState;
         onSuccess?: (data: common.CalculateResultHistogramData) => void;
         onFailed?: (execution: common.RExecutionError) => void;
         onError?: (error: string) => void;
@@ -73,7 +73,7 @@ export const generateCalculateEvpiRequest = () => {
     }: {
         accessToken: string;
         graph: common.Graph;
-        computation: common.BackendComputationState;
+        computation: common.BackendEvpiComputationState;
         onSuccess?: (data: common.CalculateEvpiData) => void;
         onFailed?: (error: common.RExecutionError) => void;
         onError?: (error: string) => void;

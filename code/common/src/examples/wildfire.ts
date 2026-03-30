@@ -6,7 +6,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
     return {
         _schema: {
             name: "de.uni-bonn.decision-model/file",
-            version: 1
+            version: 2
         },
         graph: {
             nodes: [
@@ -1092,10 +1092,15 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                 gpuAcceleration: true
             },
             backend: {
-                mcRuns: 10000,
-                histogramBins: 40,
-                evpiMcRuns: 1000,
-                maxRuntime: 10
+                resultHistogram: {
+                    mcRuns: 10000,
+                    histogramBins: 40,
+                    maxRuntime: 10
+                },
+                evpi: {
+                    mcRuns: 2000,
+                    maxRuntime: 20
+                }
             }
         },
         editor: {

@@ -6,7 +6,7 @@ import { DSUI_R_MAX_RUNTIME } from "../constants";
 
 export const generateAndExecuteEvpiScript = async (
     graph: common.Graph,
-    computation: common.BackendComputationState,
+    computation: common.BackendEvpiComputationState,
     rScriptExecutablePath: string
 ) => {
     const resultVariables = common.getResultVariables(graph.nodes);
@@ -18,7 +18,7 @@ export const generateAndExecuteEvpiScript = async (
             resultVariables,
             estimatesCsvFilepath,
             resultsCsvFilepath,
-            computation.evpiMcRuns
+            computation.mcRuns
         );
     };
 

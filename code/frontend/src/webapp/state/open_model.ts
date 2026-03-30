@@ -61,12 +61,13 @@ export const useOpenModelDialogStore = defineStore(OPEN_MODEL_DIALOG_STORE_ID, (
         try {
             const text = await uploadFile();
             const state = JSON.parse(text) as common.ModelFileState;
-            const validationError = validateModelFile(state);
+            const migratedState = common.migrateModelFile(state);
+            const validationError = validateModelFile(migratedState);
             if (validationError) {
                 throw new Error(validationError);
             }
             saveModelDialog.setModelId(null);
-            loadModelFileToState(null, state);
+            loadModelFileToState(null, migratedState);
         } catch (e) {
             errorDialog.openDialog(
                 "Invalid Model File",

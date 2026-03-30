@@ -1,27 +1,17 @@
-import {
-    AddModelResponseSchema,
-    DeleteModelResponseSchema,
-    GetModelResponseSchema,
-    ListModelsResponseSchema,
-    UpdateModelResponseSchema,
-    type AddModelRequestBody,
-    type ListModelsEntry,
-    type ModelFileState,
-    type UpdateModelRequestBody
-} from "@decision-support-ui/common";
+import * as common from "@decision-support-ui/common";
 import { getBackendBaseURL, validateAxiosResponse } from "./common";
 import axios, { AxiosError, type AxiosResponse } from "axios";
 import { DSUI_BEARER_HEADER, DSUI_REQUEST_TIMEOUT } from "../common/constants";
 
 export const generateListModelsRequest = () => {
-    const validateResponse = validateAxiosResponse(ListModelsResponseSchema);
+    const validateResponse = validateAxiosResponse(common.ListModelsResponseSchema);
     return async ({
         accessToken,
         onSuccess = () => {},
         onError = () => {}
     }: {
         accessToken: string;
-        onSuccess?: (models: ListModelsEntry[]) => void;
+        onSuccess?: (models: common.ListModelsEntry[]) => void;
         onError?: (message: string) => void;
     }) => {
         return validateResponse(
@@ -50,7 +40,7 @@ export const generateListModelsRequest = () => {
 };
 
 export const generateAddModelRequest = () => {
-    const validateResponse = validateAxiosResponse(AddModelResponseSchema);
+    const validateResponse = validateAxiosResponse(common.AddModelResponseSchema);
     return async ({
         accessToken,
         modelfile,
@@ -59,13 +49,13 @@ export const generateAddModelRequest = () => {
         onError = () => {}
     }: {
         accessToken: string;
-        modelfile: ModelFileState;
+        modelfile: common.ModelFileState;
         onSuccess?: (modelId: number) => void;
         onMaxModelsReached?: () => void;
         onError?: (message: string) => void;
     }) => {
         return validateResponse(
-            axios.post((await getBackendBaseURL()) + "/api/models/model", { modelfile } as AddModelRequestBody, {
+            axios.post((await getBackendBaseURL()) + "/api/models/model", { modelfile } as common.AddModelRequestBody, {
                 headers: { "Content-Type": "application/json", [DSUI_BEARER_HEADER]: `Bearer ${accessToken}` },
                 timeout: DSUI_REQUEST_TIMEOUT
             }),
@@ -91,7 +81,7 @@ export const generateAddModelRequest = () => {
 };
 
 export const generateGetModelRequest = () => {
-    const validateResponse = validateAxiosResponse(GetModelResponseSchema);
+    const validateResponse = validateAxiosResponse(common.GetModelResponseSchema);
     return async ({
         accessToken,
         modelId,
@@ -100,7 +90,7 @@ export const generateGetModelRequest = () => {
     }: {
         accessToken: string;
         modelId: number;
-        onSuccess?: (modelId: number, modelfile: ModelFileState) => void;
+        onSuccess?: (modelId: number, modelfile: common.ModelFileState) => void;
         onError?: (message: string) => void;
     }) => {
         return validateResponse(
@@ -127,7 +117,7 @@ export const generateGetModelRequest = () => {
 };
 
 export const generateDeleteModelRequest = () => {
-    const validateResponse = validateAxiosResponse(DeleteModelResponseSchema);
+    const validateResponse = validateAxiosResponse(common.DeleteModelResponseSchema);
     return async ({
         accessToken,
         modelId,
@@ -163,7 +153,7 @@ export const generateDeleteModelRequest = () => {
 };
 
 export const generateUpdateModelRequest = () => {
-    const validateResponse = validateAxiosResponse(UpdateModelResponseSchema);
+    const validateResponse = validateAxiosResponse(common.UpdateModelResponseSchema);
     return async ({
         accessToken,
         modelId,
@@ -173,14 +163,14 @@ export const generateUpdateModelRequest = () => {
     }: {
         accessToken: string;
         modelId: number;
-        modelfile: ModelFileState;
+        modelfile: common.ModelFileState;
         onSuccess?: () => void;
         onError?: (message: string) => void;
     }) => {
         return validateResponse(
             axios.put(
                 (await getBackendBaseURL()) + `/api/models/model/${modelId}`,
-                { modelfile } as UpdateModelRequestBody,
+                { modelfile } as common.UpdateModelRequestBody,
                 {
                     headers: { "Content-Type": "application/json", [DSUI_BEARER_HEADER]: `Bearer ${accessToken}` },
                     timeout: DSUI_REQUEST_TIMEOUT

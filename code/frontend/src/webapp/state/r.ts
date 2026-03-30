@@ -91,7 +91,7 @@ export const useRStore = defineStore(R_STORE_ID, () => {
         return null;
     });
 
-    const computedRHistogramCode = computed(() => {
+    const computedRResultHistogramCode = computed(() => {
         if (computedModelFunctionFragment.value?.code) {
             const resultVariables = graph.state.nodes
                 .filter(n => n.type == common.VARIABLE_NODE_TYPE && n.function.type == common.RESULT_FUNCTION_TYPE)
@@ -102,8 +102,8 @@ export const useRStore = defineStore(R_STORE_ID, () => {
                 resultVariables,
                 "estimates.csv",
                 "results.csv",
-                computation.persisted.backend.mcRuns,
-                computation.persisted.backend.histogramBins
+                computation.persisted.backend.resultHistogram.mcRuns,
+                computation.persisted.backend.resultHistogram.histogramBins
             );
         }
 
@@ -121,7 +121,7 @@ export const useRStore = defineStore(R_STORE_ID, () => {
                 resultVariables,
                 "estimates.csv",
                 "results.csv",
-                computation.persisted.backend.evpiMcRuns
+                computation.persisted.backend.evpi.mcRuns
             );
         }
 
@@ -133,6 +133,13 @@ export const useRStore = defineStore(R_STORE_ID, () => {
         state.value.errorDialog.error = error;
     };
 
+    const canCalculateResultHistogram = computed(
+        () =>
+            account.isLoggedIn &&
+            !!computedRResultHistogramCode.value &&
+            state.value.resultHistogram.status != R_EXECUTION_IN_PROGRESS
+    );
+
     const calculateResultHistogram = () => {
         const accessToken = account.transient.accessToken;
         if (accessToken) {
@@ -143,7 +150,7 @@ export const useRStore = defineStore(R_STORE_ID, () => {
             doCalculateResultHistogramRequest({
                 accessToken,
                 graph: graph.state,
-                computation: computation.persisted.backend,
+                computation: computation.persisted.backend.resultHistogram,
                 onSuccess: (data: common.CalculateResultHistogramData) => {
                     state.value.resultHistogram.status = R_EXECUTION_SUCCESS;
                     state.value.resultHistogram.data = data;
@@ -166,6 +173,10 @@ export const useRStore = defineStore(R_STORE_ID, () => {
         }
     };
 
+    const canCalculateEvpi = computed(
+        () => account.isLoggedIn && !!computedREvpiCode.value && state.value.evpi.status != R_EXECUTION_IN_PROGRESS
+    );
+
     const calculateEvpi = () => {
         const accessToken = account.transient.accessToken;
         if (accessToken) {
@@ -176,7 +187,7 @@ export const useRStore = defineStore(R_STORE_ID, () => {
             doCalculateEvpiRequest({
                 accessToken,
                 graph: graph.state,
-                computation: computation.persisted.backend,
+                computation: computation.persisted.backend.evpi,
                 onSuccess: (data: common.CalculateEvpiData) => {
                     state.value.evpi.status = R_EXECUTION_SUCCESS;
                     state.value.evpi.data = data;
@@ -214,9 +225,11 @@ export const useRStore = defineStore(R_STORE_ID, () => {
 
     return {
         state,
-        computedRHistogramCode,
+        computedRResultHistogramCode,
         computedREvpiCode,
+        canCalculateResultHistogram,
         calculateResultHistogram,
+        canCalculateEvpi,
         calculateEvpi,
         reset
     };

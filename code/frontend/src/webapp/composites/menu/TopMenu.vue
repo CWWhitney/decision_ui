@@ -17,7 +17,8 @@
 
     const route = useRoute();
     const isEditorRoute = route.name == "editor";
-    const runMenuEnabled = route.name == "editor" || route.name == "analyze" || route.name == "code";
+    const runMenuEnabled =
+        route.name == "editor" || route.name == "analyze" || route.name == "r" || route.name == "rTabs";
 </script>
 
 <template>
