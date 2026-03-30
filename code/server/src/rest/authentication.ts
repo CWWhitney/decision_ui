@@ -18,10 +18,10 @@ import {
 } from "../constants";
 
 if (DSUI_ACCESS_TOKEN_SECRET == "default") {
-    logger.warn("Please specify a unique access token secret using the env variable ACCESS_TOKEN_SECRET!");
+    logger.warn("Please specify a unique access token secret using the env variable DSUI_ACCESS_TOKEN_SECRET!");
 }
 if (DSUI_REFRESH_TOKEN_SECRET == "default") {
-    logger.warn("Please specify a unique refresh token secret using the env variable REFRESH_TOKEN_SECRET!");
+    logger.warn("Please specify a unique refresh token secret using the env variable DSUI_REFRESH_TOKEN_SECRET!");
 }
 
 interface AccessToken {
