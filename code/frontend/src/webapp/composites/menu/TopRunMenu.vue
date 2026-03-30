@@ -72,7 +72,7 @@
             <TopMenuItem
                 title="Calculate EVPI"
                 shortcut="CTRL + 4"
-                :disabled="!rStore.calculateEvpi"
+                :disabled="!rStore.canCalculateEvpi"
                 @click="calculateEvpi"
             />
         </v-list>
