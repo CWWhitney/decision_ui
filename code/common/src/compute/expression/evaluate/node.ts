@@ -72,49 +72,61 @@ export const getExpressionMatchesForOperationFunction = (
     node: AbstractNode<VariableNodeType, OperationNodeFunctionState, any>
 ): OperationFunctionExpressionMatches => {
     if (!node.function.expression || node.function.expression == "") {
-        throw new Error(`expression may not be empty`);
+        throw new Error(`$expression may not be empty for node '${node.visualization.title}'`);
     }
 
-    return {
-        type: OPERATION_FUNCTION_TYPE,
-        expressionMatch: matchExpression(node.function.expression)
-    };
+    try {
+        return {
+            type: OPERATION_FUNCTION_TYPE,
+            expressionMatch: matchExpression(node.function.expression)
+        };
+    } catch (e) {
+        throw new Error(`${e.message} for node '${node.visualization.title}'`);
+    }
 };
 
 export const getExpressionMatchesForLoopFunction = (
     node: AbstractNode<VariableNodeType, LoopNodeFunctionState, any>
 ): LoopFunctionExpressionMatches => {
     if (!node.function.initExpression || node.function.initExpression == "") {
-        throw new Error(`expression for initial value may not be empty`);
+        throw new Error(`expression for initial value may not be empty for node '${node.visualization.title}'`);
     }
     if (!node.function.loopExpression || node.function.loopExpression == "") {
-        throw new Error(`expression for iteration value may not be empty`);
+        throw new Error(`expression for iteration value may not be empty for node '${node.visualization.title}'`);
     }
 
-    return {
-        type: LOOP_FUNCTION_TYPE,
-        iterationsExpressionMatch: matchExpression(node.function.iterationsExpression),
-        initExpressionMatch: matchExpression(node.function.initExpression),
-        loopExpressionMatch: matchExpression(node.function.loopExpression)
-    };
+    try {
+        return {
+            type: LOOP_FUNCTION_TYPE,
+            iterationsExpressionMatch: matchExpression(node.function.iterationsExpression),
+            initExpressionMatch: matchExpression(node.function.initExpression),
+            loopExpressionMatch: matchExpression(node.function.loopExpression)
+        };
+    } catch (e) {
+        throw new Error(`${e.message} for node '${node.visualization.title}'`);
+    }
 };
 
 export const getExpressionMatchesForResultFunction = (
     node: AbstractNode<VariableNodeType, ResultNodeFunctionState, any>
 ): ResultFunctionExpressionMatches => {
     if (!node.function.expression || node.function.expression == "") {
-        throw new Error(`expression may not be empty`);
+        throw new Error(`expression may not be empty for node '${node.visualization.title}'`);
     }
 
-    return {
-        type: RESULT_FUNCTION_TYPE,
-        expressionMatch: matchExpression(node.function.expression)
-    };
+    try {
+        return {
+            type: RESULT_FUNCTION_TYPE,
+            expressionMatch: matchExpression(node.function.expression)
+        };
+    } catch (e) {
+        throw new Error(`${e.message} for node '${node.visualization.title}'`);
+    }
 };
 
 export const getExpressionMatchesForNode = (node: Node): NodeFunctionExpressionMatches | null => {
     if (node.type != VARIABLE_NODE_TYPE) {
-        throw new Error(`cannot match expression for non-variable node '${node.id}'`);
+        throw new Error(`cannot match expression for non-variable node '${node.visualization.title}'`);
     }
     if (node.function.type == ESTIMATE_FUNCTION_TYPE) {
         return null;
@@ -216,14 +228,20 @@ export const getTypedTensorForLoopOperationNode = (
     if (iterationsTT.isProbabilistic || iterationsTT.isSeries || iterationsTT.tensor.shape.length != 0) {
         iterationsTT.tensor.dispose();
         const variableDescription = iterationsTT.isProbabilistic ? "probabilisitc" : "a time series";
-        throw new Error(`iterations expression must yield a deterministic value, but was ${variableDescription}`);
+        throw new Error(
+            `iterations expression must yield a deterministic value, but was ${variableDescription} ` +
+                `for node '${node.visualization.title}'`
+        );
     }
 
     const iterations = iterationsTT.tensor.arraySync() as number;
     iterationsTT.tensor.dispose();
 
     if (iterations != Math.floor(iterations)) {
-        throw new Error(`iterations expression must yield a integer value, but was ${iterations}`);
+        throw new Error(
+            `iterations expression must yield a integer value, but was ${iterations} ` +
+                `for node '${node.visualization.title}'`
+        );
     }
 
     // evaluate loop

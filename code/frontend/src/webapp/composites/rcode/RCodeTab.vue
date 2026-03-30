@@ -104,6 +104,5 @@
 
     .codeToolbar {
         background-color: transparent;
-        padding: 0;
     }
 </style>

@@ -30,10 +30,10 @@
         </div>
     </div>
     <div v-else class="otherContainer">
-        <div class="runContainer">
-            <RRunButton :run="run" :status="status" :disabled="!canRun" label="Run Code" />
-        </div>
         <RHint />
+        <div class="runContainer">
+            <RRunButton :run="run" :status="status" :disabled="!canRun" label="Calculate Diagram" />
+        </div>
     </div>
 </template>
 
@@ -56,7 +56,10 @@
     }
 
     .otherContainer {
+        display: flex;
+        flex-direction: column;
         width: 100%;
+        height: 100%;
 
         :deep(.v-alert) {
             margin-top: 1em;

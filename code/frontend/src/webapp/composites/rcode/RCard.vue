@@ -258,6 +258,7 @@
 
     .tabContents {
         display: flex;
+        flex-direction: column;
         width: 100%;
         height: 100%;
 
@@ -265,6 +266,7 @@
         :deep(.v-window__container),
         :deep(.v-window-item) {
             display: flex;
+            flex-direction: column;
             height: 100%;
             width: 100%;
         }

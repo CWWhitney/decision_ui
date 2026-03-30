@@ -128,7 +128,7 @@
                 v-if="!!computationError"
                 type="error"
                 variant="outlined"
-                :text="`Computation Error: ${computationError}`"
+                :text="`${computationError}`"
                 class="functionAlert"
             />
             <v-alert

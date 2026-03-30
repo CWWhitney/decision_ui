@@ -51,11 +51,7 @@
             />
         </div>
         <div v-if="computedTypedTensorResult && computedTypedTensorResult.type == COMPUTED_RESULT_ERROR_TYPE">
-            <v-alert
-                type="error"
-                variant="outlined"
-                :text="`Computation Error: ${computedTypedTensorResult.message}`"
-            />
+            <v-alert type="error" variant="outlined" :text="`${computedTypedTensorResult.message}`" />
         </div>
     </template>
 </template>

@@ -40,6 +40,8 @@
 
 <style lang="scss" scoped>
     .alertContainer {
-        margin-bottom: 1em;
+        :deep(.v-alert) {
+            margin-bottom: 1em;
+        }
     }
 </style>

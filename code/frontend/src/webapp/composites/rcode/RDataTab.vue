@@ -99,10 +99,12 @@
                 </template>
             </vue-excel-editor>
         </div>
-        <div v-else-if="canRun" class="runContainer">
-            <RRunButton :run="run" :status="status" label="Run Code" />
-        </div>
-        <RHint />
+        <template v-else>
+            <RHint />
+            <div class="runContainer">
+                <RRunButton :run="run" :status="status" :disabled="!canRun" label="Calculate Data" />
+            </div>
+        </template>
     </div>
 </template>
 
@@ -114,6 +116,7 @@
         width: 100%;
         height: 100%;
     }
+
     .tableContainer {
         display: flex;
         flex-direction: column;
