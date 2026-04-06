@@ -11,7 +11,7 @@ export const indentCode = (code: string | null, ident = "    ") => {
 };
 
 export const getRCodeHistogramTemplate = (
-    modelFunctionCode: string,
+    modelFunctionCode: string | null,
     resultVariables: string[],
     estimatesFilepath: string,
     resultsFilepath: string,
@@ -54,7 +54,7 @@ write_csv(results, "${resultsFilepath.replaceAll("\\", "\\\\")}")
 };
 
 export const getRCodeEvpiTemplate = (
-    modelFunctionCode: string,
+    modelFunctionCode: string | null,
     resultVariables: string[],
     estimatesFilepath: string,
     resultsFilepath: string,

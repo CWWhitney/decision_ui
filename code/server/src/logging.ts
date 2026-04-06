@@ -4,7 +4,7 @@ export const format = winston.format.combine(
     winston.format.timestamp(),
     winston.format.colorize(),
     winston.format.printf(info => {
-        const { timestamp, level, message, ...args } = info; // eslint-disable-line
+        const { timestamp, level, message, ...args } = info;
         return `${timestamp} [${level}] ${message} ${Object.keys(args).length ? JSON.stringify(args, null, 2) : ""}`;
     })
 );

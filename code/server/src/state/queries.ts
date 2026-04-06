@@ -1,4 +1,4 @@
-import { Model, Op } from "sequelize";
+import { Op } from "sequelize";
 import { ModelTable, UserTable } from "./database";
 import { ModelFileState, ListModelsEntry } from "@decision-support-ui/common";
 

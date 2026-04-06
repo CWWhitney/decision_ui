@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.3.0 - 2026-04-07
+
+New Features
+
+- Replaced BaklavaJS with VueFlow and a new computational model
+- Replaced the FastAPI Python backend with a Node Express server to use the same Typescript code the generate R code both in the frontend and backend
+- Updated various dependencies (Vuetify, etc.)
+
 ## v0.2.1 - 2025-07-10
 
 New Features

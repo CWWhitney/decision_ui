@@ -1,54 +1,55 @@
 import { mkdtempSync, readFileSync, rmdirSync, rmSync, writeFileSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
-import { exec, ExecException } from "child_process";
+import { exec } from "child_process";
 import { logger } from "../logging";
 import * as common from "@decision-support-ui/common";
 
 interface RExecutionCsvResult {
-    resultsCsv: string;
+    resultsCsv: string | null;
     error: common.RExecutionError | null;
 }
 
-const asyncExecuteR = async (rScriptExecutablePath: string, rScriptFilepath: string, resultsCsvFilepath: string, timeout: number) => {
+const asyncExecuteR = async (
+    rScriptExecutablePath: string,
+    rScriptFilepath: string,
+    resultsCsvFilepath: string,
+    timeout: number
+) => {
     logger.debug(`execute Rscript`);
     return new Promise<RExecutionCsvResult>(resolve => {
-        exec(
-            `${rScriptExecutablePath} ${rScriptFilepath}`,
-            { timeout: timeout * 1000 },
-            (error: ExecException, stdout, stderr) => {
-                logger.debug("Rscript finished");
-                if (error) {
-                    if (error.killed) {
-                        return resolve({
-                            resultsCsv: null,
-                            error: {
-                                reason: `timeout of ${timeout} seconds reached`,
-                                stdout,
-                                stderr,
-                                exitcode: error.code
-                            }
-                        });
-                    }
+        exec(`${rScriptExecutablePath} ${rScriptFilepath}`, { timeout: timeout * 1000 }, (error, stdout, stderr) => {
+            logger.debug("Rscript finished");
+            if (error) {
+                if (error.killed) {
                     return resolve({
                         resultsCsv: null,
                         error: {
-                            reason: `Rscript failed with non-zero exit code`,
+                            reason: `timeout of ${timeout} seconds reached`,
                             stdout,
                             stderr,
-                            exitcode: error.code
+                            exitcode: error.code ?? null
                         }
                     });
                 }
-
-                const resultsCsv = readFileSync(resultsCsvFilepath, "utf-8");
-
                 return resolve({
-                    resultsCsv,
-                    error: null
+                    resultsCsv: null,
+                    error: {
+                        reason: `Rscript failed with non-zero exit code`,
+                        stdout,
+                        stderr,
+                        exitcode: error.code ?? null
+                    }
                 });
             }
-        );
+
+            const resultsCsv = readFileSync(resultsCsvFilepath, "utf-8");
+
+            return resolve({
+                resultsCsv,
+                error: null
+            });
+        });
     });
 };
 

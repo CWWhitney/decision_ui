@@ -11,7 +11,6 @@
         type NodeMouseEvent
     } from "@vue-flow/core";
     import { Background } from "@vue-flow/background";
-    import { MiniMap } from "@vue-flow/minimap";
 
     import * as common from "@decision-support-ui/common";
 
@@ -184,7 +183,6 @@
                     <FlowEdge v-bind="edgeProps" />
                 </template>
 
-                <MiniMap v-if="false" pannable zoomable position="top-right" />
                 <Background v-if="editor.persisted.background != 'none'" :variant="editor.persisted.background" />
             </VueFlow>
             <EditorSubgraphIndicator />
@@ -196,22 +194,10 @@
 <style lang="scss">
     @import "@vue-flow/core/dist/style.css";
     @import "@vue-flow/core/dist/theme-default.css";
-    @import "@vue-flow/minimap/dist/style.css";
     @import "@vue-flow/node-resizer/dist/style.css";
 
     .vue-flow {
         flex-grow: 1;
-    }
-
-    .vue-flow__panel.vue-flow__minimap {
-        display: block;
-
-        border: 2px solid #ddd;
-        background: #fff;
-
-        svg {
-            display: block;
-        }
     }
 </style>
 

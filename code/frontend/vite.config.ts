@@ -3,7 +3,6 @@ import { resolve } from "path";
 import childProcess from "child_process";
 import vue from "@vitejs/plugin-vue";
 import vueJsx from "@vitejs/plugin-vue-jsx";
-import legacy from "@vitejs/plugin-legacy";
 import vuetify from "vite-plugin-vuetify";
 import svgLoader from "vite-svg-loader";
 
@@ -49,10 +48,7 @@ export default defineConfig({
         svgLoader(),
         vueJsx(),
         nodePolyfills(),
-        vuetify(),
-        legacy({
-            targets: ["defaults", "not IE 11"]
-        })
+        vuetify()
     ],
     define: {
         "import.meta.env.VITE_APP_VERSION": JSON.stringify(commitHash)

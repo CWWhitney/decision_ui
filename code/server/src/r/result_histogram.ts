@@ -2,7 +2,7 @@ import { parse } from "csv-parse";
 
 import * as common from "@decision-support-ui/common";
 import { executeRScript } from "./execute";
-import { logger } from "../logging";
+
 import { DSUI_R_MAX_HISTOGRAM_BINS, DSUI_R_MAX_MCRUNS, DSUI_R_MAX_RUNTIME } from "../constants";
 
 export const generateAndExecuteResultHistogramScript = async (

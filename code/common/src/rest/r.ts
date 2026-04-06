@@ -28,7 +28,7 @@ export interface RExecutionError {
     reason: string;
     stdout: string;
     stderr: string;
-    exitcode: number;
+    exitcode: number | null;
 }
 
 export const RExcecutionErrorSchema: Schema = {

@@ -3,7 +3,7 @@ import * as express from "express";
 import { makeErrorResponseBody, validateSchema } from "@decision-support-ui/common";
 import { Schema } from "ajv";
 
-export const validateJsonBody = <T>(schema: Schema) => {
+export const validateJsonBody = (schema: Schema) => {
     const validate = validateSchema(schema);
 
     return (req: express.Request, res: express.Response, next: express.NextFunction) => {
