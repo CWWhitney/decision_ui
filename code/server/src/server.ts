@@ -1,13 +1,16 @@
 import * as path from "path";
-import * as express from "express";
-import * as compress from "compression";
+import express from "express";
+import compress from "compression";
 import * as http from "http";
-import * as nocache from "nocache";
+import nocache from "nocache";
 
-import { logger } from "./logging";
-import { getRestApi } from "./rest";
-import { loadDatabase } from "./state/database";
-import { DSUI_DATABASE_PATH, DSUI_R_SCRIPT_PATH } from "./constants";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+import { logger } from "./logging.js";
+import { getRestApi } from "./rest/index.js";
+import { loadDatabase } from "./state/database.js";
+import { DSUI_DATABASE_PATH, DSUI_R_SCRIPT_PATH } from "./constants.js";
 
 export const startServer = async ({
     port = 8080,
@@ -42,6 +45,7 @@ export const startServer = async ({
     app.use("/api", getRestApi({ rScriptPath }));
 
     // serve static files
+    const __dirname = dirname(fileURLToPath(import.meta.url));
     const pathToStatic = path.join(__dirname, "../../../frontend/dist/webapp");
     logger.info(`serving from ${pathToStatic}`);
     app.use(express.static(pathToStatic, { etag: false }));

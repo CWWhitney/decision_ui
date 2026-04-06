@@ -1,13 +1,14 @@
-import * as express from "express";
+import express from "express";
+import jwt from "jsonwebtoken";
+
 import * as bcrypt from "bcrypt";
-import * as jwt from "jsonwebtoken";
 import * as common from "@decision-support-ui/common";
 
 import { v4 as uuidv4 } from "uuid";
 
-import { addUser, findUserByUsername } from "../state/queries";
-import { logger } from "../logging";
-import { validateJsonBody } from "./common";
+import { addUser, findUserByUsername } from "../state/queries.js";
+import { logger } from "../logging.js";
+import { validateJsonBody } from "./common.js";
 import {
     DSUI_ACCESS_TOKEN_EXPIRY,
     DSUI_ACCESS_TOKEN_SECRET,
@@ -15,7 +16,7 @@ import {
     DSUI_BEARER_HEADER,
     DSUI_REFRESH_TOKEN_EXPIRY,
     DSUI_REFRESH_TOKEN_SECRET
-} from "../constants";
+} from "../constants.js";
 
 if (DSUI_ACCESS_TOKEN_SECRET == "default") {
     logger.warn("Please specify a unique access token secret using the env variable DSUI_ACCESS_TOKEN_SECRET!");
@@ -115,7 +116,7 @@ export const getAuthenticationApi = () => {
 
     // refresh login tokens
     app.post("/jwt/refresh", validateJsonBody(common.RefreshRequestSchema), (req, res) => {
-        const { refreshToken } = req.body;
+        const { refreshToken } = req.body as common.RefreshRequestBody;
 
         if (!refreshToken) {
             logger.info(`not jwt refresh token provided, cannot refresh`);
@@ -126,21 +127,27 @@ export const getAuthenticationApi = () => {
             return res.status(403).json(common.makeErrorResponseBody("invalid refresh token"));
         }
 
-        jwt.verify(refreshToken, DSUI_REFRESH_TOKEN_SECRET, (err: jwt.VerifyErrors | null, token: RefreshToken) => {
-            if (err) {
-                logger.info(`jwt refresh token cannot be verified`, err);
-                return res.status(403).json(common.makeErrorResponseBody("invalid refresh token"));
+        jwt.verify(
+            refreshToken,
+            DSUI_REFRESH_TOKEN_SECRET,
+            { complete: true },
+            (err: jwt.VerifyErrors | null, decoded) => {
+                if (err || !decoded) {
+                    logger.info(`jwt refresh token cannot be verified`, err);
+                    return res.status(403).json(common.makeErrorResponseBody("invalid refresh token"));
+                }
+
+                const token = decoded.payload as RefreshToken;
+                REFRESH_TOKENS.delete(refreshToken);
+
+                const newAccessToken = generateAccessToken(token.id);
+                const newRefreshToken = generateRefreshToken(token.id);
+
+                REFRESH_TOKENS.add(newRefreshToken);
+
+                res.status(200).json({ accessToken: newAccessToken, refreshToken: newRefreshToken });
             }
-
-            REFRESH_TOKENS.delete(refreshToken);
-
-            const newAccessToken = generateAccessToken(token.id);
-            const newRefreshToken = generateRefreshToken(token.id);
-
-            REFRESH_TOKENS.add(newRefreshToken);
-
-            res.status(200).json({ accessToken: newAccessToken, refreshToken: newRefreshToken });
-        });
+        );
     });
 
     // logout of account
@@ -172,12 +179,13 @@ export const authenticateRoute = (req: express.Request, res: express.Response, n
 
     const accessToken = bearerHeader.split(" ")[1];
 
-    jwt.verify(accessToken, DSUI_ACCESS_TOKEN_SECRET, (err: jwt.VerifyErrors | null, token: AccessToken) => {
-        if (err) {
+    jwt.verify(accessToken, DSUI_ACCESS_TOKEN_SECRET, { complete: true }, (err: jwt.VerifyErrors | null, decoded) => {
+        if (err || !decoded) {
             logger.error("received request with invalid access token");
             return res.status(401).json(common.makeErrorResponseBody("invalid access token"));
         }
 
+        const token = decoded.payload as AccessToken;
         req.authenticatedUserId = token.id;
         next();
     });

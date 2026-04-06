@@ -1,4 +1,4 @@
-import * as express from "express";
+import express from "express";
 
 import { makeErrorResponseBody, validateSchema } from "@decision-support-ui/common";
 import { Schema } from "ajv";

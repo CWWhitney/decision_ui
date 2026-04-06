@@ -1,5 +1,5 @@
-import { logger } from "./logging";
-import { startServer } from "./server";
+import { logger } from "./logging.js";
+import { startServer } from "./server.js";
 
 const run = async () => {
     const cleanup = await startServer();

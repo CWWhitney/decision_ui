@@ -12,7 +12,7 @@ export const DSUI_R_MAX_HISTOGRAM_BINS = parseInt(process.env.DSUI_R_MAX_HISTOGR
 
 export const DSUI_BEARER_HEADER = process.env.VITE_DSUI_BEARER_HEADER || "Authorization";
 
-export const DSUI_BCRYPT_SALT_ROUNDS = parseInt(process.env.DSUI_BCRYPT_SALT_ROUNDS) || 10;
+export const DSUI_BCRYPT_SALT_ROUNDS = parseInt(process.env.DSUI_BCRYPT_SALT_ROUNDS ?? "10");
 
 export const DSUI_ACCESS_TOKEN_SECRET = process.env.DSUI_ACCESS_TOKEN_SECRET || "default";
 

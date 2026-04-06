@@ -1,8 +1,8 @@
 import { parse } from "csv-parse";
 
 import * as common from "@decision-support-ui/common";
-import { executeRScript } from "./execute";
-import { DSUI_R_MAX_MCRUNS, DSUI_R_MAX_RUNTIME } from "../constants";
+import { executeRScript } from "./execute.js";
+import { DSUI_R_MAX_MCRUNS, DSUI_R_MAX_RUNTIME } from "../constants.js";
 
 export const generateAndExecuteEvpiScript = async (
     graph: common.Graph,

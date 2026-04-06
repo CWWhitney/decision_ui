@@ -1,11 +1,11 @@
-import * as express from "express";
+import express from "express";
 import * as common from "@decision-support-ui/common";
 
-import { authenticateRoute } from "./authentication";
-import { validateJsonBody } from "./common";
-import { logger } from "../logging";
-import { generateAndExecuteResultHistogramScript } from "../r/result_histogram";
-import { generateAndExecuteEvpiScript } from "../r/evpi";
+import { authenticateRoute } from "./authentication.js";
+import { validateJsonBody } from "./common.js";
+import { logger } from "../logging.js";
+import { generateAndExecuteResultHistogramScript } from "../r/result_histogram.js";
+import { generateAndExecuteEvpiScript } from "../r/evpi.js";
 
 export const getRApi = ({ rScriptPath }: { rScriptPath: string }) => {
     const app = express();
@@ -22,7 +22,7 @@ export const getRApi = ({ rScriptPath }: { rScriptPath: string }) => {
             try {
                 const responseData = await generateAndExecuteResultHistogramScript(graph, computation, rScriptPath);
                 return res.status(200).json(responseData);
-            } catch (e) {
+            } catch (e: any) {
                 logger.error("unexpected error calculating result histogram", e);
                 return res.status(500).json({
                     error: e.message
@@ -43,7 +43,7 @@ export const getRApi = ({ rScriptPath }: { rScriptPath: string }) => {
             try {
                 const responseData = await generateAndExecuteEvpiScript(graph, computation, rScriptPath);
                 return res.status(200).json(responseData);
-            } catch (e) {
+            } catch (e: any) {
                 logger.error("unexpected error calculating evpi", e);
                 return res.status(500).json({
                     error: e.message

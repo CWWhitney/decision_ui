@@ -1,9 +1,9 @@
-import * as express from "express";
+import express from "express";
 import * as common from "@decision-support-ui/common";
 
-import { authenticateRoute } from "./authentication";
-import { addModel, getModel, listModelsForUser, removeModel, updateModel } from "../state/queries";
-import { validateJsonBody } from "./common";
+import { authenticateRoute } from "./authentication.js";
+import { addModel, getModel, listModelsForUser, removeModel, updateModel } from "../state/queries.js";
+import { validateJsonBody } from "./common.js";
 
 const MAX_MODELS_PER_USER = 100;
 
@@ -12,14 +12,14 @@ export const getModelsApi = () => {
 
     // list all available models for a use
     app.get("/for_user", authenticateRoute, async (req, res) => {
-        const userId = req.authenticatedUserId;
+        const userId = req.authenticatedUserId!;
         const models = await listModelsForUser(userId);
         res.status(200).json({ models } as common.ListModelsResponseBody);
     });
 
     // retrieve existing model of a user
     app.get("/model/:modelId", authenticateRoute, async (req, res) => {
-        const userId = req.authenticatedUserId;
+        const userId = req.authenticatedUserId!;
         const modelId = parseInt(req.params.modelId as string);
         const model = await getModel(modelId);
 
@@ -35,7 +35,7 @@ export const getModelsApi = () => {
 
     // add a new model for a user
     app.post("/model", authenticateRoute, validateJsonBody(common.AddModelRequestSchema), async (req, res) => {
-        const userId = req.authenticatedUserId;
+        const userId = req.authenticatedUserId!;
         const { modelfile } = req.body as common.AddModelRequestBody;
 
         const models = await listModelsForUser(userId);
@@ -50,7 +50,7 @@ export const getModelsApi = () => {
 
     // update an existing model of a user
     app.put("/model/:modelId", authenticateRoute, async (req, res) => {
-        const userId = req.authenticatedUserId;
+        const userId = req.authenticatedUserId!;
         const modelId = parseInt(req.params.modelId as string);
         const { modelfile } = req.body;
 
@@ -67,7 +67,7 @@ export const getModelsApi = () => {
 
     // delete an existing model of a user
     app.delete("/model/:modelId", authenticateRoute, async (req, res) => {
-        const userId = req.authenticatedUserId;
+        const userId = req.authenticatedUserId!;
         const modelId = parseInt(req.params.modelId as string);
 
         const model = await getModel(modelId);

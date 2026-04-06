@@ -1,7 +1,7 @@
-import * as express from "express";
-import { getAuthenticationApi } from "./authentication";
-import { getModelsApi } from "./models";
-import { getRApi } from "./r";
+import express from "express";
+import { getAuthenticationApi } from "./authentication.js";
+import { getModelsApi } from "./models.js";
+import { getRApi } from "./r.js";
 
 export const getRestApi = ({ rScriptPath }: { rScriptPath: string }) => {
     const app = express();

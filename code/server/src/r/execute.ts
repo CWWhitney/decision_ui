@@ -2,7 +2,7 @@ import { mkdtempSync, readFileSync, rmdirSync, rmSync, writeFileSync } from "fs"
 import { tmpdir } from "os";
 import { join } from "path";
 import { exec } from "child_process";
-import { logger } from "../logging";
+import { logger } from "../logging.js";
 import * as common from "@decision-support-ui/common";
 
 interface RExecutionCsvResult {

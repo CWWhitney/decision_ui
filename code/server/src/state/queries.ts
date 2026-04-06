@@ -1,5 +1,5 @@
 import { Op } from "sequelize";
-import { ModelTable, UserTable } from "./database";
+import { ModelTable, UserTable } from "./database.js";
 import { ModelFileState, ListModelsEntry } from "@decision-support-ui/common";
 
 export const findUserByUsername = async (username: string) => {
