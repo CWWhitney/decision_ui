@@ -92,7 +92,7 @@ export const executeRScript = async (
         }
         if (directory) {
             logger.debug(`remove temporary directory ${directory}`);
-            rmdirSync(directory, {});
+            rmdirSync(directory);
         }
     }
 };

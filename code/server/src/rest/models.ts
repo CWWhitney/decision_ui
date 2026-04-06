@@ -20,7 +20,7 @@ export const getModelsApi = () => {
     // retrieve existing model of a user
     app.get("/model/:modelId", authenticateRoute, async (req, res) => {
         const userId = req.authenticatedUserId;
-        const modelId = parseInt(req.params.modelId);
+        const modelId = parseInt(req.params.modelId as string);
         const model = await getModel(modelId);
 
         if (!model || model.userId != userId) {
@@ -51,7 +51,7 @@ export const getModelsApi = () => {
     // update an existing model of a user
     app.put("/model/:modelId", authenticateRoute, async (req, res) => {
         const userId = req.authenticatedUserId;
-        const modelId = parseInt(req.params.modelId);
+        const modelId = parseInt(req.params.modelId as string);
         const { modelfile } = req.body;
 
         const model = await getModel(modelId);
@@ -68,7 +68,7 @@ export const getModelsApi = () => {
     // delete an existing model of a user
     app.delete("/model/:modelId", authenticateRoute, async (req, res) => {
         const userId = req.authenticatedUserId;
-        const modelId = parseInt(req.params.modelId);
+        const modelId = parseInt(req.params.modelId as string);
 
         const model = await getModel(modelId);
 

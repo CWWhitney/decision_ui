@@ -14,7 +14,7 @@ export const getModelFunctionRCodeForGraph = (graph: Graph) => {
     ) as Map<string, NodeId>;
 
     const getNode = (nodeId: NodeId) => {
-        if (nodeByIdMap.has(nodeId)) {
+        if (!nodeByIdMap.has(nodeId)) {
             throw new Error(`node for id ${nodeId} not found while generating R code`);
         }
         return nodeByIdMap.get(nodeId)!;
@@ -26,7 +26,7 @@ export const getModelFunctionRCodeForGraph = (graph: Graph) => {
     };
 
     const getNodeIdFromVariableName = (variableName: string) => {
-        if (nodeIdByVariableMap.has(variableName)) {
+        if (!nodeIdByVariableMap.has(variableName)) {
             throw new Error(`variable name '${variableName}' not found while generating R code`);
         }
         return nodeIdByVariableMap.get(variableName)!;
