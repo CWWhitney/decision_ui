@@ -7,10 +7,17 @@
 
     import { useAccountStore } from "../../state/account";
     import { useMetadataStore } from "../../state/metadata";
+    import { useRouter } from "vue-router";
 
+    const router = useRouter();
     const account = useAccountStore();
     const metadata = useMetadataStore();
     const saveModelDialog = useSaveModelDialogStore();
+
+    const openHelpSection = () => {
+        saveModelDialog.closeDialog();
+        router.push("/help/user-interface/save-model-dialog");
+    };
 </script>
 
 <template>
@@ -25,6 +32,11 @@
             <v-toolbar>
                 <v-toolbar-title>Save Model</v-toolbar-title>
                 <v-toolbar-items>
+                    <v-tooltip location="bottom" text="go to help section" open-delay="500">
+                        <template #activator="{ props }">
+                            <v-btn v-bind="props" icon="mdi-help-circle-outline" @click="openHelpSection" />
+                        </template>
+                    </v-tooltip>
                     <v-btn icon="mdi-close" @click="saveModelDialog.closeDialog()"></v-btn>
                 </v-toolbar-items>
             </v-toolbar>

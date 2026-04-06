@@ -22,7 +22,7 @@
 
 <template>
     <div class="loopFunctionTabContainer">
-        <HelpHintWrapper>
+        <HelpHintWrapper to="/help/user-interface/model-editor/node-edit-dialog/formula-expression-input">
             <template #default>
                 <ExpressionInput
                     v-model="node.function.iterationsExpression"
@@ -42,7 +42,7 @@
                 </p>
             </template>
         </HelpHintWrapper>
-        <HelpHintWrapper>
+        <HelpHintWrapper to="/help/user-interface/model-editor/node-edit-dialog/formula-expression-input">
             <template #default>
                 <ExpressionInput
                     v-model="node.function.initExpression"
@@ -62,7 +62,7 @@
                 </p>
             </template>
         </HelpHintWrapper>
-        <HelpHintWrapper>
+        <HelpHintWrapper to="/help/user-interface/model-editor/node-edit-dialog/formula-expression-input">
             <template #default>
                 <ExpressionInput
                     v-model="node.function.loopExpression"

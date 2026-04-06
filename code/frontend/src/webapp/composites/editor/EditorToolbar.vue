@@ -230,7 +230,7 @@
                 </template>
             </v-tooltip>
 
-            <v-tooltip location="bottom" text="reset zoom" open-delay="500">
+            <v-tooltip v-if="false" location="bottom" text="reset zoom" open-delay="500">
                 <template #activator="{ props }">
                     <v-btn
                         v-bind="props"
@@ -269,6 +269,17 @@
                         variant="outlined"
                         size="small"
                         @click="editor.toggleLocked"
+                    ></v-btn>
+                </template>
+            </v-tooltip>
+            <v-tooltip location="bottom" text="go to help section" open-delay="500">
+                <template #activator="{ props }">
+                    <v-btn
+                        v-bind="props"
+                        icon="mdi-help-circle-outline"
+                        variant="outlined"
+                        size="small"
+                        to="/help/user-interface/model-editor/"
                     ></v-btn>
                 </template>
             </v-tooltip>

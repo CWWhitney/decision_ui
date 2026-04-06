@@ -13,7 +13,24 @@
         <LeftNavigation>
             <WorkspaceCards>
                 <v-card color="white" elevation="1" rounded class="metadataCard">
-                    <v-card-title>Model</v-card-title>
+                    <v-card-item>
+                        <template #title>Metadata</template>
+                        <template #subtitle>Summarize your model with a name and description.</template>
+                        <template #append>
+                            <v-btn-group density="compact">
+                                <v-tooltip location="bottom" text="go to help section" open-delay="500">
+                                    <template #activator="{ props }">
+                                        <v-btn v-bind="props" to="/help/user-interface/metadata/">
+                                            <template #prepend>
+                                                <v-icon size="large"> mdi-help-circle-outline </v-icon>
+                                            </template>
+                                            Help
+                                        </v-btn>
+                                    </template>
+                                </v-tooltip>
+                            </v-btn-group>
+                        </template>
+                    </v-card-item>
                     <v-card-text>
                         <DebouncedTextInput v-model="metadata.state.name" label="Name" />
                         <v-textarea v-model="metadata.state.description" label="Description"></v-textarea>

@@ -108,7 +108,7 @@
 
                 <v-tooltip location="bottom" text="go to help section" open-delay="500">
                     <template #activator="{ props }">
-                        <v-btn v-bind="props" to="/help/user-interface/r-code/" variant="flat" class="helpButton">
+                        <v-btn v-bind="props" to="/help/user-interface/r-backend/" variant="flat" class="helpButton">
                             <template #prepend>
                                 <v-icon size="large"> mdi-help-circle-outline </v-icon>
                             </template>

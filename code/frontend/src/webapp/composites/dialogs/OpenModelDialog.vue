@@ -9,7 +9,9 @@
         useOpenModelDialogStore
     } from "../../state/open_model";
     import { useAccountStore } from "../../state/account";
+    import { useRouter } from "vue-router";
 
+    const router = useRouter();
     const account = useAccountStore();
     const openModelDialog = useOpenModelDialogStore();
 
@@ -38,6 +40,11 @@
         loadModelFileToState(null, file);
         openModelDialog.closeDialog();
     };
+
+    const openHelpSection = () => {
+        openModelDialog.closeDialog();
+        router.push("/help/user-interface/open-model-dialog");
+    };
 </script>
 
 <template>
@@ -52,6 +59,11 @@
             <v-toolbar>
                 <v-toolbar-title>Open Existing Model</v-toolbar-title>
                 <v-toolbar-items>
+                    <v-tooltip location="bottom" text="go to help section" open-delay="500">
+                        <template #activator="{ props }">
+                            <v-btn v-bind="props" icon="mdi-help-circle-outline" @click="openHelpSection" />
+                        </template>
+                    </v-tooltip>
                     <v-btn icon="mdi-close" @click="openModelDialog.closeDialog()"></v-btn>
                 </v-toolbar-items>
             </v-toolbar>

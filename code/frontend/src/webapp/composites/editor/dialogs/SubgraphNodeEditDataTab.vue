@@ -73,7 +73,7 @@
 <template>
     <div class="subgraphDataTabContainer">
         <p>Select a node from this subgraph to visualize the data of its variable:</p>
-        <HelpHintWrapper>
+        <HelpHintWrapper to="/help/user-interface/model-editor/node-edit-dialog/data-tab">
             <template #default
                 ><v-select
                     v-model="selectedChildNodeId"

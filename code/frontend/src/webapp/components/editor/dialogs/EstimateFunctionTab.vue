@@ -30,7 +30,7 @@
 <template>
     <div class="estimateFunctionTabContainer">
         <div>The value of this node is sampled from the following probabilistic distribution:</div>
-        <HelpHintWrapper>
+        <HelpHintWrapper to="/help/user-interface/model-editor/node-edit-dialog/function-tab">
             <template #default>
                 <v-select
                     v-model="node.function.distribution"
@@ -77,7 +77,10 @@
                 </ul>
             </template>
         </HelpHintWrapper>
-        <HelpHintWrapper v-if="node.function.distribution != common.DETERMINISTIC_DISTRIBUTION_TYPE">
+        <HelpHintWrapper
+            v-if="node.function.distribution != common.DETERMINISTIC_DISTRIBUTION_TYPE"
+            to="/help/user-interface/model-editor/node-edit-dialog/function-tab"
+        >
             <template #default>
                 <div class="lower-upper-inputs">
                     <DebouncedNumberInput
@@ -111,7 +114,7 @@
                 </p>
             </template>
         </HelpHintWrapper>
-        <HelpHintWrapper v-else>
+        <HelpHintWrapper v-else to="/help/user-interface/model-editor/node-edit-dialog/function-tab">
             <template #default>
                 <div>
                     <DebouncedNumberInput

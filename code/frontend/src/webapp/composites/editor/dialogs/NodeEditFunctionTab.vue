@@ -46,7 +46,7 @@
         <template v-if="node.function.type != common.EMPTY_FUNCTION_TYPE">
             <p>Define how the value of this node is being calculated and referenced from other nodes:</p>
             <h4>Variable</h4>
-            <HelpHintWrapper to="/help/user-interface/model-editor">
+            <HelpHintWrapper to="/help/user-interface/model-editor/node-edit-dialog/function-tab">
                 <template #default>
                     <DebouncedTextInput
                         v-model="node.function.variable"
@@ -63,7 +63,7 @@
         </template>
         <h4>Type</h4>
         <div>
-            <HelpHintWrapper to="/help/user-interface/model-editor">
+            <HelpHintWrapper to="/help/user-interface/model-editor/node-edit-dialog/function-tab">
                 <template #default>
                     <v-btn-toggle
                         v-model="functionType"

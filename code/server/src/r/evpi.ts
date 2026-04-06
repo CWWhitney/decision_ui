@@ -2,7 +2,7 @@ import { parse } from "csv-parse";
 
 import * as common from "@decision-support-ui/common";
 import { executeRScript } from "./execute";
-import { DSUI_R_MAX_RUNTIME } from "../constants";
+import { DSUI_R_MAX_MCRUNS, DSUI_R_MAX_RUNTIME } from "../constants";
 
 export const generateAndExecuteEvpiScript = async (
     graph: common.Graph,
@@ -18,7 +18,7 @@ export const generateAndExecuteEvpiScript = async (
             resultVariables,
             estimatesCsvFilepath,
             resultsCsvFilepath,
-            computation.mcRuns
+            Math.min(DSUI_R_MAX_MCRUNS, computation.mcRuns)
         );
     };
 

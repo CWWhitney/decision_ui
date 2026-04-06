@@ -3,7 +3,9 @@
     import { USERNAME_REGEX_PATTERN } from "@decision-support-ui/common";
 
     import { useLoginDialogStore } from "../../state/account/login_dialog";
+    import { useRouter } from "vue-router";
 
+    const router = useRouter();
     const loginDialog = useLoginDialogStore();
 
     const form = ref<boolean>(false);
@@ -32,6 +34,11 @@
     const submitPossible = computed(() => {
         return form.value && loginDialog.username && loginDialog.password;
     });
+
+    const openHelpSection = () => {
+        loginDialog.closeDialog();
+        router.push("/help/user-interface/login-dialog");
+    };
 </script>
 
 <template>
@@ -46,6 +53,11 @@
             <v-toolbar>
                 <v-toolbar-title>Login</v-toolbar-title>
                 <v-toolbar-items>
+                    <v-tooltip location="bottom" text="go to help section" open-delay="500">
+                        <template #activator="{ props }">
+                            <v-btn v-bind="props" icon="mdi-help-circle-outline" @click="openHelpSection" />
+                        </template>
+                    </v-tooltip>
                     <v-btn icon="mdi-close" @click="loginDialog.closeDialog()"></v-btn>
                 </v-toolbar-items>
             </v-toolbar>

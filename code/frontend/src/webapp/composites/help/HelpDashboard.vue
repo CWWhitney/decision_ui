@@ -13,14 +13,25 @@
 
     const BREADCRUMB_TITLE_BY_SUBPATH: { [subpath: string]: string } = {
         "user-interface": "User Interface",
-        "model-list": "Model List",
+        "main-menu": "Main Menu",
         "model-editor": "Model Editor",
-        "estimate-editor": "Estimate Editor",
-        "results-dashboard": "Results Dashboard",
-        "r-code": "R Code",
+        "estimates-table": "Estimates Table",
+        "r-backend": "R Backend",
         "getting-started": "Getting Started",
         "developer-guide": "Developer Guide",
         "advanced-features": "Advanced Features",
+        "open-model-dialog": "Open Model Dialog",
+        "save-model-dialog": "Save Model Dialog",
+        "node-edit-dialog": "Node Edit Dialog",
+        "analyze-model": "Analyze Model",
+        "login-dialog": "Login Dialog",
+        "formula-expression-input": "Formula Expression Input",
+        "general-tab": "General Tab",
+        "function-tab": "Function Tab",
+        "data-tab": "Data Tab",
+        "style-tab": "Style Tab",
+        "analyze-tab": "Analyze Tab",
+        metadata: "Metadata Page",
         windows: "Windows Installation",
         macos: "MacOS Installation",
         linux: "Linux Installation",
@@ -77,6 +88,7 @@
         // replace href links in markdown with correct urls
         md.use(markdownit_replace_link, {
             replaceLink: (link, env, token) => {
+                console.log(`replace ${link} for token ${JSON.stringify(token)}`);
                 if (token.type == "image") {
                     return `./static/documentation/${path}/${link}`;
                 }
@@ -85,7 +97,9 @@
                     return link;
                 }
 
-                return `#${route.path}/${link}`;
+                const basePath = route.path.endsWith("/") ? route.path : `${route.path}/`;
+                const baseUrl = new URL(basePath, "http://dummy");
+                return `#${new URL(link, baseUrl).pathname}`;
             }
         });
 

@@ -8,9 +8,7 @@ export const DSUI_R_MAX_RUNTIME = parseFloat(process.env.DSUI_R_MAX_RUNTIME ?? "
 
 export const DSUI_R_MAX_MCRUNS = parseInt(process.env.DSUI_R_MAX_MCRUNS ?? "100000");
 
-export const DSUI_R_MAX_BINS = parseInt(process.env.DSUI_R_MAX_BINS ?? "200");
-
-export const DSUI_R_VALUE_PRECISION = parseInt(process.env.DSUI_R_VALUE_PRECISION ?? "5");
+export const DSUI_R_MAX_HISTOGRAM_BINS = parseInt(process.env.DSUI_R_MAX_HISTOGRAM_BINS ?? "200");
 
 export const DSUI_BEARER_HEADER = process.env.VITE_DSUI_BEARER_HEADER || "Authorization";
 

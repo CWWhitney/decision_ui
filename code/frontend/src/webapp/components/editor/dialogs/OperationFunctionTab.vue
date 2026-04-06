@@ -27,7 +27,7 @@
 
 <template>
     <p>The value of this node is determined by the following mathematical expression:</p>
-    <HelpHintWrapper to="/help/user-interface/model-editor">
+    <HelpHintWrapper to="/help/user-interface/model-editor/node-edit-dialog/formula-expression-input">
         <template #default>
             <ExpressionInput
                 v-model="node.function.expression"

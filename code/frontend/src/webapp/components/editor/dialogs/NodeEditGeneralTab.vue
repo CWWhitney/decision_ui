@@ -32,7 +32,7 @@
     <div class="generalTabContainer">
         <div>General properties of this node:</div>
 
-        <HelpHintWrapper to="/help/user-interface/model-editor">
+        <HelpHintWrapper to="/help/user-interface/model-editor/node-edit-dialog/general-tab">
             <template #default>
                 <DebouncedTextInput
                     v-model="node.visualization.title"
@@ -49,7 +49,7 @@
             </template>
         </HelpHintWrapper>
 
-        <HelpHintWrapper to="/help/user-interface/model-editor">
+        <HelpHintWrapper to="/help/user-interface/model-editor/node-edit-dialog/general-tab">
             <template #default>
                 <v-select v-model="node.type" label="Type" :items="NODE_TYPE_ITEMS" hide-details disabled />
             </template>
@@ -64,7 +64,7 @@
             </template>
         </HelpHintWrapper>
         <div v-if="node.function.type == ESTIMATE_FUNCTION_TYPE">
-            <HelpHintWrapper to="/help/user-interface/model-editor">
+            <HelpHintWrapper to="/help/user-interface/model-editor/node-edit-dialog/general-tab">
                 <template #default>
                     <v-text-field
                         v-model="node.function.comment"
@@ -78,7 +78,7 @@
             </HelpHintWrapper>
         </div>
         <div>
-            <HelpHintWrapper to="/help/user-interface/model-editor">
+            <HelpHintWrapper to="/help/user-interface/model-editor/node-edit-dialog/general-tab">
                 <template #default>
                     <v-switch
                         v-model="node.visualization.autoConnect"

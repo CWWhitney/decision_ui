@@ -11,7 +11,23 @@
         <LeftNavigation>
             <CardContainer class="cardContainer">
                 <v-card color="white" elevation="1" rounded class="estimatesCard">
-                    <v-card-title> Analyze Model</v-card-title>
+                    <v-card-item>
+                        <template #title>Analyze Model</template>
+                        <template #append>
+                            <v-btn-group density="compact">
+                                <v-tooltip location="bottom" text="go to help section" open-delay="500">
+                                    <template #activator="{ props }">
+                                        <v-btn v-bind="props" to="/help/user-interface/analyze-model">
+                                            <template #prepend>
+                                                <v-icon size="large"> mdi-help-circle-outline </v-icon>
+                                            </template>
+                                            Help
+                                        </v-btn>
+                                    </template>
+                                </v-tooltip>
+                            </v-btn-group>
+                        </template>
+                    </v-card-item>
                     <v-card-text class="estimatesCardText">
                         <EstimatesSlidersList />
                     </v-card-text>

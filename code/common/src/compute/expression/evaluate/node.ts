@@ -72,7 +72,7 @@ export const getExpressionMatchesForOperationFunction = (
     node: AbstractNode<VariableNodeType, OperationNodeFunctionState, any>
 ): OperationFunctionExpressionMatches => {
     if (!node.function.expression || node.function.expression == "") {
-        throw new Error(`$expression may not be empty for node '${node.visualization.title}'`);
+        throw new Error(`expression may not be empty for node '${node.visualization.title}'`);
     }
 
     try {

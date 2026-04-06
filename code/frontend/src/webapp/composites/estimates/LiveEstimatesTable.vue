@@ -103,7 +103,7 @@
                     </v-tooltip>
                     <v-tooltip location="bottom" text="go to help section" open-delay="500">
                         <template #activator="{ props }">
-                            <v-btn v-bind="props" to="/help/user-interface/estimate-editor/">
+                            <v-btn v-bind="props" to="/help/user-interface/estimates-table">
                                 <template #prepend>
                                     <v-icon size="large"> mdi-help-circle-outline </v-icon>
                                 </template>

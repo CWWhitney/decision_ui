@@ -3,7 +3,7 @@ import { parse } from "csv-parse";
 import * as common from "@decision-support-ui/common";
 import { executeRScript } from "./execute";
 import { logger } from "../logging";
-import { DSUI_R_MAX_RUNTIME } from "../constants";
+import { DSUI_R_MAX_HISTOGRAM_BINS, DSUI_R_MAX_MCRUNS, DSUI_R_MAX_RUNTIME } from "../constants";
 
 export const generateAndExecuteResultHistogramScript = async (
     graph: common.Graph,
@@ -19,8 +19,8 @@ export const generateAndExecuteResultHistogramScript = async (
             resultVariables,
             estimatesCsvFilepath,
             resultsCsvFilepath,
-            computation.mcRuns,
-            computation.histogramBins
+            Math.min(DSUI_R_MAX_MCRUNS, computation.mcRuns),
+            Math.min(DSUI_R_MAX_HISTOGRAM_BINS, computation.histogramBins)
         );
     };
 

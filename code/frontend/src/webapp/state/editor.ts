@@ -70,6 +70,7 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
                 data: {
                     label: node.visualization.title,
                     nodeType: node.type,
+                    functionType: node.function.type,
                     ...(node.visualization.style.type == common.CUSTOM_STYLE_TYPE && {
                         border: node.visualization.style.border
                     })

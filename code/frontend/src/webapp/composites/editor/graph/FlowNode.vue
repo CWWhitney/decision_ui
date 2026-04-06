@@ -7,6 +7,7 @@
     import * as common from "@decision-support-ui/common";
 
     import {
+        NODE_EDIT_ANALYZE_TAB,
         NODE_EDIT_DATA_TAB,
         NODE_EDIT_FUNCTION_TAB,
         NODE_EDIT_GENERAL_TAB,
@@ -144,6 +145,23 @@
             >
                 <template #activator="{ props }">
                     <v-btn v-bind="props" icon="mdi-call-split" @click="extractSubgraph(node.id)"></v-btn>
+                </template>
+            </v-tooltip>
+            <v-tooltip
+                v-if="
+                    flowNodeProps.data.nodeType == common.VARIABLE_NODE_TYPE &&
+                    flowNodeProps.data.functionType == common.ESTIMATE_FUNCTION_TYPE
+                "
+                location="top"
+                text="analyze options"
+                open-delay="500"
+            >
+                <template #activator="{ props }">
+                    <v-btn
+                        v-bind="props"
+                        icon="mdi-tune-variant"
+                        @click="nodeEditDialog.openDialog(flowNodeProps.id, NODE_EDIT_ANALYZE_TAB)"
+                    ></v-btn>
                 </template>
             </v-tooltip>
             <v-tooltip location="top" text="node style options" open-delay="500">

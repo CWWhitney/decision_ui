@@ -60,11 +60,7 @@
 
                         <v-menu>
                             <template #activator="{ props }">
-                                <v-btn
-                                    v-bind="props"
-                                    text="Run"
-                                    :variant="!runMenuEnabled ? 'plain' : 'elevated'"
-                                ></v-btn>
+                                <v-btn v-bind="props" text="Run" variant="elevated"></v-btn>
                             </template>
                             <TopRunMenu />
                         </v-menu>

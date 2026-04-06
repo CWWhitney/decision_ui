@@ -95,7 +95,15 @@
                             />
                         </template>
                     </v-tooltip>
-
+                    <v-tooltip location="bottom" text="go to help section" open-delay="500">
+                        <template #activator="{ props }">
+                            <v-btn
+                                v-bind="props"
+                                to="/help/user-interface/model-editor/node-edit-dialog/"
+                                icon="mdi-help-circle-outline"
+                            />
+                        </template>
+                    </v-tooltip>
                     <v-btn icon="mdi-close" @click="nodeEditDialog.closeDialog()"></v-btn>
                 </v-toolbar-items>
             </v-toolbar>
@@ -115,7 +123,6 @@
                         text="Data"
                         :value="NODE_EDIT_DATA_TAB"
                     ></v-tab>
-                    <v-tab prepend-icon="mdi-palette-outline" text="Style" :value="NODE_EDIT_STYLE_TAB"></v-tab>
                     <v-tab
                         v-if="
                             node.type == common.VARIABLE_NODE_TYPE &&
@@ -125,8 +132,9 @@
                         text="Analyze"
                         :value="NODE_EDIT_ANALYZE_TAB"
                     ></v-tab>
+                    <v-tab prepend-icon="mdi-palette-outline" text="Style" :value="NODE_EDIT_STYLE_TAB"></v-tab>
                     <v-tab
-                        v-if="node.type == common.VARIABLE_NODE_TYPE"
+                        v-if="node.type == common.VARIABLE_NODE_TYPE && false"
                         prepend-icon="mdi-bug-outline"
                         text="Debug"
                         :value="NODE_EDIT_DEBUG_TAB"
