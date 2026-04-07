@@ -4,9 +4,32 @@
 
 New Features
 
-- Replaced BaklavaJS with VueFlow and a new computational model
-- Replaced the FastAPI Python backend with a Node Express server to use the same code both in the frontend and backend
-- Updated various dependencies (Vuetify, etc.)
+- Simplified graph visualization based on VueFlow
+- Custom node shapes and colors
+- GPU-accelerated model calculations with TensorflowJS
+- Arbitrary formula expression parsing using OhmJS
+- Box plot visualization of probabilistic series data
+- Copy-Paste support via the operating system clipboard
+- Interactive estimate sliders to analyze the impact of parameter changes
+- Unsaved graph model survives browser refresh (saved in SessionStorage)
+- Undo and redo of all model related changes
+- Subgraphs can be extracted
+- Nodes can be moved around with snap-to-grid feature
+
+Breaking Changes
+
+- Model files are not compatible with previous versions
+- Database is not compatible with previous versions
+- Subgraph semantics no longer match an R function and have no impact on R code generation
+- Replaced BaklavaJS with VueFlow
+- Replaced BaklavaJS frontend calculations with TensorflowJS
+- Replaced FastAPI Python backend with a Node Express server to use the same code both in the frontend and backend
+- Updated environment variables (e.g. `BACKEND_AUTH_HEADER` to `DSUI_BEARER_HEADER`)
+
+Other Changes
+
+- Updated various dependencies (e.g. Vuetify)
+- Updated funding logos on start page
 
 ## v0.2.1 - 2025-07-10
 
