@@ -6,7 +6,7 @@ The general tab allows entering a title and comment for a node. The title corres
 
 ### Node Title and Variable Name
 
-Variable nodes are referenced by a variable whose name can be specified in the "Function" tab, see below. For your convinience, if both the title and variable name matches, changing the title of a node also changes the variable name for this node.
+Variable nodes are referenced by a variable whose name can be specified in the "Function" tab, see below. For your convenience, if both the title and variable name matches, changing the title of a node also changes the variable name for this node.
 
 For example, if the title of the node is `Discount Rate` and the variable name for this node is `Discount_Rate` (spaces are replaced with underscores), both node title and variable name are considered the same. Changing the title to `Discount Rate in Percent` will automatically change the variable name to `Discount_Rate_in_Percent`.
 

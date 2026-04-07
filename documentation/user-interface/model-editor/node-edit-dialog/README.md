@@ -1,6 +1,6 @@
 # Node Edit Dialog
 
-The node edit dialog can be used to customize each node and define important options such that the overall model is calculatable.
+The node edit dialog can be used to customize each node and define important options such that the overall model is calculable.
 
 You can access the node edit dialog either by double-clicking on variable nodes, or by clicking on one of the corresponding icons of the node toolbar, see [Model Editor](../):
 

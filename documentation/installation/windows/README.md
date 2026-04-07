@@ -54,7 +54,7 @@ For Node.js, please follow the official [installation instructions](https://node
 make sure to select the option that the `node` and `npm` command is added to the `PATH` environment and available in
 your terminal.
 
-Afterward, install the Javascript tool [`concurrently`](https://www.npmjs.com/package/concurrently) by executing the
+Afterward, install the JavaScript tool [`concurrently`](https://www.npmjs.com/package/concurrently) by executing the
 following command in a terminal:
 
 ```
@@ -75,7 +75,7 @@ git clone https://github.com/CWWhitney/decision_ui.git
 cd decision_ui
 ```
 
-Install further software libraries (python packages and Javascript libraries) by executing the Windows batch file
+Install further software libraries (JavaScript libraries) by executing the Windows batch file
 `bin/install.bat`.
 
 ### Build the application

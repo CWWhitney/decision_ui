@@ -1,10 +1,10 @@
 # Function Tab of the Node Edit Dialog
 
-The function tab is only available for variables nodes and allows specifying how a node is calculated.
+The function tab is only available for variable nodes and allows specifying how a node is calculated.
 
 ![Function Tab of the Node Editor Dialog](./function-tab.webp)
 
-Each variable node requires to have a variable name, which can be used to refer to this node's value inside of other variable nodes. Variable names need to be compatible with R code, so you cannot use spaces and other special symbols inside variable names, only regular letters and the underscore is allowed.
+Each variable node needs to have a variable name, which can be used to refer to this node's value inside of other variable nodes. Variable names need to be compatible with R code, so you cannot use spaces and other special symbols inside variable names, only regular letters and the underscore is allowed.
 
 There are currently 4 different ways to specify the function definition of a variable node:
 
@@ -21,7 +21,7 @@ An estimate node allows adding an input variable to your model. It may either be
 - Positive Truncated Normal Distribution
 - 0-1 Truncated Normal Distribution
 
-Instead of specifying a probability distributions by declaring their respective parameters (e.g. mean and variance of a normal distribution), probability distributions are inferred from boundaries of a confidence interval:
+Instead of specifying probability distributions by declaring their respective parameters (e.g. mean and variance of a normal distribution), probability distributions are inferred from boundaries of a confidence interval:
 
 - the lower bound of the 90% confidence interval, i.e., the 5%-quantile of the distribution
 - the upper bound of the 90% confidence interval, i.e., the 95%-quantile of the distribution
@@ -38,11 +38,11 @@ An operation node defines an intermediary variable that calculates a combination
 
 ![Operation Definition of the Node Editor Dialog](./operation-type.webp)
 
-The mathematical formula expression can be arbitrarly complex and use various mathematical functions. A detailed description is given in section [Formula Expression Input](../formula-expression-input).
+The mathematical formula expression can be arbitrarily complex and use various mathematical functions. A detailed description is given in section [Formula Expression Input](../formula-expression-input).
 
 ### Loop Operation Type
 
-A loop operation type extends the idea of an operation node to calculate a list of values. The meaning of the list of values is not predetermined, but usually describes a time-dependency. In order to specify the value change, three formula expressions need to be define:
+A loop operation type extends the idea of an operation node to calculate a list of values. The meaning of the list of values is not predetermined, but usually describes a time-dependency. In order to specify the value change, three formula expressions need to be defined:
 
 - the total number time steps
 - the initial value of the variable at time step 1
@@ -58,14 +58,14 @@ For example, costs may grow over a 20-year time period by a certain factor descr
 
 In contrast to regular operation nodes, there are two special features that you can use when defining formula expressions for loop nodes:
 
-- You may refer to the the current time step with the term `i` (meaning 1,2,3 ...)
+- You may refer to the current time step with the term `i` (meaning 1,2,3 ...)
 - You may refer to the previous value of your current variable with the term `previous`
 - You may refer to the value of other variables at the same time step by appending `[i]` or `[i-1]`, e.g. `Benefits_over_Time[i]`
 
 You may only reference other variables if they have the exact same number of time steps. Also, you cannot currently reference a specific time step, e.g. `Benefit_over_Time[20]`.
 
-Besides that, mathematical formula expression can be arbitrarly complex and use various mathematical functions. A detailed description is given in section [Formula Expression Input](../formula-expression-input).
+Besides that, mathematical formula expression can be arbitrarily complex and use various mathematical functions. A detailed description is given in section [Formula Expression Input](../formula-expression-input).
 
 ### Result Type
 
-A result node works exactly like a operation node. The only difference is that result nodes are considered output variables of your model. Because of that, their values are visualized in the final result histogram on the [Analyze Model](../../../analyze-model) page.
+A result node works exactly like an operation node. The only difference is that result nodes are considered output variables of your model. Because of that, their values are visualized in the final result histogram on the [Analyze Model](../../../analyze-model) page.

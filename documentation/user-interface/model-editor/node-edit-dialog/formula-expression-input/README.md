@@ -45,7 +45,7 @@ You can also ask for suggestions by pressing `CTRL + SPACE`.
 
 ## If Statement
 
-The if statement allows to define alternatives given a condition. For example, you can distinguish two different estimates based on the value of another variable:
+The if statement allows defining alternatives given a condition. For example, you can distinguish two different estimates based on the value of another variable:
 
 ```
 if ( Risk > 0.5 ) High_Costs else Low_Costs

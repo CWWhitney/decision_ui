@@ -95,7 +95,7 @@ You may change the dimensions of a node by selecting it, and then dragging one o
 There are two types of edges:
 
 - manually drawn edges between nodes (dashed lines)
-- automatically deduced edges betwee nodes (solid lines)
+- automatically deduced edges between nodes (solid lines)
 
 You can manually draw edges between nodes by hovering over specific sections on the border of a node. Hovering over
 these special sections will cause the mouse cursor to change into a cross or plus sign:
@@ -106,7 +106,7 @@ Then, you can click and drag your mouse towards another node, which will create 
 
 ![Node Toolbar](./node-edge-drop.webp)
 
-You can remove a manual edge by selecting it with a left mouse click and confirming the removal by pressung the `BACKSPACE` key.
+You can remove a manual edge by selecting it with a left mouse click and confirming the removal by pressing the `BACKSPACE` key.
 
 ## Automatic Edges between Nodes
 

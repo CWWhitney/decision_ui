@@ -57,7 +57,7 @@ The Undo and Redo feature allows reverting and reapplying recent changes to your
 
 ### Copy & Paste
 
-The copy & paste features allows copying a selection of nodes to your clipboard. You may select any number of nodes or subgraphs and copy them by pressing `CTRL + C`. Selected nodes and all their properties are translated into a machine-readable text file (in JSON format) and copyied to your clipboard. You can then paste these nodes to the same model, a different subgraph or a different model in a separate browser window or browser tab by pressing `CTRL + V`. You may also save your nodes in a simple text file by opening a text editor and pasting the text to this text file. The pasted text should look like this:
+The copy & paste features allows copying a selection of nodes to your clipboard. You may select any number of nodes or subgraphs and copy them by pressing `CTRL + C`. Selected nodes and all their properties are translated into a machine-readable text file (in JSON format) and copied to your clipboard. You can then paste these nodes to the same model, a different subgraph or a different model in a separate browser window or browser tab by pressing `CTRL + V`. You may also save your nodes in a simple text file by opening a text editor and pasting the text to this text file. The pasted text should look like this:
 
 ```
 {
@@ -133,7 +133,7 @@ The run menu provides the following frontend functions:
 
 - "Histogram Bins" - Choose the number of histogram bins that is used to preview the distribution of probabilistic variables
 
-- "Use GPU acceleration" - If enable, calculations in the browser are accelerated with your GPU if possible
+- "Use GPU acceleration" - If enabled, calculations in the browser are accelerated with your GPU if possible
 
 - "Recalculate Frontend" - Reset all calculations and compute model again from scratch
 
@@ -141,7 +141,7 @@ The run menu provides the following frontend functions:
 > this setting in case your browser is lagging, meaning, your browser does not immediately react to mouse clicks or
 > other interactions.
 
-Besides, the run menu provides the following R backend functions, which are only available for logged in users:
+Besides, the run menu provides the following R backend functions, which are only available for logged-in users:
 
 - "Calculate Result Histogram" - Trigger the calculation of the result histogram via the R backend
 
@@ -153,4 +153,4 @@ The help menu allows accessing this documentation.
 
 ## Account Menu
 
-The account menu can be use to login into your account or create a new account via the [Login Dialog](./login-dialog). If logged in, the account menu is replaced with your user name and can be used to log out of your account.
+The account menu can be used to log in into your account or create a new account via the [Login Dialog](./login-dialog). If logged in, the account menu is replaced with your username and can be used to log out of your account.

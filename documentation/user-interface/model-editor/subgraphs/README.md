@@ -7,9 +7,9 @@ Subgraphs are sets of nodes that are hidden from the main graph. You can use sub
 In this example, complex biomass calculations are hidden inside a single "Biomass" subgraph node. In order to easily distinguish subgraph nodes from other nodes, they are always drawn with a border consisting of two lines. You can open the corresponding subgraph by double-clicking this node, or clicking on the corresponding toolbar button. In contrast to other nodes, subgraph nodes have two additional toolbar buttons:
 
 - "Open subgraph" - switches the work space to view all nodes for this particular subgraph
-- "Extract subgraph" - moves all nodes from the subgraph to the parent subraph or main graph
+- "Extract subgraph" - moves all nodes from the subgraph to the parent subgraph or main graph
 
-> Warning: In version 0.2 of the Decision Support UI, subgraphs were designed as independent reusable templates and translated to R functions. This is not the case any more. Currently, subgraphs are only a way to hide nodes from the graph visualization. All variable nodes are still considered global variables and translated to a single R model function. There is currently no replacement feature to recreate the behavior of version 0.2.
+> Warning: In version 0.2 of the Decision Support UI, subgraphs were designed as independent reusable templates and translated to R functions. This is not the case anymore. Currently, subgraphs are only a way to hide nodes from the graph visualization. All variable nodes are still considered global variables and translated to a single R model function. There is currently no replacement feature to recreate the behavior of version 0.2.
 
 ## Create a Subgraph
 

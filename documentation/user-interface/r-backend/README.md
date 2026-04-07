@@ -1,12 +1,12 @@
 # R Backend
 
-The "R Backend" page shows R code that corresponds to your model, and allows to run the Monte Carlo simulation for your model in the R backend using the [decisionSupport](https://cran.r-project.org/web/packages/decisionSupport/index.html) CRAN package:
+The "R Backend" page shows R code that corresponds to your model, and allows running the Monte Carlo simulation for your model in the R backend using the [decisionSupport](https://cran.r-project.org/web/packages/decisionSupport/index.html) CRAN package:
 
 ![R Backend](./r-backend.webp)
 
 There are currently two variants of R code that is generated:
 
-- R code for generating the result histogram
+- R code for calculating the result histogram
 - R code for calculating the expected value of perfect information (EVPI)
 
 For each variant you can see:
@@ -16,7 +16,7 @@ For each variant you can see:
 - a visualization of the data
 - additional settings
 
-In order to run the Monte Carlo simulation for your model with the R backend, you first need to create and login to an account.
+In order to run the Monte Carlo simulation for your model with the R backend, you first need to create and log in to an account.
 
 ## R Code Tab
 

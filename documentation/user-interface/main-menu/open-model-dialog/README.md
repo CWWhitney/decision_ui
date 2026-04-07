@@ -8,7 +8,7 @@ You may load an existing model from your account (if you are logged in), a previ
 
 ## From Account
 
-In order to load a model from your account, you first need to login by clicking on the "Account" menu in the top right corner and entering your username and password in the [Login Dialog](../login-dialog).
+In order to load a model from your account, you first need to log in by clicking on the "Account" menu in the top right corner and entering your username and password in the [Login Dialog](../login-dialog).
 
 If logged in, you previously saved models should be listed. The most recently saved model is shown at the top.
 
@@ -17,7 +17,7 @@ You can load a model from your account by clicking on the model name in the list
 Besides, there are two buttons to the right of each model name:
 
 - "Download as File" - download a model from your account as a file
-- "Tash" - remove a model from your account
+- "Trash" - remove a model from your account
 
 In order to remove a model from your account, click the on the "Trash" button and confirm your choice by clicking the red check mark.
 

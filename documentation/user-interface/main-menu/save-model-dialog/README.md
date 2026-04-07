@@ -4,7 +4,7 @@ To save your model, you can open the "Save Model" dialog from the "File menu" by
 
 ![To Account Tab](./account-tab.webp)
 
-There are two ways to save your model: to your account in case your are logged in, and to a file.
+There are two ways to save your model: to your account in case you are logged in, and to a file.
 
 When saving your model to your account, you can change the name of your model again directly in the dialog. The name is the same name defined in the "[Metadata](../../metadata)" page. This name is also the name that is shown for your model in the [Open Model Dialog](../open-model-dialog).
 

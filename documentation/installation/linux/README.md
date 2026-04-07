@@ -94,7 +94,7 @@ install.packages(c("decisionSupport", "readr"))
 ```
 
 The application needs to know the correct location of the R executable file. In case the `Rscript` command is available
-on your terminal, Python should detect it and use it by default. Otherwise, specify the environment variable
+on your terminal, it should be detected automatically by default. Otherwise, specify the environment variable
 `DSUI_R_SCRIPT_PATH` with your custom path to the `Rscript` executable file. Make sure that the respective R
 environment contains the required packages. Run the following R commands and verify that there are no error messages:
 
@@ -106,7 +106,7 @@ library(decisionSupport);
 ### Install Node.js
 
 For Node.js, please follow the official [installation instructions](https://nodejs.org/en/download). Make sure that the
-`node` and `npm` commands are available in your terminal. Also install the Javascript tool
+`node` and `npm` commands are available in your terminal. Also install the JavaScript tool
 [`concurrently`](https://www.npmjs.com/package/concurrently) by executing:
 
 ```
@@ -121,7 +121,7 @@ Download the source code from GitHub:
 git clone https://github.com/CWWhitney/decision_ui.git
 ```
 
-Install further software libraries (python packages and Javascript libraries) by executing the bash script
+Install further software libraries (JavaScript libraries) by executing the bash script
 `bin/install.sh`.
 
 ### Build the application

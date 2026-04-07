@@ -1,6 +1,6 @@
 # Data Tab of the Node Edit Dialog
 
-The data tab viusalizes the calculated value for this node. Depending on the kind of value, different visualizations are used:
+The data tab visualizes the calculated value for this node. Depending on the kind of value, different visualizations are used:
 
 - a simple deterministic value is indicated as simple number, e.g. `123`
 - a probabilistic value is visualized in a histogram
@@ -14,7 +14,7 @@ For probabilistic values, you can influence the precision of their visualization
 
 Choosing higher values for both "Monte Carlo Runs" and "Histogram Bins" will lead to a more detailed visualization of probabilistic values, but may take more processing time.
 
-Visualizations are only recalculated if the node's function definition was changed or any dependent variable was changed. That means, if all estimate nodes in your model remain unchanged, the exact same random sample is used to calculate all data and visualizations. You can manually request a new random sample by clicking on "Recalculate Frontend" from the from the "Run" menu, see section [Main Menu](../../../main-menu).
+Visualizations are only recalculated if the node's function definition was changed or any dependent variable was changed. That means, if all estimate nodes in your model remain unchanged, the exact same random sample is used to calculate all data and visualizations. You can manually request a new random sample by clicking on "Recalculate Frontend" from the "Run" menu, see section [Main Menu](../../../main-menu).
 
 ### Visualization of Probabilistic Variables with Time-Dependency
 
@@ -22,7 +22,7 @@ Variables that describe a series of values are visualized as a box plot.
 
 ![Box Plot Visualization in the Data Tab of the Node Editor Dialog](./data-tab.webp)
 
-In addition, there are three visualization options that help to get a better undestanding of the data:
+In addition, there are three visualization options that help to get a better understanding of the data:
 
 - "All Data" shows all values in a single visualization as a box plot (default option)
 - "Single Sample" reduces the data to a single random sample and visualizes this sample in a scatter plot

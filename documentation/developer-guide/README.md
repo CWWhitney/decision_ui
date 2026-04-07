@@ -21,7 +21,7 @@ Inside the container, you can use various build scripts from the `bin` directory
 
 - `build.sh` - build the webapp in production mode
 - `clean.sh` - remove all runtime files (cache, dependencies, etc.)
-- `install.sh` - install software dependencies (python packages, node modules)
+- `install.sh` - install software dependencies (node modules)
 - `lint.sh` - check source code style
 - `package-electron.sh` - package electron app for Linux as AppImage (without R)
 - `test.sh` - run unit tests
@@ -42,7 +42,7 @@ Afterward, you can use various batch scripts from the `bin` directory to start d
 
 - `build.bat` - build the webapp in production mode
 - `clean.bat` - remove all runtime files (cache, dependencies, etc.)
-- `install.bat` - install software dependencies (R, python packages, node modules)
+- `install.bat` - install software dependencies (R, node modules)
 - `lint.bat` - check source code style
 - `package-electron.bat` - package electron app for Windows as setup executable
 - `run-webapp.bat` - run webapp in production mode
@@ -60,7 +60,7 @@ For development on MacOS, we suggest installing [Podman](https://podman.io/) and
 
 ### MacOS Distribution & Packaging
 
-On MacOS, there is no self-contained pre-built version of R that can be packaged alongside an electron app. Because of that, the easiest way to distribute the application is with a Docker image, same as in Linux.
+On MacOS, there is no self-contained pre-built version of R that can be packaged alongside an electron app. Because of that, the easiest way to distribute the application is with a Docker image, same as on Linux.
 
 ## Environment Variables
 
