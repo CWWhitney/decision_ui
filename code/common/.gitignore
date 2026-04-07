@@ -1,0 +1,4 @@
+node_modules/
+build/
+src/**/*.ohm-bundle.d.ts
+src/**/*.ohm-bundle.js

@@ -26,11 +26,16 @@ import App from "./App.vue";
 import router from "./router";
 
 const vuetify = createVuetify({
-  components,
-  directives,
-  theme: {
-    defaultTheme: "light"
-  }
+    defaults: {
+        global: {
+            transition: false
+        }
+    },
+    components,
+    directives,
+    theme: {
+        defaultTheme: "light"
+    }
 });
 
 const pinia = createPinia();

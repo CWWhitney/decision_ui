@@ -1,0 +1,138 @@
+<script setup lang="ts">
+    import { useVueFlow } from "@vue-flow/core";
+    import { computed } from "vue";
+    import { useRoute } from "vue-router";
+    import type { Position } from "@decision-support-ui/common";
+
+    import TopMenuItem from "../../components/menu/TopMenuItem.vue";
+    import { useEditorStore } from "../../state/editor";
+    import { useGraphStore } from "../../state/graph";
+    import { generateInsertGraphFromClipboard, saveGraphFileToClipboard } from "../../state/io";
+
+    const {
+        removeSelectedElements,
+        getSelectedNodes,
+        getSelectedEdges,
+        removeNodes,
+        removeEdges,
+        addSelectedNodes,
+        getNodes
+    } = useVueFlow("editor");
+
+    const graph = useGraphStore();
+    const editor = useEditorStore();
+
+    const insertGraphFromClipboard = generateInsertGraphFromClipboard();
+
+    const route = useRoute();
+    const isEditorRoute = route.name == "editor";
+
+    const removeNodesOrEdges = () => {
+        removeEdges(getSelectedEdges.value);
+        removeNodes(getSelectedNodes.value);
+    };
+
+    const selectAllNodes = () => {
+        addSelectedNodes(getNodes.value);
+    };
+
+    const onCopyClick = () => {
+        saveGraphFileToClipboard(getSelectedNodes.value.map(n => n.id));
+    };
+
+    const onCutClick = () => {
+        saveGraphFileToClipboard(getSelectedNodes.value.map(n => n.id));
+        removeNodesOrEdges();
+    };
+
+    const onPasteClick = () => {
+        insertGraphFromClipboard(
+            {
+                x: window.innerWidth / 2.0,
+                y: window.innerHeight / 2.0
+            } as Position,
+            editor.transient.subgraphId
+        );
+    };
+
+    const nothingIsSelected = computed(() => getSelectedNodes.value.length == 0 && getSelectedEdges.value.length == 0);
+</script>
+
+<template>
+    <v-card class="card">
+        <v-list class="list">
+            <TopMenuItem
+                title="Undo"
+                shortcut="CTRL + Z"
+                :disabled="!graph.history.canUndo || editor.persisted.locked"
+                @click="graph.history.undo"
+            />
+            <TopMenuItem
+                title="Redo"
+                shortcut="CTRL + SHIFT + Z"
+                :disabled="!graph.history.canRedo || editor.persisted.locked"
+                @click="graph.history.redo"
+            />
+            <v-divider />
+            <TopMenuItem
+                title="Select All Nodes"
+                shortcut="CTRL + A"
+                :disabled="!isEditorRoute || editor.persisted.locked"
+                @click="selectAllNodes"
+            />
+            <TopMenuItem
+                title="Unselect All"
+                shortcut="CTRL + SHIFT + A"
+                :disabled="!isEditorRoute || nothingIsSelected || editor.persisted.locked"
+                @click="removeSelectedElements"
+            />
+            <TopMenuItem
+                title="Select Multiple"
+                shortcut="CTRL + CLICK"
+                :disabled="true"
+                @click="console.log(`select multiple menu clicked`)"
+            />
+            <TopMenuItem
+                title="Box Selection"
+                shortcut="SHIFT + CLICK"
+                :disabled="true"
+                @click="console.log(`box selection menu clicked`)"
+            />
+            <v-divider />
+            <TopMenuItem
+                title="Create Subgraph from Selection"
+                shortcut="CTRL + G"
+                :disabled="!isEditorRoute || getSelectedNodes.length == 0 || editor.persisted.locked"
+                @click="editor.createSubgraphFromSelection(getSelectedNodes.map(n => n.id))"
+            />
+            <v-divider />
+            <TopMenuItem
+                title="Cut"
+                shortcut="CTRL + X"
+                :disabled="!isEditorRoute || getSelectedNodes.length == 0 || editor.persisted.locked"
+                @click="onCutClick"
+            />
+            <TopMenuItem
+                title="Copy"
+                shortcut="CTRL + C"
+                :disabled="!isEditorRoute || getSelectedNodes.length == 0 || editor.persisted.locked"
+                @click="onCopyClick"
+            />
+            <TopMenuItem
+                title="Paste"
+                shortcut="CTRL + V"
+                :disabled="!isEditorRoute || editor.persisted.locked"
+                @click="onPasteClick"
+            />
+            <v-divider />
+            <TopMenuItem
+                title="Remove"
+                shortcut="BACKSPACE"
+                :disabled="!isEditorRoute || nothingIsSelected || editor.persisted.locked"
+                @click="removeNodesOrEdges"
+            />
+        </v-list>
+    </v-card>
+</template>
+
+<style lang="scss" scoped></style>

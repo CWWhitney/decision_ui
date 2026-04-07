@@ -1,9 +1,10 @@
-@ECHO OFF 
+@ECHO OFF
 setlocal
 
-REM change to frontend directory
-CD /D "%~dp0/../"
+REM change to script directory
+CD /D "%~dp0/"
 
-npm install
+call install-node.bat
+call install-r.bat
 
 endlocal

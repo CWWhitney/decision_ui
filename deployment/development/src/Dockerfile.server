@@ -1,10 +1,10 @@
-FROM docker.io/library/fedora:41
+FROM docker.io/library/fedora:43
 
-# install R build dependencies
-RUN --mount=type=cache,target=/var/cache/dnf,z \
-    dnf install -y gcc-c++ cmake openssl-devel libcurl-devel \
-                   libsodium-devel udunits2-devel gdal-devel \
-                   proj-devel geos-devel
+# install R build dependencies (in case CRAN packages need to be build from source, not necessary if available in COPR)
+# RUN --mount=type=cache,target=/var/cache/dnf,z \
+#     dnf install -y gcc-c++ cmake openssl-devel libcurl-devel \
+#                    libsodium-devel udunits2-devel gdal-devel \
+#                    proj-devel geos-devel abseil-cpp-devel
 
 # install R
 RUN --mount=type=cache,target=/var/cache/dnf,z \
@@ -25,12 +25,19 @@ RUN --mount=type=cache,target=/var/cache/dnf,z \
                    R-R.utils R-Rcpp R-Rcpp-devel R-readxl \
                    R-reshape2 R-XML R-tkrplot
 
-# create directory to avoid R install error
-RUN mkdir -p /usr/share/doc/R/html/
+# enable R CRAN copr repository
+# see https://copr.fedorainfracloud.org/coprs/iucar/cran/
+RUN dnf copr enable -y iucar/cran && \
+    dnf install -y R-CoprManager && \
+    dnf clean all && \
+    rm -rf /var/cache/dnf
 
-# set env variable to reduce install size of R dependencies
+# create directory to avoid R install error (in case CRAN packages need to be build from source)
+# RUN mkdir -p /usr/share/doc/R/html/
+
+# set env variable to reduce install size of R dependencies (in case CRAN packages need to be build from source)
 # see http://dirk.eddelbuettel.com/blog/2019/03/27/
-ENV _R_SHLIB_STRIP_=1
+# ENV _R_SHLIB_STRIP_=1
 
 # manually install decisionSupport package
 RUN MAKE="make -j8" R -e 'options(warn=2); \
@@ -50,7 +57,7 @@ RUN --mount=type=cache,target=/var/cache/dnf,z \
 
 # install nodejs
 RUN --mount=type=cache,target=/var/cache/dnf,z \
-    curl -fsSL https://rpm.nodesource.com/setup_22.x | bash - && \
+    curl -fsSL https://rpm.nodesource.com/setup_24.x | bash - && \
     dnf install -y nodejs
 
 # install node "concurrently" to start multiple commands in parallel

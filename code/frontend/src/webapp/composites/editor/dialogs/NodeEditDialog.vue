@@ -1,0 +1,231 @@
+<script setup lang="ts">
+    import { computed, ref } from "vue";
+    import * as common from "@decision-support-ui/common";
+
+    import {
+        NODE_EDIT_DATA_TAB,
+        NODE_EDIT_DEBUG_TAB,
+        NODE_EDIT_FUNCTION_TAB,
+        NODE_EDIT_GENERAL_TAB,
+        NODE_EDIT_STYLE_TAB,
+        NODE_EDIT_ANALYZE_TAB,
+        useNodeEditDialogStore
+    } from "../../../state/node_edit";
+
+    import { useGraphStore } from "../../../state/graph";
+
+    import NodeEditGeneralTab from "../../../components/editor/dialogs/NodeEditGeneralTab.vue";
+    import NodeEditStyleTab from "../../../components/editor/dialogs/NodeEditStyleTab.vue";
+    import NodeEditAnalyzeTab from "../../../components/editor/dialogs/NodeEditAnalyzeTab.vue";
+
+    import NodeEditFunctionTab from "./NodeEditFunctionTab.vue";
+    import NodeEditDebugTab from "./NodeEditDebugTab.vue";
+    import NodeEditDataTab from "./NodeEditDataTab.vue";
+
+    const nodeEditDialog = useNodeEditDialogStore();
+    const graph = useGraphStore();
+
+    const node = computed(() => {
+        const nodeId = nodeEditDialog.nodeId;
+        if (nodeId) {
+            try {
+                return graph.getComputedNode(nodeId);
+            } catch {
+                // node might not exist any more, e.g. when deleting node via undo while viewing it
+                nodeEditDialog.closeDialog();
+            }
+        }
+        return null;
+    });
+
+    const maximized = ref(false);
+
+    const toggleMaximize = () => {
+        maximized.value = !maximized.value;
+    };
+</script>
+
+<template>
+    <v-dialog
+        v-if="node"
+        v-model="nodeEditDialog.isOpen"
+        :width="maximized ? '90%' : 'auto'"
+        :height="maximized ? '90%' : 'auto'"
+        :class="`nodeEditDialog ${maximized ? 'maximized' : ''}`"
+        persistent
+        no-click-animation
+        @click:outside="nodeEditDialog.closeDialog()"
+    >
+        <v-card>
+            <v-toolbar>
+                <v-toolbar-title>{{ node.visualization.title }}</v-toolbar-title>
+                <v-toolbar-items>
+                    <v-tooltip location="bottom" text="undo" open-delay="500">
+                        <template #activator="{ props }">
+                            <v-btn
+                                v-bind="props"
+                                icon="mdi-undo"
+                                size="small"
+                                :disabled="!graph.history.canUndo"
+                                @click="graph.history.undo"
+                            ></v-btn>
+                        </template>
+                    </v-tooltip>
+                    <v-tooltip location="bottom" text="redo" open-delay="500">
+                        <template #activator="{ props }">
+                            <v-btn
+                                v-bind="props"
+                                icon="mdi-redo"
+                                size="small"
+                                :disabled="!graph.history.canRedo"
+                                @click="graph.history.redo"
+                            ></v-btn>
+                        </template>
+                    </v-tooltip>
+                    <v-tooltip
+                        location="bottom"
+                        :text="maximized ? 'reduce window size' : 'maximize window size'"
+                        open-delay="500"
+                    >
+                        <template #activator="{ props }">
+                            <v-btn
+                                v-bind="props"
+                                :icon="maximized ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'"
+                                @click="toggleMaximize"
+                            />
+                        </template>
+                    </v-tooltip>
+                    <v-tooltip location="bottom" text="go to help section" open-delay="500">
+                        <template #activator="{ props }">
+                            <v-btn
+                                v-bind="props"
+                                to="/help/user-interface/model-editor/node-edit-dialog/"
+                                icon="mdi-help-circle-outline"
+                            />
+                        </template>
+                    </v-tooltip>
+                    <v-btn icon="mdi-close" @click="nodeEditDialog.closeDialog()"></v-btn>
+                </v-toolbar-items>
+            </v-toolbar>
+
+            <v-card-text class="tabCard">
+                <v-tabs v-model="nodeEditDialog.tab" color="primary" direction="vertical">
+                    <v-tab prepend-icon="mdi-information-outline" text="General" :value="NODE_EDIT_GENERAL_TAB"></v-tab>
+                    <v-tab
+                        v-if="node.type == common.VARIABLE_NODE_TYPE"
+                        prepend-icon="mdi-function"
+                        text="Function"
+                        :value="NODE_EDIT_FUNCTION_TAB"
+                    ></v-tab>
+                    <v-tab
+                        v-if="node.type == common.VARIABLE_NODE_TYPE || node.type == common.SUBGRAPH_NODE_TYPE"
+                        prepend-icon="mdi-chart-histogram"
+                        text="Data"
+                        :value="NODE_EDIT_DATA_TAB"
+                    ></v-tab>
+                    <v-tab
+                        v-if="
+                            node.type == common.VARIABLE_NODE_TYPE &&
+                            node.function.type == common.ESTIMATE_FUNCTION_TYPE
+                        "
+                        prepend-icon="mdi-tune-variant"
+                        text="Analyze"
+                        :value="NODE_EDIT_ANALYZE_TAB"
+                    ></v-tab>
+                    <v-tab prepend-icon="mdi-palette-outline" text="Style" :value="NODE_EDIT_STYLE_TAB"></v-tab>
+                    <v-tab
+                        v-if="node.type == common.VARIABLE_NODE_TYPE && false"
+                        prepend-icon="mdi-bug-outline"
+                        text="Debug"
+                        :value="NODE_EDIT_DEBUG_TAB"
+                    ></v-tab>
+                </v-tabs>
+                <v-tabs-window v-model="nodeEditDialog.tab">
+                    <v-tabs-window-item :value="NODE_EDIT_GENERAL_TAB">
+                        <NodeEditGeneralTab v-if="nodeEditDialog.tab == NODE_EDIT_GENERAL_TAB" v-model="node" />
+                    </v-tabs-window-item>
+                    <v-tabs-window-item :value="NODE_EDIT_FUNCTION_TAB">
+                        <NodeEditFunctionTab v-if="nodeEditDialog.tab == NODE_EDIT_FUNCTION_TAB" v-model="node" />
+                    </v-tabs-window-item>
+                    <v-tabs-window-item :value="NODE_EDIT_DATA_TAB">
+                        <NodeEditDataTab v-if="nodeEditDialog.tab == NODE_EDIT_DATA_TAB" v-model="node" />
+                    </v-tabs-window-item>
+                    <v-tabs-window-item :value="NODE_EDIT_STYLE_TAB">
+                        <NodeEditStyleTab v-if="nodeEditDialog.tab == NODE_EDIT_STYLE_TAB" v-model="node" />
+                    </v-tabs-window-item>
+                    <v-tabs-window-item :value="NODE_EDIT_ANALYZE_TAB">
+                        <NodeEditAnalyzeTab
+                            v-if="nodeEditDialog.tab == NODE_EDIT_ANALYZE_TAB"
+                            v-model="node as common.EstimateNode"
+                        />
+                    </v-tabs-window-item>
+                    <v-tabs-window-item :value="NODE_EDIT_DEBUG_TAB">
+                        <NodeEditDebugTab v-if="nodeEditDialog.tab == NODE_EDIT_DEBUG_TAB" v-model="node" />
+                    </v-tabs-window-item>
+                </v-tabs-window>
+            </v-card-text>
+
+            <v-card-actions>
+                <v-btn color="primary" variant="text" @click="nodeEditDialog.closeDialog()">done</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
+</template>
+
+<style lang="scss">
+    .nodeEditDialog {
+        .v-toolbar {
+            background: transparent;
+        }
+
+        .v-card {
+            padding: 0.5em;
+        }
+
+        .v-card-text {
+            overflow: hidden;
+        }
+
+        .tabCard {
+            display: flex;
+            gap: 2em;
+            justify-content: stretch;
+            align-items: stretch;
+        }
+
+        .v-window {
+            width: 100%;
+            min-width: 35em;
+            overflow: auto;
+
+            .v-window__container {
+                min-height: 100%;
+            }
+
+            .v-window-item {
+                display: flex;
+                flex-direction: column;
+                flex-grow: 1;
+            }
+        }
+
+        h4 {
+            font-size: 10pt;
+            font-weight: 500;
+            margin: 1.5em 0 1em 0;
+            text-transform: uppercase;
+
+            &:first-child {
+                margin-top: 0;
+            }
+        }
+
+        p {
+            margin: 1em 0;
+
+            &:first-child {
+                margin-top: 0;
+            }
+        }
+    }
+</style>

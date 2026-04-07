@@ -37,9 +37,10 @@ Now, you can start the decision support user interface with the following comman
 ```
 podman run \
     --rm -it \
-    -v $(pwd):/root/workspace/code/backend/data \
+    -v $(pwd):/root/workspace/code/server/data \
     -p 8080:8080 \
-    -e DSUI_SECRET=default_secret \
+    -e DSUI_ACCESS_TOKEN_SECRET=some_secret \
+    -e DSUI_REFRESH_TOKEN_SECRET=another_secret \
     docker.io/knopflogik/inres_decision-support-ui_server:latest
 ```
 
@@ -56,7 +57,7 @@ Finally, open [http://localhost:8080](http://localhost:8080) in your browser.
 To build the container image yourself, you need to download the source code from GitHub:
 
 ```
-git clone https://github.com/johanneskopton/decision_ui.git
+git clone https://github.com/CWWhitney/decision_ui.git
 cd decision_ui
 git checkout knopflogik-improvements
 ```

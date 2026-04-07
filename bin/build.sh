@@ -2,5 +2,6 @@
 
 cd "$(dirname "$0")/../"
 
+bash code/common/bin/build.sh
 bash code/frontend/bin/build-webapp.sh
 bash code/server/bin/build.sh
