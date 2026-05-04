@@ -25,7 +25,23 @@ export const migrateModelFile = (file: any): ModelFileState => {
             }
         };
 
-        file._schema.version = 2;
+        file._schema = {
+            ...file._schema,
+            version: 2
+        };
+    }
+
+    if (file._schema.version == 2) {
+        // migrate from v2 to v3
+        file.editor = {
+            ...file.editor,
+            autosave: false
+        };
+
+        file._schema = {
+            ...file._schema,
+            version: 3
+        };
     }
 
     return file;

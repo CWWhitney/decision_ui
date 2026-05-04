@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.4.0 - tbd
+
+New Features
+
+- Autosaving models to your account every 5 minutes
+
+Fixes
+
+- Help buttons of login dialog, open model dialog and save dialog did navigate to incorrect help page
+
 ## v0.3.0 - 2026-04-07
 
 New Features

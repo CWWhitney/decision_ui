@@ -43,7 +43,7 @@
 
     const openHelpSection = () => {
         openModelDialog.closeDialog();
-        router.push("/help/user-interface/open-model-dialog");
+        router.push("/help/user-interface/main-menu/open-model-dialog");
     };
 </script>
 
