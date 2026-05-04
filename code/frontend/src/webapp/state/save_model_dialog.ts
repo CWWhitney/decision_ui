@@ -1,10 +1,14 @@
-import { ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { defineStore } from "pinia";
+import { type Schema } from "ajv";
+
+import * as common from "@decision-support-ui/common";
 
 import { generateAddModelRequest, generateUpdateModelRequest } from "../rest/models";
 import { useAccountStore } from "./account";
-import { downloadModelFile, getModelFileFromState } from "./io";
+import { downloadModelFile, getModelFileFromState, useValidatedSessionStorage } from "./io";
 import { useErrorDialogStore } from "./error_dialog";
+import { useEditorStore } from "./editor";
 
 export const SAVE_MODEL_TO_ACCOUNT_TAB = "account";
 export const SAVE_MODEL_TO_FILE_TAB = "file";
@@ -16,42 +20,82 @@ export type AvailableSaveModelTabs = SaveModelToAccountTab | SaveModelToFileTab;
 
 export const AVAILABLE_SAVE_MODEL_TABS = [SAVE_MODEL_TO_ACCOUNT_TAB, SAVE_MODEL_TO_FILE_TAB];
 
+export const AUTOSAVE_INTERVAL = 300000; // 5 minutes
+
 const SAVE_MODEL_DIALOG_STORE_ID = "saveModelDialog";
+
+interface SaveModelDialogTransientState {
+    isOpen: boolean;
+    tab: AvailableSaveModelTabs;
+    autosaveInterval: NodeJS.Timeout | null;
+}
+
+const getDefaultSaveModelDialogTransientState = (): SaveModelDialogTransientState => {
+    return {
+        isOpen: false,
+        tab: SAVE_MODEL_TO_FILE_TAB,
+        autosaveInterval: null
+    };
+};
+
+interface SaveModelDialogPersistedState {
+    modelId: number | null;
+}
+
+const SaveModelDialogPersistedSchema: Schema = {
+    type: "object",
+    properties: {
+        modlId: { type: ["number", "null"] }
+    },
+    required: ["modelId"]
+};
+
+const getDefaultSaveModelDialogPersistedState = (): SaveModelDialogPersistedState => {
+    return {
+        modelId: null
+    };
+};
 
 export const useSaveModelDialogStore = defineStore(SAVE_MODEL_DIALOG_STORE_ID, () => {
     const account = useAccountStore();
     const errorDialog = useErrorDialogStore();
+    const editor = useEditorStore();
     const doAddModelRequest = generateAddModelRequest();
     const doUpdateModelRequest = generateUpdateModelRequest();
+    const validateSaveModelDialogPersistedState = common.validateSchema(SaveModelDialogPersistedSchema);
 
-    const isOpen = ref(false);
-    const tab = ref<AvailableSaveModelTabs>(SAVE_MODEL_TO_FILE_TAB);
-    const modelId = ref<number | null>(null);
+    // --- persisted state
+    const transient = ref<SaveModelDialogTransientState>(getDefaultSaveModelDialogTransientState());
+    const persisted = useValidatedSessionStorage(
+        SAVE_MODEL_DIALOG_STORE_ID,
+        getDefaultSaveModelDialogPersistedState(),
+        validateSaveModelDialogPersistedState
+    );
 
     const reset = () => {
-        isOpen.value = false;
-        tab.value = SAVE_MODEL_TO_FILE_TAB;
+        transient.value = getDefaultSaveModelDialogTransientState();
+        persisted.value = getDefaultSaveModelDialogPersistedState();
     };
 
     const openDialog = (currentTab?: AvailableSaveModelTabs) => {
-        isOpen.value = true;
-        tab.value = currentTab ?? (account.isLoggedIn ? SAVE_MODEL_TO_ACCOUNT_TAB : SAVE_MODEL_TO_FILE_TAB);
+        transient.value.isOpen = true;
+        transient.value.tab = currentTab ?? (account.isLoggedIn ? SAVE_MODEL_TO_ACCOUNT_TAB : SAVE_MODEL_TO_FILE_TAB);
     };
 
     const closeDialog = () => {
-        isOpen.value = false;
+        transient.value.isOpen = false;
     };
 
     const setModelId = (newModelId: number | null) => {
-        modelId.value = newModelId;
+        persisted.value.modelId = newModelId;
     };
 
-    const saveCurrent = () => {
+    const saveCurrent = (fallbackToDialog = true) => {
         const accessToken = account.transient.accessToken;
-        if (modelId.value != null && accessToken) {
+        if (persisted.value.modelId != null && accessToken) {
             doUpdateModelRequest({
                 accessToken,
-                modelId: modelId.value,
+                modelId: persisted.value.modelId,
                 modelfile: getModelFileFromState(),
                 onSuccess: () => {
                     //
@@ -64,7 +108,7 @@ export const useSaveModelDialogStore = defineStore(SAVE_MODEL_DIALOG_STORE_ID, (
                     );
                 }
             });
-        } else {
+        } else if (fallbackToDialog) {
             openDialog();
         }
     };
@@ -101,5 +145,37 @@ export const useSaveModelDialogStore = defineStore(SAVE_MODEL_DIALOG_STORE_ID, (
         downloadModelFile(getModelFileFromState());
     };
 
-    return { isOpen, tab, openDialog, closeDialog, reset, saveAsNew, setModelId, downloadModel, saveCurrent };
+    const canSaveCurrent = computed(() => persisted.value.modelId !== null);
+
+    const isAutosaveAvailable = computed(() => account.isLoggedIn && canSaveCurrent.value);
+
+    watch(
+        () => isAutosaveAvailable.value && editor.persisted.autosave,
+        active => {
+            if (!active && transient.value.autosaveInterval) {
+                // stop autosave interval (becaues it is not needed at the moment)
+                clearInterval(transient.value.autosaveInterval);
+                transient.value.autosaveInterval = null;
+            } else if (active && transient.value.autosaveInterval == null) {
+                // start autosave interval
+                transient.value.autosaveInterval = setInterval(() => {
+                    saveCurrent(false);
+                }, AUTOSAVE_INTERVAL);
+            }
+        }
+    );
+
+    return {
+        transient,
+        persisted,
+        openDialog,
+        closeDialog,
+        reset,
+        saveAsNew,
+        setModelId,
+        downloadModel,
+        saveCurrent,
+        canSaveCurrent,
+        isAutosaveAvailable
+    };
 });

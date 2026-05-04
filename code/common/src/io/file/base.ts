@@ -6,9 +6,9 @@ import { EditorFileSchema, EditorFileState } from "./editor";
 import { ComputationFileSchema, ComputationFileState } from "./computation";
 
 export const MODEL_FILE_SCHEMA_NAME = "de.uni-bonn.decision-model/file";
-export const MODEL_FILE_VERSION = 2;
+export const MODEL_FILE_VERSION = 3;
 
-export type ModelFileVersion = 2;
+export type ModelFileVersion = 3;
 export type ModelFileSchemaName = "de.uni-bonn.decision-model/file";
 
 export const ModelFileInfoSchema: Schema = {

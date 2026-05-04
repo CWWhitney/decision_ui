@@ -1,4 +1,5 @@
 <script setup lang="ts">
+    import { useEditorStore } from "../../state/editor";
     import TopMenuItem from "../../components/menu/TopMenuItem.vue";
     import { resetState } from "../../state";
     import { useOpenModelDialogStore } from "../../state/open_model";
@@ -6,6 +7,7 @@
 
     const openModelDialog = useOpenModelDialogStore();
     const saveModelDialog = useSaveModelDialogStore();
+    const editor = useEditorStore();
 </script>
 
 <template>
@@ -16,6 +18,24 @@
             <TopMenuItem title="Open..." shortcut="CTRL + O" @click="openModelDialog.openDialog()" />
             <TopMenuItem title="Save" shortcut="CTRL + S" @click="saveModelDialog.saveCurrent()" />
             <TopMenuItem title="Save As..." shortcut="CTRL + SHIFT + S" @click="saveModelDialog.openDialog()" />
+            <v-divider />
+            <v-list-item
+                class="autosaveToggle"
+                :disabled="!saveModelDialog.isAutosaveAvailable"
+                @click="editor.toggleAutosave"
+            >
+                <template #title>Autosave every 5 Minutes</template>
+                <template #append>
+                    <v-switch
+                        v-model="editor.persisted.autosave"
+                        color="primary"
+                        :disabled="!saveModelDialog.isAutosaveAvailable"
+                        density="compact"
+                        hide-details
+                        inset
+                    />
+                </template>
+            </v-list-item>
         </v-list>
     </v-card>
 </template>

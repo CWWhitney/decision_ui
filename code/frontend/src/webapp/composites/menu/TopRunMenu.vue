@@ -53,6 +53,7 @@
                     <v-switch
                         v-model="computation.persisted.frontend.gpuAcceleration"
                         color="primary"
+                        density="compact"
                         hide-details
                         inset
                     />

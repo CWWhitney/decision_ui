@@ -1,10 +1,10 @@
-import { ModelFileState } from "../io";
+import { MODEL_FILE_VERSION, ModelFileState } from "../io";
 
 export const getMultipleResultsExampleModelFile = (): ModelFileState => {
     return {
         _schema: {
             name: "de.uni-bonn.decision-model/file",
-            version: 2
+            version: MODEL_FILE_VERSION
         },
         graph: {
             nodes: [
@@ -217,7 +217,8 @@ export const getMultipleResultsExampleModelFile = (): ModelFileState => {
             snapToGrid: true,
             edgeStyle: "smooth-step",
             background: "dots",
-            autoAddComputationEdges: true
+            autoAddComputationEdges: true,
+            autosave: true
         }
     };
 };

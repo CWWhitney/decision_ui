@@ -12,6 +12,7 @@ export interface EditorFileState {
     locked: boolean;
     snapToGrid: boolean;
     autoAddComputationEdges: boolean;
+    autosave: boolean;
 }
 
 export const EditorFileSchema: Schema = {
@@ -21,7 +22,8 @@ export const EditorFileSchema: Schema = {
         background: { enum: AVAILABLE_EDITOR_BACKGROUNDS },
         locked: { type: "boolean" },
         snapToGrid: { type: "boolean" },
-        autoAddComputationEdges: { type: "boolean" }
+        autoAddComputationEdges: { type: "boolean" },
+        autosave: { type: "boolean" }
     },
-    required: ["edgeStyle", "background", "locked", "snapToGrid", "autoAddComputationEdges"]
+    required: ["edgeStyle", "background", "locked", "snapToGrid", "autoAddComputationEdges", "autosave"]
 };
