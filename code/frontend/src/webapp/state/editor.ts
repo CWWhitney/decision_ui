@@ -30,7 +30,8 @@ const getDefaultEditorPersistedState = (): common.EditorStorePersistedState => {
         snapToGrid: true,
         edgeStyle: common.SMOOTH_STEP_EDGE_STYLE_TYPE,
         background: common.DOTS_EDITOR_BACKGROUND,
-        autoAddComputationEdges: true
+        autoAddComputationEdges: true,
+        autosave: true
     };
 };
 
@@ -285,6 +286,10 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
         transient.value.shouldFitOnNextUpdate = false;
     };
 
+    const toggleAutosave = () => {
+        persisted.value.autosave = !persisted.value.autosave;
+    };
+
     const reset = () => {
         persisted.value = getDefaultEditorPersistedState();
     };
@@ -307,6 +312,7 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
         switchBackground,
         markAsFittedOnUpdate,
         markAsNeedsFitOnNextUpdate,
+        toggleAutosave,
         reset
     };
 });

@@ -32,6 +32,7 @@ The file menu provides the following functions:
 - "Open..." - open the "[Open Model](./open-model-dialog)" dialog which can be used to open an existing model
 - "Save" - save the current model to your account unless it was never saved before, which opens the "Save Model" dialog
 - "Save As..." - open the "[Save Model](./save-model-dialog)" dialog which allows saving the model to your account or as a file
+- "Autosave every 5 Minutes" - enables autosaving if the model was previously saved to your account
 
 ## Edit Menu
 

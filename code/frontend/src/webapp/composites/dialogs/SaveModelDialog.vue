@@ -8,21 +8,23 @@
     import { useAccountStore } from "../../state/account";
     import { useMetadataStore } from "../../state/metadata";
     import { useRouter } from "vue-router";
+    import { useEditorStore } from "../../state/editor";
 
     const router = useRouter();
     const account = useAccountStore();
     const metadata = useMetadataStore();
+    const editor = useEditorStore();
     const saveModelDialog = useSaveModelDialogStore();
 
     const openHelpSection = () => {
         saveModelDialog.closeDialog();
-        router.push("/help/user-interface/save-model-dialog");
+        router.push("/help/user-interface/main-menu/save-model-dialog");
     };
 </script>
 
 <template>
     <v-dialog
-        v-model="saveModelDialog.isOpen"
+        v-model="saveModelDialog.transient.isOpen"
         :width="'auto'"
         :height="'auto'"
         class="saveModelDialog"
@@ -42,7 +44,7 @@
             </v-toolbar>
 
             <v-card-text class="tabCard">
-                <v-tabs v-model="saveModelDialog.tab" color="primary" direction="vertical">
+                <v-tabs v-model="saveModelDialog.transient.tab" color="primary" direction="vertical">
                     <v-tab
                         prepend-icon="mdi-account-circle"
                         text="To Account"
@@ -51,22 +53,32 @@
                     ></v-tab>
                     <v-tab prepend-icon="mdi-file-outline" text="To File" :value="SAVE_MODEL_TO_FILE_TAB"></v-tab>
                 </v-tabs>
-                <v-tabs-window v-model="saveModelDialog.tab">
+                <v-tabs-window v-model="saveModelDialog.transient.tab">
                     <v-tabs-window-item :value="SAVE_MODEL_TO_ACCOUNT_TAB">
                         <p>Save this model as a new model to your account:</p>
-                        <div class="centeredButtonContainer">
+                        <div class="contentContainer">
                             <v-text-field v-model="metadata.state.name" label="Model Name" hide-details />
-                            <v-btn
-                                text="Save as New"
-                                color="primary"
-                                variant="outlined"
-                                @click="saveModelDialog.saveAsNew"
-                            ></v-btn>
+                            <div class="saveAsNewContainer">
+                                <v-switch
+                                    v-model="editor.persisted.autosave"
+                                    color="primary"
+                                    label="Autosave every 5 minutes"
+                                    density="compact"
+                                    hide-details
+                                    inset
+                                />
+                                <v-btn
+                                    text="Save as New"
+                                    color="primary"
+                                    variant="outlined"
+                                    @click="saveModelDialog.saveAsNew"
+                                />
+                            </div>
                         </div>
                     </v-tabs-window-item>
                     <v-tabs-window-item :value="SAVE_MODEL_TO_FILE_TAB">
                         <p>Save this model as a file:</p>
-                        <div class="centeredButtonContainer">
+                        <div class="contentContainer">
                             <v-text-field v-model="metadata.state.name" label="Model Name" hide-details />
                             <v-btn
                                 text="Download File"
@@ -125,11 +137,11 @@
         }
     }
 
-    .centeredButtonContainer {
+    .contentContainer {
         margin-top: 1em;
         display: flex;
         flex-direction: column;
-        gap: 0.5em;
+        gap: 0.75em;
         width: 100%;
         height: 100%;
         justify-content: center;
@@ -138,5 +150,12 @@
         :deep(.v-input) {
             width: 100%;
         }
+    }
+
+    .saveAsNewContainer {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 </style>

@@ -37,7 +37,7 @@
 
     const openHelpSection = () => {
         loginDialog.closeDialog();
-        router.push("/help/user-interface/login-dialog");
+        router.push("/help/user-interface/main-menu/login-dialog");
     };
 </script>
 

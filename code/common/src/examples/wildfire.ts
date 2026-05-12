@@ -1,4 +1,4 @@
-import { ModelFileState } from "../io";
+import { MODEL_FILE_VERSION, ModelFileState } from "../io";
 
 /* eslint-disable max-len */
 
@@ -6,7 +6,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
     return {
         _schema: {
             name: "de.uni-bonn.decision-model/file",
-            version: 2
+            version: MODEL_FILE_VERSION
         },
         graph: {
             nodes: [
@@ -1108,7 +1108,8 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
             snapToGrid: true,
             edgeStyle: "bezier",
             background: "dots",
-            autoAddComputationEdges: true
+            autoAddComputationEdges: true,
+            autosave: true
         }
     };
 };

@@ -112,7 +112,7 @@ You can remove a manual edge by selecting it with a left mouse click and confirm
 
 Usually, you do not need to manually draw edges between nodes. Edges are automatically inferred based on whether one node references another node in its function definition. In rare circumstances, it might be useful to manually draw an edge between two nodes, e.g., to highlight a conceptual dependency, even if there is no actual computational dependency present between these nodes.
 
-If both a manual edge and automatic edge is available, the automatic edge is drawn prioritized. However, the manual edge is still remembered. If the function definition of those nodes changes, the automatic edge might disappear and the manual edge might be shown instead.
+If both a manual edge and automatic edge is available, drawing the automatic edge is prioritized. However, the manual edge is still remembered. If the function definition of those nodes changes, the automatic edge might disappear and the manual edge might be shown instead.
 
 You can disable automatic edges for all nodes from the "View" menu. You may disable automatic edges for one specific node from the "General" tab in its [Node Edit Dialog](./node-edit-dialog).
 
