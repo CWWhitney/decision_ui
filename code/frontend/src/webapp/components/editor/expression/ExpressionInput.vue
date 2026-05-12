@@ -285,8 +285,8 @@
         },
         {
             icon: "mdi-pi",
-            expression: "mathematical constant pi",
-            tooltip: "pi"
+            expression: "pi",
+            tooltip: "mathematical constant pi"
         }
     ];
 
