@@ -8,6 +8,6 @@ export const generateVariableName = (title: string) => {
         "àáãạảăắằẳẵặâấầẩẫậèéẹẻẽêềếểễệđìíĩỉịòóõọỏôốồổỗộơớờởỡợùúũụủưứừửữựỳỵỷỹý" +
         "ÀÁÃẠẢĂẮẰẲẴẶÂẤẦẨẪẬÈÉẸẺẼÊỀẾỂỄỆĐÌÍĨỈỊÒÓÕỌỎÔỐỒỔỖỘƠỚỜỞỠỢÙÚŨỤỦƯỨỪỬỮỰỲỴỶỸÝ";
 
-    const filter = new RegExp(String.raw`/[^${RE_LATIN}${RE_NUMBERS}${RE_GERMAN}${RE_VIETNAMESE}_]/g`);
+    const filter = new RegExp(`[^${RE_LATIN}${RE_NUMBERS}${RE_GERMAN}${RE_VIETNAMESE}_]`, "g");
     return title.normalize("NFC").trim().replace(/ /g, "_").replace(filter, "");
 };
