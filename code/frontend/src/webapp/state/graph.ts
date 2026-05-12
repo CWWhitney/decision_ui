@@ -52,7 +52,7 @@ export const useGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
     );
 
     const isNodeIdValid = (nodeId: common.NodeId) => _nodesByIdMap.value.has(nodeId);
-    const isVariableNameValid = (variableName: string) => _nodeIdByVariableMap.value.has(variableName);
+    const isVariableNameKnown = (variableName: string) => _nodeIdByVariableMap.value.has(variableName);
 
     const getComputedNodePosition: (nodeId: common.NodeId) => common.Position = makeSafeComputedGetterByKey(
         (nodeId: common.NodeId) =>
@@ -247,7 +247,7 @@ export const useGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         state,
         history,
         computedEstimateNodes,
-        isVariableNameValid,
+        isVariableNameKnown,
         getComputedNodeIdFromVariableName,
         getComputedNodePosition,
         getComputedNode,

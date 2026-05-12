@@ -27,14 +27,14 @@ export const getEdgeIdForNodes = (source: NodeId, target: NodeId): EdgeId => {
 export const getComputationEdges = (
     nodes: Node[],
     getVariableDependencies: (nodeId: string) => string[],
-    isVariableNameValid: (variableName: string) => boolean,
+    isVariableNameKnown: (variableName: string) => boolean,
     getNodeIdFromVariableName: (variableName: string) => NodeId
 ) => {
     return nodes.reduce((p, node) => {
         const dependencies = getVariableDependencies(node.id);
         return [
             ...p,
-            ...dependencies.filter(isVariableNameValid).map(d => {
+            ...dependencies.filter(isVariableNameKnown).map(d => {
                 const source = getNodeIdFromVariableName(d);
                 const target = node.id;
                 return {

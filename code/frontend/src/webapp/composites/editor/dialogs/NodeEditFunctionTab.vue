@@ -3,6 +3,7 @@
     import * as common from "@decision-support-ui/common";
 
     import { useGraphStore } from "../../../state/graph";
+    import { useEditorStore } from "../../../state/editor";
 
     import LoopFunctionTab from "../../../components/editor/dialogs/LoopFunctionTab.vue";
     import EstimateFunctionTab from "../../../components/editor/dialogs/EstimateFunctionTab.vue";
@@ -12,6 +13,7 @@
 
     const node = defineModel<common.Node>({ required: true });
     const graph = useGraphStore();
+    const editor = useEditorStore();
 
     const knownVariables = computed(() =>
         graph.state.nodes
@@ -27,6 +29,10 @@
             return e instanceof Error ? e.message : `${e}`;
         }
         return null;
+    });
+
+    const variableNameError = computed(() => {
+        return editor.getComputedVariableNameError(node.value.id);
     });
 
     const functionType = computed({
@@ -60,6 +66,13 @@
                     this node in other nodes using this variable name.
                 </template>
             </HelpHintWrapper>
+            <v-alert
+                v-if="!!variableNameError"
+                type="error"
+                variant="outlined"
+                :text="`${variableNameError}`"
+                class="functionAlert"
+            />
         </template>
         <h4>Type</h4>
         <div>
@@ -133,7 +146,7 @@
                 class="functionAlert"
             />
             <v-alert
-                v-if="!computationError"
+                v-if="!computationError && !variableNameError"
                 class="functionAlert"
                 type="success"
                 variant="outlined"
