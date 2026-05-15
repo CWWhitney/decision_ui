@@ -2,12 +2,12 @@
     /* eslint vue/no-v-html: 0 */
 
     import { computed } from "vue";
-    import { useRoute } from "vue-router";
     import { computedAsync } from "@vueuse/core";
 
     import markdownit from "markdown-it";
     import markdownit_replace_link from "markdown-it-replace-link";
-    import CardContainer from "../../components/layout/CardContainer.vue";
+
+    const props = defineProps<{ pathArray: string[] }>();
 
     const HELP_BASE_PATH = "#/help";
 
@@ -41,8 +41,6 @@
         settings: "Settings"
     };
 
-    const route = useRoute();
-
     const breadcrumbs = computed(() => {
         const items = [
             {
@@ -50,9 +48,9 @@
                 href: HELP_BASE_PATH
             }
         ];
-        if (Array.isArray(route.params.path)) {
+        if (props.pathArray.join().trim() != "") {
             let path = HELP_BASE_PATH;
-            for (const subpath of route.params.path) {
+            for (const subpath of props.pathArray) {
                 path = path + "/" + subpath;
                 items.push({
                     title: BREADCRUMB_TITLE_BY_SUBPATH[subpath] || "???",
@@ -76,11 +74,7 @@
     };
 
     const markdown = computedAsync(async () => {
-        if (route.name != "help") {
-            return `route not correct (maybe path parameter is missing?)`;
-        }
-
-        const path = Array.isArray(route.params.path) ? route.params.path.join("/") : route.params.path;
+        const path = props.pathArray.join("/");
         const readme_url = `./static/documentation/${path ?? ""}/README.md`.replace(/\/\//g, "/");
 
         const md = markdownit();
@@ -97,7 +91,8 @@
                     return link;
                 }
 
-                const basePath = route.path.endsWith("/") ? route.path : `${route.path}/`;
+                const basePath = "help/" + (props.pathArray.join().trim() != "" ? props.pathArray.join("/") + "/" : "");
+                console.log(`basePath is ${basePath}`);
                 const baseUrl = new URL(basePath, "http://dummy");
                 return `#${new URL(link, baseUrl).pathname}`;
             }
@@ -114,18 +109,16 @@
 </script>
 
 <template>
-    <CardContainer>
-        <v-card color="white" elevation="1" rounded class="card">
-            <v-card-text>
-                <v-breadcrumbs :items="breadcrumbs" class="breadcrumbs">
-                    <template #divider>
-                        <v-icon icon="mdi-chevron-right"></v-icon>
-                    </template>
-                </v-breadcrumbs>
-                <div class="markdown" v-html="markdown" />
-            </v-card-text>
-        </v-card>
-    </CardContainer>
+    <v-card color="white" elevation="1" rounded class="card">
+        <v-card-text>
+            <v-breadcrumbs :items="breadcrumbs" class="breadcrumbs">
+                <template #divider>
+                    <v-icon icon="mdi-chevron-right"></v-icon>
+                </template>
+            </v-breadcrumbs>
+            <div class="markdown" v-html="markdown" />
+        </v-card-text>
+    </v-card>
 </template>
 
 <style scoped lang="scss">

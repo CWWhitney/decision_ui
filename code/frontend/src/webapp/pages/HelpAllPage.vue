@@ -1,13 +1,13 @@
 <script setup lang="ts">
     import TopMenu from "../composites/menu/TopMenu.vue";
     import LeftNavigation from "../composites/menu/LeftNavigation.vue";
-    import HelpSingleCard from "../composites/help/HelpSingleCard.vue";
+    import HelpAllCards from "../composites/help/HelpAllCards.vue";
 </script>
 
 <template>
     <TopMenu>
         <LeftNavigation>
-            <HelpSingleCard />
+            <HelpAllCards />
         </LeftNavigation>
     </TopMenu>
 </template>
