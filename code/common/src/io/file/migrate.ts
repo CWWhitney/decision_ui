@@ -1,3 +1,4 @@
+import { VARIABLE_NODE_TYPE } from "../../graph";
 import { ModelFileState } from "./base";
 
 export const migrateModelFile = (file: any): ModelFileState => {
@@ -41,6 +42,29 @@ export const migrateModelFile = (file: any): ModelFileState => {
         file._schema = {
             ...file._schema,
             version: 3
+        };
+    }
+
+    if (file._schema.version == 3) {
+        // migrate from v3 to v4
+        file.graph.nodes = [
+            ...file.graph.nodes.map((node: any) => {
+                if (node.type == VARIABLE_NODE_TYPE) {
+                    return {
+                        ...node,
+                        function: {
+                            ...node.function,
+                            unit: ""
+                        }
+                    };
+                }
+                return node;
+            })
+        ];
+
+        file._schema = {
+            ...file._schema,
+            version: 4
         };
     }
 

@@ -16,6 +16,7 @@ export const getDiscountExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "Cost",
+                        unit: "",
                         distribution: "posnorm",
                         lower: 50,
                         upper: 150,
@@ -49,6 +50,7 @@ export const getDiscountExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "loop",
                         variable: "Cost_over_10_Years",
+                        unit: "",
                         iterationsExpression: "10",
                         initExpression: "Cost",
                         loopExpression: "Cost"
@@ -77,6 +79,7 @@ export const getDiscountExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "result",
                         variable: "Discounted_Cost",
+                        unit: "",
                         expression: "discount(Cost_over_10_Years, 5, TRUE)"
                     },
                     visualization: {
@@ -103,6 +106,7 @@ export const getDiscountExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "result",
                         variable: "Not_Discounted",
+                        unit: "",
                         expression: "sum(Cost_over_10_Years)"
                     },
                     visualization: {

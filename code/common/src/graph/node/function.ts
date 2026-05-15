@@ -20,6 +20,12 @@ export type NodeFunctionType =
     | ResultFunctionType
     | EmptyFunctionType;
 
+export type VariableNodeFunctionType =
+    | EstimateFunctionType
+    | OperationFunctionType
+    | LoopFunctionType
+    | ResultFunctionType;
+
 export const AVAILABLE_NODE_FUNCTION_TYPES: NodeFunctionType[] = [
     ESTIMATE_FUNCTION_TYPE,
     OPERATION_FUNCTION_TYPE,
@@ -33,8 +39,11 @@ export interface AbstractNodeFunctionState<T extends NodeFunctionType> {
     type: T;
 }
 
-export interface AbstractVariableNodeFunctionState<T extends NodeFunctionType> extends AbstractNodeFunctionState<T> {
+export interface AbstractVariableNodeFunctionState<
+    T extends VariableNodeFunctionType
+> extends AbstractNodeFunctionState<T> {
     variable: string;
+    unit: string;
 }
 
 export interface EstimateNodeFunctionState extends AbstractVariableNodeFunctionState<EstimateFunctionType> {
@@ -121,9 +130,10 @@ export const NodeVariableFunctionSchema: Schema = {
     type: "object",
     properties: {
         type: { enum: AVAILABLE_NODE_FUNCTION_TYPES },
-        variable: { type: "string" }
+        variable: { type: "string" },
+        unit: { type: "string" }
     },
-    required: ["type", "variable"],
+    required: ["type", "variable", "unit"],
     allOf: [
         {
             if: {

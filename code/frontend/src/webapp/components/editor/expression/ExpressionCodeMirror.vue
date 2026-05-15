@@ -21,10 +21,15 @@
         required: true
     });
 
+    export interface KnownVariablesInfo {
+        name: string;
+        unit: string;
+    }
+
     const props = withDefaults(
         defineProps<{
             disabled?: boolean;
-            knownVariables?: string[];
+            knownVariables?: KnownVariablesInfo[];
             knownFunctions?: string[];
             knownConstants?: string[];
         }>(),
@@ -64,8 +69,9 @@
                     section: { name: "Functions", rank: 1 } as CompletionSection
                 })),
                 ...props.knownVariables.map(v => ({
-                    label: v,
+                    label: v.name,
                     type: "variable",
+                    detail: v.unit,
                     section: { name: "Variables", rank: 0 } as CompletionSection
                 })),
                 ...props.knownConstants.map(v => ({
@@ -156,10 +162,19 @@
     .cm-tooltip-autocomplete {
         li[aria-selected="true"] {
             background: #17c;
+
+            .cm-completionDetail {
+                color: #fff;
+            }
         }
 
         completion-section:not(:first-child) {
             margin-top: 0.5em;
+        }
+
+        .cm-completionDetail {
+            color: #777;
+            margin-left: 1em;
         }
     }
 </style>

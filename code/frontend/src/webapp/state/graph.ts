@@ -131,7 +131,7 @@ export const useGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
             common.getExpressionMatchesForNode(getComputedNode(nodeId))
         );
 
-    const getComputedTypedTensor: (nodeId: common.NodeId, visitedNodeIds: string[]) => common.TypedTensor =
+    const getComputedTypedTensor: (nodeId: common.NodeId, visitedNodeIds?: string[] | undefined) => common.TypedTensor =
         makeSafeComputedGetterByKey(
             (
                 nodeId: common.NodeId,

@@ -16,6 +16,7 @@ export const getMinimalExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "Estimate",
+                        unit: "",
                         distribution: "norm",
                         lower: -1,
                         upper: 1,
@@ -49,6 +50,7 @@ export const getMinimalExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "result",
                         variable: "Result",
+                        unit: "",
                         expression: "Estimate"
                     },
                     visualization: {

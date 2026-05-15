@@ -4,7 +4,17 @@ The function tab is only available for variable nodes and allows specifying how 
 
 ![Function Tab of the Node Editor Dialog](./function-tab.webp)
 
-Each variable node needs to have a variable name, which can be used to refer to this node's value inside of other variable nodes. Variable names need to be compatible with R code, so you cannot use spaces and other special symbols inside variable names, only regular letters and the underscore is allowed.
+Each variable node needs to have a variable name, which can be used to refer to this node's value from other variable nodes. Variable names need to be compatible with R code, so you cannot use spaces and other special symbols inside variable names, only regular letters and the underscore is allowed.
+
+## Unit of Measurement
+
+You may specify a unit of measurement for a node's variable. Typical examples are `m` (meter), `kg` (kilogram) or `dollar`. You don't have to use standard units, though. You can specify any name, e.g., `weight`, `currency`, `points` or even `something`.
+
+A node's unit of measurement does not affect the model calculation in any way. It is only used as a hint. For example, a warning message is shown in case you try to combine variables of different units of measurement in a formula expression. In this case, you need to manually check whether this will cause any issues in your calculations and make sure that variables are correctly converted between different units if necessary.
+
+In order to help users building correct decision models, units of measurements are displayed in various other parts of the user interface, e.g., when getting auto-complete suggestions while [editing formulas](../formula-expression-input/), in the [Estimates Table](../../../estimates-table/), and in the corresponding [R Code](../../../r-backend/).
+
+## Function Type
 
 There are currently 4 different ways to specify the function definition of a variable node:
 

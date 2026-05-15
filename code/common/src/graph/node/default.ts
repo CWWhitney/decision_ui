@@ -12,8 +12,11 @@ import {
     NodeFunctionState,
     NodeFunctionType,
     OPERATION_FUNCTION_TYPE,
+    OperationNodeFunctionState,
     RESULT_FUNCTION_TYPE,
-    ResultNodeFunctionState
+    ResultNodeFunctionState,
+    VariableNodeFunctionState,
+    VariableNodeFunctionType
 } from "./function";
 import {
     AbstractNodeStyleState,
@@ -68,12 +71,14 @@ export const getDefaultFunctionState = (variable: string, functionType: NodeFunc
             return {
                 type: OPERATION_FUNCTION_TYPE,
                 variable,
+                unit: "",
                 expression: ""
-            };
+            } as OperationNodeFunctionState;
         case LOOP_FUNCTION_TYPE:
             return {
                 type: LOOP_FUNCTION_TYPE,
                 variable,
+                unit: "",
                 iterationsExpression: "10",
                 initExpression: "",
                 loopExpression: ""
@@ -81,6 +86,7 @@ export const getDefaultFunctionState = (variable: string, functionType: NodeFunc
         case RESULT_FUNCTION_TYPE:
             return {
                 type: RESULT_FUNCTION_TYPE,
+                unit: "",
                 variable,
                 expression: ""
             } as ResultNodeFunctionState;
@@ -90,6 +96,41 @@ export const getDefaultFunctionState = (variable: string, functionType: NodeFunc
             } as EmptyNodeFunctionState;
         default:
             throw new Error(`unkown node function type '${functionType}'`);
+    }
+};
+
+export const transitionFunctionState = (
+    previous: VariableNodeFunctionState,
+    newFunctionType: VariableNodeFunctionType
+) => {
+    const newSimpleExpression =
+        previous.type == OPERATION_FUNCTION_TYPE || previous.type == RESULT_FUNCTION_TYPE ? previous.expression : "";
+
+    switch (newFunctionType) {
+        case ESTIMATE_FUNCTION_TYPE:
+            return {
+                ...getDefaultFunctionState(previous.variable, newFunctionType),
+                unit: previous.unit
+            } as EstimateNodeFunctionState;
+        case OPERATION_FUNCTION_TYPE:
+            return {
+                ...getDefaultFunctionState(previous.variable, newFunctionType),
+                unit: previous.unit,
+                expression: newSimpleExpression
+            } as OperationNodeFunctionState;
+        case LOOP_FUNCTION_TYPE:
+            return {
+                ...getDefaultFunctionState(previous.variable, newFunctionType),
+                unit: previous.unit
+            } as LoopNodeFunctionState;
+        case RESULT_FUNCTION_TYPE:
+            return {
+                ...getDefaultFunctionState(previous.variable, newFunctionType),
+                unit: previous.unit,
+                expression: newSimpleExpression
+            } as ResultNodeFunctionState;
+        default:
+            throw new Error(`unkown node function type '${newFunctionType}'`);
     }
 };
 

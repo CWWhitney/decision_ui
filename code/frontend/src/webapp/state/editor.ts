@@ -185,6 +185,28 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
         }
     );
 
+    const getComputedVariableUnitWarning: (nodeId: common.NodeId) => string | null = makeSafeComputedGetterByKey(
+        (nodeId: common.NodeId) => {
+            const node = graphStore.getComputedNode(nodeId);
+            if (node.type == common.VARIABLE_NODE_TYPE) {
+                const variableDependencies = graphStore.getComputedVariableDependencies(nodeId);
+                const dependentNodes = variableDependencies.map(v =>
+                    graphStore.getComputedNode(graphStore.getComputedNodeIdFromVariableName(v))
+                );
+                const dependentUnits = new Set(
+                    dependentNodes
+                        .map(n => (n.type == common.VARIABLE_NODE_TYPE ? n.function.unit : ""))
+                        .filter(d => d !== "")
+                );
+                if (dependentUnits.size > 1) {
+                    const unitString = [...dependentUnits].map(u => `'${u}'`).join(", ");
+                    return `This formula combines variables with different units of measurement: ${unitString}.`;
+                }
+            }
+            return null;
+        }
+    );
+
     // actions
 
     const loadFromFile = (newState: common.EditorFileState) => {
@@ -305,6 +327,7 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
         computedVueFlowEdges,
         computedSubgraphTitle,
         getComputedVariableNameError,
+        getComputedVariableUnitWarning,
         toggleLocked,
         toggleSnapToGrid,
         toggleAutoAddComputationEdges,

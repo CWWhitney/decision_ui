@@ -21,7 +21,8 @@
 <template>
     <div class="estimateSliderContainer">
         <div class="labelRow">
-            <span>{{ node.visualization.title }}</span>
+            <span class="nodeLabel">{{ node.visualization.title }}</span>
+            <span class="unitLabel">{{ node.function.unit }}</span>
         </div>
         <div class="sliderRow">
             <span>{{ node.function.lowerBounds[0] }}</span>
@@ -43,8 +44,19 @@
 
 <style lang="scss" scoped>
     .labelRow {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .nodeLabel {
         font-weight: 400;
         font-size: 12pt;
+    }
+
+    .unitLabel {
+        font-style: italic;
+        color: #777;
     }
 
     .sliderRow {

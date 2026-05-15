@@ -10,6 +10,7 @@ import {
 } from "../../../graph";
 import { VariableDependencies } from "../dependencies";
 import { R_CODE_LINE_BREAK, RCodeFragment } from "./base";
+import { stripRComment } from "./strip";
 
 export const combineRCodeFragments = (fragment1: RCodeFragment, fragment2: RCodeFragment): RCodeFragment => {
     return {
@@ -70,10 +71,14 @@ export const getRCodeFragmentForNodeRecursion = (
                 getRCodeFragmentForNode
             );
 
+            const comment = stripRComment(
+                `${node.visualization.title}${node.function.unit ? ` (${node.function.unit})` : ""}`
+            );
+
             return combineRCodeFragments(dependencyFragment, {
                 definedVariables: [node.function.variable],
                 code:
-                    `# ${node.visualization.title}${R_CODE_LINE_BREAK}` +
+                    `# ${comment}${R_CODE_LINE_BREAK}` +
                     `${node.function.variable} <- ${getRCodeForExpression(node.function.expression)}`
             });
         } else if (node.function.type == LOOP_FUNCTION_TYPE) {
@@ -87,10 +92,14 @@ export const getRCodeFragmentForNodeRecursion = (
                 getRCodeFragmentForNode
             );
 
+            const comment = stripRComment(
+                `${node.visualization.title}${node.function.unit ? ` (${node.function.unit})` : ""}`
+            );
+
             return combineRCodeFragments(dependencyFragment, {
                 definedVariables: [node.function.variable],
                 code:
-                    `# ${node.visualization.title}${R_CODE_LINE_BREAK}` +
+                    `# ${comment}${R_CODE_LINE_BREAK}` +
                     `${node.function.variable} <- ` +
                     `numeric(${getRCodeForExpression(node.function.iterationsExpression)})${R_CODE_LINE_BREAK}` +
                     `for (i in 1:length(${node.function.variable})) {${R_CODE_LINE_BREAK}` +
