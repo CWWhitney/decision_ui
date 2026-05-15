@@ -26,7 +26,7 @@
                 @click="editor.toggleSnapToGrid"
             />
             <v-divider />
-            <TopMenuItem title="Change Edge Style" @click="editor.switchEdgeStyle" />
+            <TopMenuItem title="Change Arrow (Edge) Style" @click="editor.switchEdgeStyle" />
             <TopMenuItem title="Change Background" @click="editor.switchBackground" />
             <v-divider />
             <TopMenuItem

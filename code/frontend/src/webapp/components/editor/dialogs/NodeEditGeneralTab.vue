@@ -82,7 +82,7 @@
                 <template #default>
                     <v-switch
                         v-model="node.visualization.autoConnect"
-                        label="Automatically draw edges based on computation dependencies"
+                        label="Automatically draw arrows (edges) based on computation dependencies"
                         color="primary"
                         hide-details
                         inset
@@ -91,12 +91,12 @@
                 <template #tooltip>
                     <p>
                         Whenever another node references this node's variable as part of its own variable definition, an
-                        edge between these two nodes can be automatically drawn in the diagram, highlighting this
+                        arrow between these two nodes can be automatically drawn in the diagram, highlighting this
                         relationship.
                     </p>
                     <p>
-                        Sometimes, e.g., when too many edges would make the diagram difficult to read, it can be helpful
-                        to disable this feature.
+                        Sometimes, e.g., when too many arrows would make the diagram difficult to read, it can be
+                        helpful to disable this feature.
                     </p>
                 </template>
             </HelpHintWrapper>

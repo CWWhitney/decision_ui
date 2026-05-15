@@ -187,7 +187,7 @@
                     ></v-btn>
                 </template>
             </v-tooltip>
-            <v-tooltip location="bottom" text="remove selected nodes or edges" open-delay="500">
+            <v-tooltip location="bottom" text="remove selected nodes or arrows (edges)" open-delay="500">
                 <template #activator="{ props }">
                     <v-btn
                         v-bind="props"
