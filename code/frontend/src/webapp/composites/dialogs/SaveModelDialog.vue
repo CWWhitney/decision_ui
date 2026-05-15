@@ -47,11 +47,15 @@
                 <v-tabs v-model="saveModelDialog.transient.tab" color="primary" direction="vertical">
                     <v-tab
                         prepend-icon="mdi-account-circle"
-                        text="To Account"
+                        text="To Account in Cloud"
                         :value="SAVE_MODEL_TO_ACCOUNT_TAB"
                         :disabled="!account.isLoggedIn"
                     ></v-tab>
-                    <v-tab prepend-icon="mdi-file-outline" text="To File" :value="SAVE_MODEL_TO_FILE_TAB"></v-tab>
+                    <v-tab
+                        prepend-icon="mdi-file-outline"
+                        text="To File on Computer"
+                        :value="SAVE_MODEL_TO_FILE_TAB"
+                    ></v-tab>
                 </v-tabs>
                 <v-tabs-window v-model="saveModelDialog.transient.tab">
                     <v-tabs-window-item :value="SAVE_MODEL_TO_ACCOUNT_TAB">
@@ -77,7 +81,12 @@
                         </div>
                     </v-tabs-window-item>
                     <v-tabs-window-item :value="SAVE_MODEL_TO_FILE_TAB">
-                        <p>Save this model as a file:</p>
+                        <div v-if="!account.isLoggedIn" class="loginAlert">
+                            <v-alert type="info" variant="outlined">
+                                You can only save your model to your account after registering and logging in.
+                            </v-alert>
+                        </div>
+                        <p>Save this model as a file to your computer:</p>
                         <div class="contentContainer">
                             <v-text-field v-model="metadata.state.name" label="Model Name" hide-details />
                             <v-btn
@@ -110,6 +119,10 @@
 
         .v-card-text {
             overflow: hidden;
+        }
+
+        .loginAlert {
+            margin-bottom: 1em;
         }
 
         .tabCard {
