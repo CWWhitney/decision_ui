@@ -17,13 +17,19 @@ export type ComputedResult<T> =
       };
 
 export const extractComputedResultOrThrow = <T>(result: ComputedResult<T>): T => {
+    if (result === undefined) {
+        throw new Error(`computed result is undefined`);
+    }
     if (result.type == COMPUTED_RESULT_SUCCESS_TYPE) {
         return result.value;
     }
     throw new Error(result.message);
 };
 
-export const catchForComputedResult = <T>(generate: () => T, message?: string): ComputedResult<T> => {
+export const catchForComputedResult = <T>(
+    generate: () => T,
+    messageGenerator?: (e: Error) => string
+): ComputedResult<T> => {
     try {
         return {
             type: COMPUTED_RESULT_SUCCESS_TYPE,
@@ -32,7 +38,11 @@ export const catchForComputedResult = <T>(generate: () => T, message?: string): 
     } catch (e) {
         return {
             type: COMPUTED_RESULT_ERROR_TYPE,
-            message: message ? message : e instanceof Error ? `${e.message}` : `${e}`
+            message: messageGenerator
+                ? messageGenerator(e instanceof Error ? e : new Error(`${e}`))
+                : e instanceof Error
+                  ? `${e.message}`
+                  : `${e}`
         };
     }
 };
@@ -42,13 +52,18 @@ export const catchForComputedResult = <T>(generate: () => T, message?: string): 
  * and re-throwing the exception when the value is accessed via the returned getter.
  *
  * @param get the getter function to produce a value (same as in the vue computed function)
+ * @param messageGenerator a function providing an error message generator overwriting the actual thrown errors
  * @returns a getter function that returns the computed value or throws an error if an error
  *  was previously thrown in the computed getter
  */
-export const makeSafeComputedGetter = <T>(get: (previous: T | undefined) => T) => {
+export const makeSafeComputedGetter = <T>(
+    get: (previous: T | undefined) => T,
+    messageGenerator?: (e: Error) => string
+) => {
     const c = computed<ComputedResult<T>>(previous =>
-        catchForComputedResult(() =>
-            get(previous && previous.type == COMPUTED_RESULT_SUCCESS_TYPE ? previous.value : undefined)
+        catchForComputedResult(
+            () => get(previous && previous.type == COMPUTED_RESULT_SUCCESS_TYPE ? previous.value : undefined),
+            messageGenerator ? messageGenerator : undefined
         )
     );
     return (): T => extractComputedResultOrThrow(c.value);
@@ -59,16 +74,16 @@ export const makeSafeComputedGetter = <T>(get: (previous: T | undefined) => T) =
  * every time the value is accessed from the returned getter.
  *
  * @param get the getter function that produces a value for a key
- * @param getMessage a function providing error messages overwriting the actual thrown errors
+ * @param getMessageGenerator a function providing an error message generator overwriting the actual thrown errors
  * @returns a getter function which returns the computed value for the provided key or throws an error if an error
  *  was previously thrown in the computed getter
  */
-export const makeSafeComputedGetterByKey = <K, T>(
-    get: (key: K, previous: T | undefined) => T,
-    getMessage?: (key: K) => string
+export const makeSafeComputedGetterByKey = <K, T, E>(
+    get: (key: K, previous: T | undefined, extra: E | undefined) => T,
+    getMessageGenerator?: (key: K) => (e: Error) => string
 ) => {
     const cache = new Map<K, ComputedRef<ComputedResult<T>>>();
-    return (key: K): T => {
+    return (key: K, extra?: E | undefined): T => {
         if (!cache.has(key)) {
             cache.set(
                 key,
@@ -77,9 +92,10 @@ export const makeSafeComputedGetterByKey = <K, T>(
                         () =>
                             get(
                                 key,
-                                previous && previous.type == COMPUTED_RESULT_SUCCESS_TYPE ? previous.value : undefined
+                                previous && previous.type == COMPUTED_RESULT_SUCCESS_TYPE ? previous.value : undefined,
+                                extra
                             ),
-                        getMessage ? getMessage(key) : undefined
+                        getMessageGenerator ? getMessageGenerator(key) : undefined
                     )
                 )
             );
