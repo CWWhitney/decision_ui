@@ -1,19 +1,9 @@
 <script setup lang="ts">
-    import { registerNetworkErrorInterceptor } from "../../rest/interceptors";
-    import { ref } from "vue";
+    import { useSnackbarStore } from "../../state/snackbar";
 
-    const show = ref<boolean>(false);
-
-    registerNetworkErrorInterceptor(() => {
-        show.value = true;
-    });
+    const snackbar = useSnackbarStore();
 </script>
 
 <template>
-    <v-snackbar v-model="show" :timeout="2000" color="error">
-        No connection to server!
-        <template #actions>
-            <v-btn color="white" variant="text" @click="show = false"> Close </v-btn>
-        </template>
-    </v-snackbar>
+    <v-snackbar-queue v-model="snackbar.messages" closable />
 </template>

@@ -39,7 +39,7 @@
             saveModelDialog.saveCurrent();
         }
 
-        // export as file (ctrl + shift + s)
+        // save as file (ctrl + shift + s)
         if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "S") {
             e.preventDefault();
             saveModelDialog.openDialog();

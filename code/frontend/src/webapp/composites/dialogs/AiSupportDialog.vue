@@ -7,9 +7,11 @@
     import AI_PROMPT_GRAMMAR from "../../../../resources/ai_prompt/grammar.md?raw";
     import AI_PROMPT_RESPONSE from "../../../../resources/ai_prompt/response.md?raw";
     import { useGraphStore } from "../../state/graph";
+    import { useSnackbarStore } from "../../state/snackbar";
 
     const aiSupportDialog = useAiSupportDialogStore();
     const graph = useGraphStore();
+    const snackbar = useSnackbarStore();
 
     const includeModel = ref<boolean>(true);
     const userQuery = ref<string>("");
@@ -64,6 +66,7 @@
             userQuery.value;
 
         navigator.clipboard.writeText(aiPrompt);
+        snackbar.addSuccessMessage("Copied AI prompt to clipboard!");
     };
 </script>
 

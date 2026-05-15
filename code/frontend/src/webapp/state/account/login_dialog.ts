@@ -1,11 +1,13 @@
 import { ref, watch } from "vue";
 import { defineStore } from "pinia";
 import { useAccountStore } from ".";
+import { useSnackbarStore } from "../snackbar";
 
 const LOGIN_DIALOG_STORE_ID = "loginDialog";
 
 export const useLoginDialogStore = defineStore(LOGIN_DIALOG_STORE_ID, () => {
     const account = useAccountStore();
+    const snackbar = useSnackbarStore();
 
     const isOpen = ref(false);
     const username = ref<string>("");
@@ -35,6 +37,7 @@ export const useLoginDialogStore = defineStore(LOGIN_DIALOG_STORE_ID, () => {
             username.value,
             password.value,
             () => {
+                snackbar.addSuccessMessage("Successfully logged in!");
                 closeDialog();
             },
             () => {
@@ -48,6 +51,7 @@ export const useLoginDialogStore = defineStore(LOGIN_DIALOG_STORE_ID, () => {
             username.value,
             password.value,
             () => {
+                snackbar.addSuccessMessage("Successfully registered new account!");
                 closeDialog();
             },
             () => {
