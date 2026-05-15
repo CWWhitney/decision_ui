@@ -6,10 +6,12 @@
     import { useComputationStore } from "../../state/computation";
     import { useOpenModelDialogStore } from "../../state/open_model";
     import { useSaveModelDialogStore } from "../../state/save_model_dialog";
+    import { useUnsavedModelDialogStore } from "../..//state/unsaved_model";
     import { useRStore } from "../../state/r";
 
     const openModelDialog = useOpenModelDialogStore();
     const saveModelDialog = useSaveModelDialogStore();
+    const unsavedModelDialog = useUnsavedModelDialogStore();
     const computation = useComputationStore();
     const rStore = useRStore();
     const router = useRouter();
@@ -18,13 +20,17 @@
         // new file (alt + n)
         if (e.altKey && e.key === "n") {
             e.preventDefault();
-            resetState();
+            unsavedModelDialog.openDialog(() => {
+                resetState();
+            });
         }
 
         // open file dialog (ctrl + o)
         if ((e.ctrlKey || e.metaKey) && e.key === "o") {
             e.preventDefault();
-            openModelDialog.openDialog();
+            unsavedModelDialog.openDialog(() => {
+                openModelDialog.openDialog();
+            });
         }
 
         // save current (ctrl + s)

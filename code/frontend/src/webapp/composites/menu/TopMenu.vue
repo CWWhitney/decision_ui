@@ -3,6 +3,7 @@
 
     import { useMetadataStore } from "../../state/metadata";
     import { useAccountStore } from "../../state/account";
+    import { useUnsavedModelDialogStore } from "../..//state/unsaved_model";
 
     import TopHelpMenu from "./TopHelpMenu.vue";
     import TopRunMenu from "./TopRunMenu.vue";
@@ -14,6 +15,7 @@
 
     const metadata = useMetadataStore();
     const account = useAccountStore();
+    const unsavedModelDialog = useUnsavedModelDialogStore();
 
     const route = useRoute();
     const isEditorRoute = route.name == "editor";
@@ -67,7 +69,10 @@
                     </v-btn-group>
                 </div>
             </div>
-            <div>{{ metadata.state.name }}</div>
+            <div class="centerLabel">
+                <span class="modelName">{{ metadata.state.name }}</span>
+                <span class="unsavedHint">{{ unsavedModelDialog.modelIsUnsaved ? "(unsaved)" : "" }}</span>
+            </div>
             <div>
                 <v-btn-group divided>
                     <v-menu>
@@ -128,6 +133,16 @@
 
             .menu {
                 display: flex;
+            }
+
+            .centerLabel {
+                display: flex;
+                gap: 0.5em;
+            }
+
+            .unsavedHint {
+                color: #777;
+                font-style: italic;
             }
         }
 

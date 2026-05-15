@@ -58,6 +58,7 @@ export const getDefaultFunctionState = (variable: string, functionType: NodeFunc
             return {
                 type: ESTIMATE_FUNCTION_TYPE,
                 variable,
+                unit: "",
                 distribution: NORMAL_DISTRIBUTION_TYPE,
                 lower: -1,
                 upper: 1,

@@ -8,6 +8,7 @@ import { useOpenModelDialogStore } from "./open_model";
 import { useAiSupportDialogStore } from "./ai_support";
 import { useErrorDialogStore } from "./error_dialog";
 import { useNodeEditDialogStore } from "./node_edit";
+import { useUnsavedModelDialogStore } from "./unsaved_model";
 
 export const resetState = () => {
     const graph = useGraphStore();
@@ -20,6 +21,7 @@ export const resetState = () => {
     const saveModelDialog = useSaveModelDialogStore();
     const nodeEditDialog = useNodeEditDialogStore();
     const errorDialog = useErrorDialogStore();
+    const unsavedModelDialog = useUnsavedModelDialogStore();
 
     graph.reset();
     editor.reset();
@@ -31,4 +33,5 @@ export const resetState = () => {
     saveModelDialog.reset();
     nodeEditDialog.reset();
     errorDialog.reset();
+    unsavedModelDialog.reset();
 };

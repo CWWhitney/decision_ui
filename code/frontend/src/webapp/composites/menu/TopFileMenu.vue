@@ -6,9 +6,12 @@
     import { useOpenModelDialogStore } from "../../state/open_model";
     import { useSaveModelDialogStore } from "../../state/save_model_dialog";
     import { computed } from "vue";
+    import { useUnsavedModelDialogStore } from "../../state/unsaved_model";
 
     const openModelDialog = useOpenModelDialogStore();
     const saveModelDialog = useSaveModelDialogStore();
+    const unsavedModelDialog = useUnsavedModelDialogStore();
+
     const account = useAccountStore();
     const editor = useEditorStore();
 
@@ -22,14 +25,26 @@
             return "Autosave every 5 Minutes";
         }
     });
+
+    const onNewClick = () => {
+        unsavedModelDialog.openDialog(() => {
+            resetState();
+        });
+    };
+
+    const onOpenClick = () => {
+        unsavedModelDialog.openDialog(() => {
+            openModelDialog.openDialog();
+        });
+    };
 </script>
 
 <template>
     <v-card class="card">
         <v-list class="list">
-            <TopMenuItem title="New" shortcut="ALT + N" @click="resetState" />
+            <TopMenuItem title="New" shortcut="ALT + N" @click="onNewClick" />
             <v-divider />
-            <TopMenuItem title="Open..." shortcut="CTRL + O" @click="openModelDialog.openDialog()" />
+            <TopMenuItem title="Open..." shortcut="CTRL + O" @click="onOpenClick" />
             <TopMenuItem title="Save" shortcut="CTRL + S" @click="saveModelDialog.saveCurrent()" />
             <TopMenuItem title="Save As..." shortcut="CTRL + SHIFT + S" @click="saveModelDialog.openDialog()" />
             <v-divider />
