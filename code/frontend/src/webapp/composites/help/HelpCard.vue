@@ -31,6 +31,7 @@
         "data-tab": "Data Tab",
         "style-tab": "Style Tab",
         "analyze-tab": "Analyze Tab",
+        "ai-support": "AI Support (Experiment)",
         metadata: "Metadata Page",
         windows: "Windows Installation",
         macos: "MacOS Installation",

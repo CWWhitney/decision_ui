@@ -22,10 +22,11 @@
         ["user-interface", "model-editor", "node-edit-dialog", "analyze-tab"],
         ["user-interface", "model-editor", "node-edit-dialog", "style-tab"],
         ["user-interface", "model-editor", "node-edit-dialog", "formula-expression-input"],
-        ["user-interface", "model-editor", "node-edit-dialog", "subgraphs"],
+        ["user-interface", "model-editor", "subgraphs"],
         ["user-interface", "analyze-model"],
         ["user-interface", "estimates-table"],
         ["user-interface", "r-backend"],
+        ["user-interface", "ai-support"],
         ["developer-guide"]
     ];
 </script>

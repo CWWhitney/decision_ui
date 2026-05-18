@@ -1,6 +1,7 @@
 <script setup lang="ts">
     import { ref } from "vue";
     import * as common from "@decision-support-ui/common";
+    import { useRouter } from "vue-router";
 
     import { useAiSupportDialogStore } from "../../state/ai_support";
     import AI_PROMPT_TOOL_DESCRIPTION from "../../../../resources/ai_prompt/tool_description.md?raw";
@@ -12,6 +13,7 @@
     const aiSupportDialog = useAiSupportDialogStore();
     const graph = useGraphStore();
     const snackbar = useSnackbarStore();
+    const router = useRouter();
 
     const includeModel = ref<boolean>(true);
     const userQuery = ref<string>("");
@@ -68,6 +70,11 @@
         navigator.clipboard.writeText(aiPrompt);
         snackbar.addSuccessMessage("Copied AI prompt to clipboard!");
     };
+
+    const openHelpSection = () => {
+        aiSupportDialog.closeDialog();
+        router.push("/help/user-interface/ai-support");
+    };
 </script>
 
 <template>
@@ -82,6 +89,11 @@
             <v-toolbar>
                 <v-toolbar-title>AI Support (Experiment)</v-toolbar-title>
                 <v-toolbar-items>
+                    <v-tooltip location="bottom" text="go to help section" open-delay="500">
+                        <template #activator="{ props }">
+                            <v-btn v-bind="props" icon="mdi-help-circle-outline" @click="openHelpSection" />
+                        </template>
+                    </v-tooltip>
                     <v-btn icon="mdi-close" @click="aiSupportDialog.closeDialog()"></v-btn>
                 </v-toolbar-items>
             </v-toolbar>
