@@ -1,13 +1,29 @@
 # Changelog
 
-## v0.4.0 - tbd
+## v0.4.0 - 2026-05-18
 
 New Features
 
 - Autosaving models to your account every 5 minutes
+- Add warning to nodes with duplicate variable names
+- Allow to save simple unit labels for each node
+- Show warning if formula combines variables with different units
+- Add hint to UI that "edges" refer to the arrows between nodes
+- Show warning if model is not yet saved before losing model
+- Improve save dialog labels and descriptions
+- Compile all help pages into one document for easy quick search
+- Add help section on how to use the AI experiment
+- Add warning in case of cyclic variable dependencies
+- Add warning if variable name matches a reserved name
+- Update autosave menu label and show hint why autosave is not available
+- Show notification whenenver the model is saved as snackbar
 
 Fixes
 
+- Fix app shortcuts for new file on MacOS
+- Fix meta click can be used to select multiple nodes on MacOS
+- Fix pi button did not insert the correct formula expression
+- Fix variable name filter did not correctly filter out special non-letter characters
 - Help buttons of login dialog, open model dialog and save dialog did navigate to incorrect help page
 
 ## v0.3.0 - 2026-04-07
