@@ -1,6 +1,7 @@
 import * as path from "path";
 import express from "express";
 import compress from "compression";
+import cors from "cors";
 import * as http from "http";
 import nocache from "nocache";
 
@@ -31,6 +32,9 @@ export const startServer = async ({
     // setup express
     const app = express();
     const httpServer = http.createServer(app);
+
+    // enable cors
+    app.use(cors());
 
     // enable compression
     app.use(compress());
