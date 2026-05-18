@@ -1,6 +1,6 @@
 {
     "name": "@uni-bonn/decision-support-ui_server",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "description": "webserver hosting decision support ui",
     "main": "build/src/server.js",
     "private": true,
