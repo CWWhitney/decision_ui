@@ -6,6 +6,7 @@
     import { useEditorStore } from "../../state/editor";
     import { useGraphStore } from "../../state/graph";
     import { generateInsertGraphFromClipboard, saveGraphFileToClipboard } from "../../state/io";
+    import { useSnackbarStore } from "../../state/snackbar";
 
     const {
         addSelectedNodes,
@@ -24,6 +25,7 @@
 
     const graph = useGraphStore();
     const editor = useEditorStore();
+    const snackbar = useSnackbarStore();
 
     const insertGraphFromClipboard = generateInsertGraphFromClipboard();
 
@@ -99,15 +101,23 @@
         // cut (ctrl + x)
         if ((e.ctrlKey || e.metaKey) && e.key === "x") {
             e.preventDefault();
-            saveGraphFileToClipboard(getSelectedNodes.value.map(n => n.id));
-            removeEdges(getSelectedEdges.value);
-            removeNodes(getSelectedNodes.value);
+            const nodeIds = getSelectedNodes.value.map(n => n.id);
+            if (nodeIds.length > 0) {
+                saveGraphFileToClipboard(nodeIds);
+                removeEdges(getSelectedEdges.value);
+                removeNodes(getSelectedNodes.value);
+                snackbar.addSuccessMessage(`Successfully extracted ${nodeIds.length} nodes to clipboard!`);
+            }
         }
 
         // copy (ctrl + c)
         if ((e.ctrlKey || e.metaKey) && e.key === "c") {
             e.preventDefault();
-            saveGraphFileToClipboard(getSelectedNodes.value.map(n => n.id));
+            const nodeIds = getSelectedNodes.value.map(n => n.id);
+            if (nodeIds.length > 0) {
+                saveGraphFileToClipboard(nodeIds);
+                snackbar.addSuccessMessage(`Successfully copied ${nodeIds.length} nodes to clipboard!`);
+            }
         }
 
         // copy (ctrl + v)

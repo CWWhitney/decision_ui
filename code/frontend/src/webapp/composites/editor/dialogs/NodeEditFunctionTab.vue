@@ -3,21 +3,30 @@
     import * as common from "@decision-support-ui/common";
 
     import { useGraphStore } from "../../../state/graph";
+    import { useEditorStore } from "../../../state/editor";
 
     import LoopFunctionTab from "../../../components/editor/dialogs/LoopFunctionTab.vue";
     import EstimateFunctionTab from "../../../components/editor/dialogs/EstimateFunctionTab.vue";
     import OperationFunctionTab from "../../../components/editor/dialogs/OperationFunctionTab.vue";
     import DebouncedTextInput from "../../../components/form/DebouncedTextInput.vue";
     import HelpHintWrapper from "../../../components/form/HelpHintWrapper.vue";
+    import type { KnownVariablesInfo } from "../../../components/editor/expression/ExpressionCodeMirror.vue";
 
     const node = defineModel<common.Node>({ required: true });
     const graph = useGraphStore();
+    const editor = useEditorStore();
 
     const knownVariables = computed(() =>
         graph.state.nodes
             .filter(n => n.type == common.VARIABLE_NODE_TYPE)
             .filter(n => n.id != node.value.id)
-            .map(n => n.function.variable)
+            .map(
+                n =>
+                    ({
+                        name: n.function.variable,
+                        unit: n.function.unit
+                    }) as KnownVariablesInfo
+            )
     );
 
     const computationError = computed(() => {
@@ -29,13 +38,21 @@
         return null;
     });
 
+    const variableNameError = computed(() => {
+        return editor.getComputedVariableNameError(node.value.id);
+    });
+
+    const variableUnitWarning = computed(() => {
+        return editor.getComputedVariableUnitWarning(node.value.id);
+    });
+
     const functionType = computed({
         get: () => {
             return node.value.function.type;
         },
-        set: (value: common.NodeFunctionType) => {
+        set: (value: common.VariableNodeFunctionType) => {
             if (node.value.function.type != common.EMPTY_FUNCTION_TYPE) {
-                return (node.value.function = common.getDefaultFunctionState(node.value.function.variable, value));
+                return (node.value.function = common.transitionFunctionState(node.value.function, value));
             }
         }
     });
@@ -46,20 +63,39 @@
         <template v-if="node.function.type != common.EMPTY_FUNCTION_TYPE">
             <p>Define how the value of this node is being calculated and referenced from other nodes:</p>
             <h4>Variable</h4>
-            <HelpHintWrapper to="/help/user-interface/model-editor/node-edit-dialog/function-tab">
-                <template #default>
-                    <DebouncedTextInput
-                        v-model="node.function.variable"
-                        label="Variable Name"
-                        hide-details
-                        :transform="common.generateVariableName"
-                    />
-                </template>
-                <template #tooltip>
-                    The name of the variable representing the result of the calculation defined below. You can reference
-                    this node in other nodes using this variable name.
-                </template>
-            </HelpHintWrapper>
+            <div class="variableDefiniton">
+                <HelpHintWrapper to="/help/user-interface/model-editor/node-edit-dialog/function-tab">
+                    <template #default>
+                        <DebouncedTextInput
+                            v-model="node.function.variable"
+                            label="Variable Name"
+                            hide-details
+                            :transform="common.generateVariableName"
+                        />
+                    </template>
+                    <template #tooltip>
+                        The name of the variable representing the result of the calculation defined below. You can
+                        reference this node in other nodes using this variable name.
+                    </template>
+                </HelpHintWrapper>
+                <v-alert
+                    v-if="!!variableNameError"
+                    type="error"
+                    variant="outlined"
+                    :text="`${variableNameError}`"
+                    class="functionAlert"
+                />
+                <HelpHintWrapper to="/help/user-interface/model-editor/node-edit-dialog/function-tab">
+                    <template #default>
+                        <DebouncedTextInput v-model="node.function.unit" label="Unit of Measurement" hide-details />
+                    </template>
+                    <template #tooltip>
+                        The unit of measurement for the variable, e.g. meter, kilogram, etc. You may choose any value
+                        here. The value is not checked and does not have to be a standard unit. Based on this name, a
+                        warning message is shown in case formulas combine variables of different units of measurement.
+                    </template>
+                </HelpHintWrapper>
+            </div>
         </template>
         <h4>Type</h4>
         <div>
@@ -133,7 +169,14 @@
                 class="functionAlert"
             />
             <v-alert
-                v-if="!computationError"
+                v-if="!computationError && variableUnitWarning"
+                type="info"
+                variant="outlined"
+                :text="`${variableUnitWarning}`"
+                class="functionAlert"
+            />
+            <v-alert
+                v-if="!computationError && !variableNameError"
                 class="functionAlert"
                 type="success"
                 variant="outlined"
@@ -164,5 +207,11 @@
     .functionAlert {
         margin-top: 1em;
         margin-right: 3em;
+    }
+
+    .variableDefiniton {
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
     }
 </style>

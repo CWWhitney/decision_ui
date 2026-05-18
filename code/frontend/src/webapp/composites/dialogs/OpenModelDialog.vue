@@ -72,11 +72,15 @@
                 <v-tabs v-model="openModelDialog.tab" color="primary" direction="vertical">
                     <v-tab
                         prepend-icon="mdi-account-circle"
-                        text="From Account"
+                        text="From Account In Cloud"
                         :value="OPEN_MODEL_FROM_ACCOUNT_TAB"
                         :disabled="!account.isLoggedIn"
                     ></v-tab>
-                    <v-tab prepend-icon="mdi-file-outline" text="From File" :value="OPEN_MODEL_FROM_FILE_TAB"></v-tab>
+                    <v-tab
+                        prepend-icon="mdi-file-outline"
+                        text="From File On Computer"
+                        :value="OPEN_MODEL_FROM_FILE_TAB"
+                    ></v-tab>
                     <v-tab
                         prepend-icon="mdi-lightbulb-outline"
                         text="From Example"

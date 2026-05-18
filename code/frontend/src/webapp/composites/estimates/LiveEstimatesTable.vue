@@ -161,8 +161,15 @@
                     :change="onFieldChange"
                     :field="common.ESTIMATES_CSV_UPPER_HEADER"
                     label="Upper"
-                    width="120px"
+                    width="150px"
                     type="number"
+                />
+                <vue-excel-column
+                    :change="onFieldChange"
+                    :field="common.ESTIMATES_CSV_UNIT_HEADER"
+                    label="Unit"
+                    type="string"
+                    width="120px"
                 />
                 <vue-excel-column
                     :change="onFieldChange"

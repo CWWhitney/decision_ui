@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import * as common from "@decision-support-ui/common";
 import { ref } from "vue";
 import { useValidatedSessionStorage } from "./io";
+import { useSnackbarStore } from "./snackbar";
 
 export const COMPUTATION_STORE_ID = "computation";
 
@@ -36,6 +37,7 @@ const getDefaultComputationState = (): common.ComputationFileState => {
 };
 
 export const useComputationStore = defineStore(COMPUTATION_STORE_ID, () => {
+    const snackbar = useSnackbarStore();
     const validateComputationState = common.validateSchema(common.ComputationFileSchema);
 
     // --- persisted state
@@ -52,6 +54,7 @@ export const useComputationStore = defineStore(COMPUTATION_STORE_ID, () => {
 
     const triggerRecalculation = () => {
         transient.value.seed += 1;
+        snackbar.addInfoMessage("Model is recalculated ...");
     };
 
     const reset = () => {

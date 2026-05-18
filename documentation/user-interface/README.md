@@ -19,3 +19,4 @@ This section describes all user interface elements in detail:
 - [Analyze Model](analyze-model)
 - [Estimates Table](estimates-table)
 - [R Backend](r-backend)
+- [AI Support (Experiment)](ai-support)

@@ -4,45 +4,45 @@ All mathematical expressions in the Decision Support UI tool use the following O
 
 ```
 Arithmetic {
-Exp
+  Exp
     = OrExp
 
-OrExp
+  OrExp
     = OrExp "|" AndExp    -- or
     | AndExp
 
-AndExp
+  AndExp
     = AndExp "&" NegExp   -- and
     | NegExp
 
-NegExp
+  NegExp
     = "!" NegExp          -- not
     | RelExp
 
-RelExp
+  RelExp
     = AddExp relOperation AddExp -- rel
     | AddExp
 
-AddExp
+  AddExp
     = AddExp "+" MulExp  -- plus
     | AddExp "-" MulExp  -- minus
     | MulExp
 
-MulExp
+  MulExp
     = MulExp "*" UnaryExp  -- times
     | MulExp "/" UnaryExp  -- divide
     | MulExp "%" UnaryExp  -- modulo
     | UnaryExp
 
-UnaryExp
+  UnaryExp
     = "-" UnaryExp         -- neg
     | ExpExp
 
-ExpExp
+  ExpExp
     = PriExp "^" ExpExp    -- power
     | PriExp
 
-PriExp
+  PriExp
     = "(" Exp ")"  -- paren
     | IfExp
     | FuncExp
@@ -52,27 +52,27 @@ PriExp
     | variable
     | number
 
-IfExp
+  IfExp
     = "if" "(" Exp ")" Exp "else" Exp
 
-FuncExp
+  FuncExp
     = #(funcName "(") FuncArgs ")"
 
-FuncArgs
+  FuncArgs
     = Exp ("," Exp)*
 
-IndexedVariable
+  IndexedVariable
     = #(variable "[i]")
     | #(variable "[i-1]")
 
-quotedText
+  quotedText
     = "\"" alnum* "\""
     | "'" alnum* "'"
 
-relOperation  (a comparison)
+  relOperation  (a comparison)
     = ">=" | "<=" | ">" | "<" | "==" | "!="
 
-funcName  (a function)
+  funcName  (a function)
     = "chance_event"
     | "vv"
     | "discount"
@@ -95,34 +95,34 @@ funcName  (a function)
     | "max"
     | "mean"
 
-constants
+  constants
     = pi
     | true
     | false
     | null
 
-pi  (pi)
+  pi  (pi)
     = "pi"
 
-true  (true)
+  true  (true)
     = "TRUE"
 
-false  (false)
+  false  (false)
     = "FALSE"
 
-null  (null)
+  null  (null)
     = "NA"
 
-variable  (a variable)
+  variable  (a variable)
     = variableStart variableContinue*
 
-variableStart
+  variableStart
     = letter
 
-variableContinue
+  variableContinue
     = variableStart | digit | "_"
 
-number  (a number)
+  number  (a number)
     = digit* "." digit+  -- fract
     | digit+             -- whole
 }

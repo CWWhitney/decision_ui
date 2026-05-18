@@ -6,9 +6,9 @@ import { EditorFileSchema, EditorFileState } from "./editor";
 import { ComputationFileSchema, ComputationFileState } from "./computation";
 
 export const MODEL_FILE_SCHEMA_NAME = "de.uni-bonn.decision-model/file";
-export const MODEL_FILE_VERSION = 3;
+export const MODEL_FILE_VERSION = 4;
 
-export type ModelFileVersion = 3;
+export type ModelFileVersion = 4;
 export type ModelFileSchemaName = "de.uni-bonn.decision-model/file";
 
 export const ModelFileInfoSchema: Schema = {
@@ -42,9 +42,9 @@ export const ModelFileSchema: Schema = {
 };
 
 export const GRAPH_FILE_SCHEMA_NAME = "de.uni-bonn.decision-model/graph";
-export const GRAPH_FILE_VERSION = 1;
+export const GRAPH_FILE_VERSION = 2;
 
-export type GraphFileVersion = 1;
+export type GraphFileVersion = 2;
 export type GraphFileSchemaName = "de.uni-bonn.decision-model/graph";
 
 export const GraphFileInfoSchema: Schema = {

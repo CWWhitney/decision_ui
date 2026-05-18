@@ -7,6 +7,7 @@ import MetadataPage from "./pages/MetadataPage.vue";
 import AnalyzePage from "./pages/AnalyzePage.vue";
 import EstimatesTablePage from "./pages/EstimatesTablePage.vue";
 import CodePage from "./pages/RPage.vue";
+import HelpAllPage from "./pages/HelpAllPage.vue";
 
 const routes = [
     {
@@ -47,6 +48,11 @@ const routes = [
         path: "/help",
         name: "help",
         component: HelpPage
+    },
+    {
+        path: "/help/all",
+        name: "help-all",
+        component: HelpAllPage
     },
     {
         path: "/help/:path*",

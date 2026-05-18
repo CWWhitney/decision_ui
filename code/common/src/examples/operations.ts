@@ -18,6 +18,7 @@ export const getOperationsExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "Cost",
+                        unit: "",
                         distribution: "posnorm",
                         lower: 50,
                         upper: 200,
@@ -51,6 +52,7 @@ export const getOperationsExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "Benefit",
+                        unit: "",
                         distribution: "posnorm",
                         lower: 100,
                         upper: 150,
@@ -84,6 +86,7 @@ export const getOperationsExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "operation",
                         variable: "Operation",
+                        unit: "",
                         expression: "Benefit - Cost"
                     },
                     visualization: {
@@ -110,6 +113,7 @@ export const getOperationsExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "result",
                         variable: "Profit",
+                        unit: "",
                         expression: "Operation"
                     },
                     visualization: {

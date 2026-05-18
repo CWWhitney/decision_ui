@@ -41,18 +41,18 @@ export const useGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         ) as Map<string, common.NodeId>;
     });
 
-    const getComputedNode = makeSafeComputedGetterByKey<common.NodeId, common.Node>(
+    const getComputedNode = makeSafeComputedGetterByKey<common.NodeId, common.Node, undefined>(
         (nodeId: common.NodeId) => common.getFromMapOrThrow(nodeId, _nodesByIdMap.value),
-        (nodeId: common.NodeId) => `Node with id "${nodeId}" does not exist`
+        (nodeId: common.NodeId) => _e => `Node with id "${nodeId}" does not exist`
     );
 
-    const getComputedNodeIdFromVariableName = makeSafeComputedGetterByKey<string, common.NodeId>(
+    const getComputedNodeIdFromVariableName = makeSafeComputedGetterByKey<string, common.NodeId, undefined>(
         (variableName: string) => common.getFromMapOrThrow(variableName, _nodeIdByVariableMap.value),
-        (variableName: string) => `Variable "${variableName}" is not known`
+        (variableName: string) => _e => `Variable "${variableName}" is not known`
     );
 
     const isNodeIdValid = (nodeId: common.NodeId) => _nodesByIdMap.value.has(nodeId);
-    const isVariableNameValid = (variableName: string) => _nodeIdByVariableMap.value.has(variableName);
+    const isVariableNameKnown = (variableName: string) => _nodeIdByVariableMap.value.has(variableName);
 
     const getComputedNodePosition: (nodeId: common.NodeId) => common.Position = makeSafeComputedGetterByKey(
         (nodeId: common.NodeId) =>
@@ -131,30 +131,36 @@ export const useGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
             common.getExpressionMatchesForNode(getComputedNode(nodeId))
         );
 
-    const getComputedTypedTensor: (nodeId: common.NodeId) => common.TypedTensor = makeSafeComputedGetterByKey(
-        (nodeId: common.NodeId, previousTensor: common.TypedTensor | undefined) => {
-            const started = +new Date();
-            if (previousTensor) {
-                previousTensor.tensor.dispose();
-            }
+    const getComputedTypedTensor: (nodeId: common.NodeId, visitedNodeIds?: string[] | undefined) => common.TypedTensor =
+        makeSafeComputedGetterByKey(
+            (
+                nodeId: common.NodeId,
+                previousTensor: common.TypedTensor | undefined,
+                visitedNodeIds: string[] | undefined
+            ) => {
+                const started = +new Date();
+                if (previousTensor) {
+                    previousTensor.tensor.dispose();
+                }
 
-            const result = common.getTypedTensorForNodeRecursion(
-                nodeId,
-                getComputedNode,
-                getComputedVariableDependencies,
-                getComputedNodeIdFromVariableName,
-                getComputedExpressionMatches,
-                evaluateExpressionMatch,
-                getComputedTypedTensor,
-                {
-                    seed: computationStore.transient.seed,
-                    mcRuns: computationStore.persisted.frontend.mcRuns
-                } as common.ComputationContext
-            );
-            console.log(`calculated tensor for node ${nodeId} in ${+new Date() - started}ms`);
-            return result;
-        }
-    );
+                const result = common.getTypedTensorForNodeRecursion(
+                    nodeId,
+                    visitedNodeIds ? visitedNodeIds : [],
+                    getComputedNode,
+                    getComputedVariableDependencies,
+                    getComputedNodeIdFromVariableName,
+                    getComputedExpressionMatches,
+                    evaluateExpressionMatch,
+                    getComputedTypedTensor,
+                    {
+                        seed: computationStore.transient.seed,
+                        mcRuns: computationStore.persisted.frontend.mcRuns
+                    } as common.ComputationContext
+                );
+                console.log(`calculated tensor for node ${nodeId} in ${+new Date() - started}ms`);
+                return result;
+            }
+        );
 
     const computedEstimateNodes = computed(() => {
         return state.value.nodes.filter(
@@ -247,7 +253,7 @@ export const useGraphStore = defineStore(FLOW_GRAPH_STORE_ID, () => {
         state,
         history,
         computedEstimateNodes,
-        isVariableNameValid,
+        isVariableNameKnown,
         getComputedNodeIdFromVariableName,
         getComputedNodePosition,
         getComputedNode,

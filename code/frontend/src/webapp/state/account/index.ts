@@ -13,6 +13,7 @@ import {
 import { registerUnauthorizedInterceptor } from "../../rest/interceptors";
 import { useErrorDialogStore } from "../error_dialog";
 import { useValidatedSessionStorage } from "../io";
+import { useSnackbarStore } from "../snackbar";
 
 const ACCOUNT_STORE_ID = "account";
 const REFRESH_INTERVAL = 60000; // 60 seconds
@@ -45,6 +46,7 @@ const getDefaultTransientAccountState = () => {
 };
 
 export const useAccountStore = defineStore(ACCOUNT_STORE_ID, () => {
+    const snackbar = useSnackbarStore();
     const validatePersistedAccountState = common.validateSchema(PersistedAccountSchema);
     const doLoginRequest = generateDoLoginRequest();
     const doRefreshRequest = generateDoRefreshRequest();
@@ -121,6 +123,7 @@ export const useAccountStore = defineStore(ACCOUNT_STORE_ID, () => {
         reset();
         if (refreshToken) {
             await doLogoutRequest({ refreshToken });
+            snackbar.addSuccessMessage("Successfully logged out!");
         }
     };
 

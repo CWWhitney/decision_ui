@@ -18,10 +18,11 @@ export const getAppleAgroforestExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "Sheep_Income",
+                        unit: "dollar",
                         distribution: "posnorm",
                         lower: 3000,
                         upper: 5000,
-                        comment: "",
+                        comment: "income per year for sheep farming",
                         isModifiable: true,
                         lowerBounds: [1000, 5000],
                         upperBounds: [2000, 10000],
@@ -51,10 +52,11 @@ export const getAppleAgroforestExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "Apple_Income",
+                        unit: "dollar",
                         distribution: "posnorm",
                         lower: 30000,
                         upper: 60000,
-                        comment: "",
+                        comment: "income per year for apple production and sale",
                         isModifiable: true,
                         lowerBounds: [10000, 50000],
                         upperBounds: [30000, 90000],
@@ -84,10 +86,11 @@ export const getAppleAgroforestExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "Sheep_Cost",
+                        unit: "dollar",
                         distribution: "posnorm",
                         lower: 1000,
                         upper: 2500,
-                        comment: "",
+                        comment: "annual operating and maintenance costs for sheep farming",
                         isModifiable: true,
                         lowerBounds: [100, 2000],
                         upperBounds: [1000, 5000],
@@ -117,10 +120,11 @@ export const getAppleAgroforestExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "Apple_Cost",
+                        unit: "dollar",
                         distribution: "posnorm",
                         lower: 15000,
                         upper: 30000,
-                        comment: "",
+                        comment: "annual operating and maintenance costs for apple production",
                         isModifiable: true,
                         lowerBounds: [5000, 30000],
                         upperBounds: [10000, 50000],
@@ -150,10 +154,11 @@ export const getAppleAgroforestExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "Discount_Rate",
+                        unit: "percent",
                         distribution: "posnorm",
                         lower: 9,
                         upper: 11,
-                        comment: "",
+                        comment: "discount rate used to calculate the net present value",
                         isModifiable: true,
                         lowerBounds: [1, 15],
                         upperBounds: [5, 20],
@@ -183,6 +188,7 @@ export const getAppleAgroforestExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "result",
                         variable: "Both_Gain_NPV",
+                        unit: "dollar",
                         expression:
                             "discount(\n  vv(Sheep_Income + Apple_Income - Sheep_Cost - Apple_Cost, 0, Years), \n  Discount_Rate,\n  TRUE\n)"
                     },
@@ -210,6 +216,7 @@ export const getAppleAgroforestExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "result",
                         variable: "Sheep_Only_Gain_NPV",
+                        unit: "dollar",
                         expression:
                             "discount(\n  vv(Sheep_Income - Sheep_Cost, 0, Years), \n  Discount_Rate,\n  TRUE\n)"
                     },
@@ -237,6 +244,7 @@ export const getAppleAgroforestExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "result",
                         variable: "Decision_Benefit",
+                        unit: "dollar",
                         expression: "Both_Gain_NPV - Sheep_Only_Gain_NPV"
                     },
                     visualization: {
@@ -263,10 +271,11 @@ export const getAppleAgroforestExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "Years",
+                        unit: "time",
                         distribution: "const",
                         lower: 10,
                         upper: 10,
-                        comment: "",
+                        comment: "number of years to simulate",
                         isModifiable: true,
                         lowerBounds: [5, 20],
                         upperBounds: [5, 20],

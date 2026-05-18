@@ -12,6 +12,7 @@ export const ESTIMATES_CSV_VARIABLE_HEADER = "variable";
 export const ESTIMATES_CSV_DISTRIBUTION_HEADER = "distribution";
 export const ESTIMATES_CSV_LOWER_HEADER = "lower";
 export const ESTIMATES_CSV_UPPER_HEADER = "upper";
+export const ESTIMATES_CSV_UNIT_HEADER = "unit";
 export const ESTIMATES_CSV_COMMENT_HEADER = "comment";
 export const ESTIMATES_CSV_NODE_HEADER = "node";
 
@@ -21,6 +22,7 @@ export interface EstimatesTableRow {
     distribution: string;
     lower: number;
     upper: number;
+    unit: string;
     comment: string;
     node: string;
 }
@@ -35,6 +37,7 @@ export const ESTIMATES_CSV_HEADER: (keyof EstimatesTableRow)[] = [
     ESTIMATES_CSV_DISTRIBUTION_HEADER,
     ESTIMATES_CSV_LOWER_HEADER,
     ESTIMATES_CSV_UPPER_HEADER,
+    ESTIMATES_CSV_UNIT_HEADER,
     ESTIMATES_CSV_COMMENT_HEADER,
     ESTIMATES_CSV_NODE_HEADER
 ];
@@ -45,6 +48,7 @@ export const UPDATEDABLE_ESTIMATE_FIELDS: EstimatesTableColumn[] = [
     ESTIMATES_CSV_DISTRIBUTION_HEADER,
     ESTIMATES_CSV_LOWER_HEADER,
     ESTIMATES_CSV_UPPER_HEADER,
+    ESTIMATES_CSV_UNIT_HEADER,
     ESTIMATES_CSV_COMMENT_HEADER
 ];
 
@@ -54,6 +58,7 @@ export const getEstimateTableRowFromNode = (node: EstimateNode) => ({
     distribution: node.function.distribution,
     upper: node.function.upper,
     lower: node.function.lower,
+    unit: node.function.unit,
     comment: node.function.comment,
     node: node.id
 });
@@ -98,6 +103,8 @@ export const updateNodeFromEstimateTableEdit = (
         } else {
             node.function.upper = parseFloat(value);
         }
+    } else if (column == ESTIMATES_CSV_UNIT_HEADER) {
+        node.function.unit = value;
     } else if (column == ESTIMATES_CSV_COMMENT_HEADER) {
         node.function.comment = value;
     } else {

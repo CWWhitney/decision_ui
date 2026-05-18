@@ -18,6 +18,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "n_years",
+                        unit: "time",
                         distribution: "const",
                         lower: 20,
                         upper: 20,
@@ -51,6 +52,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "area_size",
+                        unit: "area",
                         distribution: "const",
                         lower: 1,
                         upper: 1,
@@ -84,6 +86,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "initial_biomass",
+                        unit: "biomass",
                         distribution: "posnorm",
                         lower: 20,
                         upper: 100,
@@ -117,6 +120,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "biomass_after_burning",
+                        unit: "biomass",
                         distribution: "posnorm",
                         lower: 10,
                         upper: 20,
@@ -150,6 +154,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "biomass_after_severe_fire",
+                        unit: "biomass",
                         distribution: "posnorm",
                         lower: 2,
                         upper: 5,
@@ -183,6 +188,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "biomass_after_mild_fire",
+                        unit: "biomass",
                         distribution: "posnorm",
                         lower: 10,
                         upper: 20,
@@ -216,6 +222,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "bio_accu_rate_contr_burn",
+                        unit: "biomass/year",
                         distribution: "posnorm",
                         lower: 10,
                         upper: 40,
@@ -249,6 +256,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "bio_accu_rate_no_contr_burn",
+                        unit: "biomass/year",
                         distribution: "posnorm",
                         lower: 40,
                         upper: 100,
@@ -282,6 +290,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "severity_threshold",
+                        unit: "biomass",
                         distribution: "posnorm",
                         lower: 50,
                         upper: 120,
@@ -315,6 +324,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "discount_rate",
+                        unit: "discount",
                         distribution: "posnorm",
                         lower: 2,
                         upper: 6,
@@ -348,6 +358,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "controlled_burning_frequency",
+                        unit: "per year",
                         distribution: "const",
                         lower: 2,
                         upper: 2,
@@ -381,6 +392,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "fire_risk",
+                        unit: "fire risk",
                         distribution: "tnorm_0_1",
                         lower: 0.1,
                         upper: 0.25,
@@ -414,6 +426,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "cost_of_controlled_burning",
+                        unit: "dollar",
                         distribution: "posnorm",
                         lower: 300,
                         upper: 1000,
@@ -447,6 +460,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "env_imp_severe_fire",
+                        unit: "dollar",
                         distribution: "posnorm",
                         lower: 1000,
                         upper: 6000,
@@ -480,6 +494,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "env_imp_mild_fire",
+                        unit: "dollar",
                         distribution: "norm",
                         lower: -500,
                         upper: 800,
@@ -513,6 +528,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "fire_fighting_cost_mild_fire",
+                        unit: "dollar",
                         distribution: "posnorm",
                         lower: 100,
                         upper: 500,
@@ -546,6 +562,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "fire_fighting_cost_severe_fire",
+                        unit: "dollar",
                         distribution: "posnorm",
                         lower: 1000,
                         upper: 10000,
@@ -579,6 +596,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "operation",
                         variable: "Fire",
+                        unit: "binary",
                         expression: "chance_event(fire_risk, 1, 0, n_years)"
                     },
                     visualization: {
@@ -605,6 +623,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "loop",
                         variable: "Controlled",
+                        unit: "binary",
                         iterationsExpression: "n_years",
                         initExpression: "0",
                         loopExpression: "i % controlled_burning_frequency == 0"
@@ -633,6 +652,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "loop",
                         variable: "No_Control_Biomass",
+                        unit: "biomass",
                         iterationsExpression: "n_years",
                         initExpression: "initial_biomass",
                         loopExpression:
@@ -662,6 +682,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "loop",
                         variable: "Control_Biomass",
+                        unit: "biomass",
                         iterationsExpression: "n_years",
                         initExpression: "initial_biomass",
                         loopExpression:
@@ -691,6 +712,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "loop",
                         variable: "No_Control_Firefighting_Cost",
+                        unit: "dollar",
                         iterationsExpression: "n_years",
                         initExpression: "0",
                         loopExpression:
@@ -720,6 +742,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "loop",
                         variable: "No_Control_Environment_Costs",
+                        unit: "dollar",
                         iterationsExpression: "n_years",
                         initExpression: "0",
                         loopExpression:
@@ -749,6 +772,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "operation",
                         variable: "No_Control_Bottom_Line",
+                        unit: "dollar",
                         expression: "-(No_Control_Firefighting_Cost + No_Control_Environment_Costs) * area_size"
                     },
                     visualization: {
@@ -775,6 +799,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "loop",
                         variable: "Control_Treatment_Costs",
+                        unit: "dollar",
                         iterationsExpression: "n_years",
                         initExpression: "0",
                         loopExpression: "Controlled[i] * cost_of_controlled_burning"
@@ -803,6 +828,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "loop",
                         variable: "Control_Firefighting_Costs",
+                        unit: "dollar",
                         iterationsExpression: "n_years",
                         initExpression: "0",
                         loopExpression:
@@ -832,6 +858,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "loop",
                         variable: "Control_Environment_Costs",
+                        unit: "dollar",
                         iterationsExpression: "n_years",
                         initExpression: "0",
                         loopExpression:
@@ -861,6 +888,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "operation",
                         variable: "Control_Bottom_Line",
+                        unit: "dollar",
                         expression:
                             "- (Control_Treatment_Costs + Control_Firefighting_Costs + Control_Environment_Costs) * area_size"
                     },
@@ -888,6 +916,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "operation",
                         variable: "Bottom_Line_Difference",
+                        unit: "dollar",
                         expression: "Control_Bottom_Line - No_Control_Bottom_Line"
                     },
                     visualization: {
@@ -914,6 +943,7 @@ export const getWildfireExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "result",
                         variable: "NPV_Controlled_Burning",
+                        unit: "dollar",
                         expression: "discount(Bottom_Line_Difference, discount_rate, TRUE)"
                     },
                     visualization: {

@@ -1,12 +1,13 @@
 <script lang="ts" setup>
     import { ref } from "vue";
     import ExpressionInput from "../expression/ExpressionInput.vue";
+    import type { KnownVariablesInfo } from "../expression/ExpressionCodeMirror.vue";
 
     const model = defineModel<boolean>();
 
     const props = withDefaults(
         defineProps<{
-            knownVariables?: string[];
+            knownVariables?: KnownVariablesInfo[];
         }>(),
         {
             knownVariables: () => []

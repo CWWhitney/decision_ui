@@ -9,7 +9,7 @@
     import ValueVarierExpressionDialog from "../dialogs/ValueVarierExpressionDialog.vue";
     import DiscountExpressionDialog from "../dialogs/DiscountExpressionDialog.vue";
     import IfExpressionDialog from "../dialogs/IfExpressionDialog.vue";
-    import ExpressionCodeMirror from "./ExpressionCodeMirror.vue";
+    import ExpressionCodeMirror, { type KnownVariablesInfo } from "./ExpressionCodeMirror.vue";
 
     const expression = defineModel<string>({
         required: true
@@ -22,7 +22,7 @@
             showToolbar?: boolean;
             hint?: string;
             focusedRows?: number;
-            knownVariables?: string[];
+            knownVariables?: KnownVariablesInfo[];
             disabled?: boolean;
         }>(),
         {
@@ -285,8 +285,8 @@
         },
         {
             icon: "mdi-pi",
-            expression: "mathematical constant pi",
-            tooltip: "pi"
+            expression: "pi",
+            tooltip: "mathematical constant pi"
         }
     ];
 

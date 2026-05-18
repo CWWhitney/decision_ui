@@ -4,6 +4,7 @@
     import LoginDialog from "../dialogs/LoginDialog.vue";
     import OpenModelDialog from "../dialogs/OpenModelDialog.vue";
     import SaveModelDialog from "../dialogs/SaveModelDialog.vue";
+    import UnsavedModelDialog from "../dialogs/UnsavedModelDialog.vue";
 </script>
 
 <template>
@@ -12,4 +13,5 @@
     <AiSupportDialog />
     <LoginDialog />
     <ErrorDialog />
+    <UnsavedModelDialog />
 </template>

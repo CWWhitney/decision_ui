@@ -9,6 +9,8 @@ import { useAccountStore } from "./account";
 import { downloadModelFile, getModelFileFromState, useValidatedSessionStorage } from "./io";
 import { useErrorDialogStore } from "./error_dialog";
 import { useEditorStore } from "./editor";
+import { useSnackbarStore } from "./snackbar";
+import { useUnsavedModelDialogStore } from "./unsaved_model";
 
 export const SAVE_MODEL_TO_ACCOUNT_TAB = "account";
 export const SAVE_MODEL_TO_FILE_TAB = "file";
@@ -60,6 +62,8 @@ export const useSaveModelDialogStore = defineStore(SAVE_MODEL_DIALOG_STORE_ID, (
     const account = useAccountStore();
     const errorDialog = useErrorDialogStore();
     const editor = useEditorStore();
+    const snackbar = useSnackbarStore();
+    const unsavedModelDialog = useUnsavedModelDialogStore();
     const doAddModelRequest = generateAddModelRequest();
     const doUpdateModelRequest = generateUpdateModelRequest();
     const validateSaveModelDialogPersistedState = common.validateSchema(SaveModelDialogPersistedSchema);
@@ -92,13 +96,15 @@ export const useSaveModelDialogStore = defineStore(SAVE_MODEL_DIALOG_STORE_ID, (
 
     const saveCurrent = (fallbackToDialog = true) => {
         const accessToken = account.transient.accessToken;
-        if (persisted.value.modelId != null && accessToken) {
+        const modelId = persisted.value.modelId;
+        if (modelId != null && accessToken) {
             doUpdateModelRequest({
                 accessToken,
-                modelId: persisted.value.modelId,
+                modelId,
                 modelfile: getModelFileFromState(),
                 onSuccess: () => {
-                    //
+                    snackbar.addSuccessMessage("Model saved successfully!");
+                    unsavedModelDialog.markModelAsSaved();
                 },
                 onError: (message: string) => {
                     errorDialog.openDialog(
@@ -120,6 +126,8 @@ export const useSaveModelDialogStore = defineStore(SAVE_MODEL_DIALOG_STORE_ID, (
                 accessToken,
                 modelfile: getModelFileFromState(),
                 onSuccess(newModelId) {
+                    snackbar.addSuccessMessage("Model saved successfully!");
+                    unsavedModelDialog.markModelAsSaved();
                     setModelId(newModelId);
                     closeDialog();
                 },
@@ -161,6 +169,16 @@ export const useSaveModelDialogStore = defineStore(SAVE_MODEL_DIALOG_STORE_ID, (
                 transient.value.autosaveInterval = setInterval(() => {
                     saveCurrent(false);
                 }, AUTOSAVE_INTERVAL);
+            }
+        }
+    );
+
+    // reset model id if logged out
+    watch(
+        () => account.isLoggedIn,
+        loggedIn => {
+            if (!loggedIn) {
+                persisted.value.modelId = null;
             }
         }
     );

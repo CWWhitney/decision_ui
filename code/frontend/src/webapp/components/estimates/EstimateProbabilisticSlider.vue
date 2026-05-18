@@ -20,6 +20,7 @@
     const combinedMin = computed(() =>
         Math.min(node.value.function.lowerBounds[0], node.value.function.upperBounds[0])
     );
+
     const combinedMax = computed(() =>
         Math.max(node.value.function.lowerBounds[1], node.value.function.upperBounds[1])
     );
@@ -28,7 +29,8 @@
 <template>
     <div class="probabilisticEstimateSliderContainer">
         <div class="labelRow">
-            <span>{{ node.visualization.title }}</span>
+            <span class="nodeLabel">{{ node.visualization.title }}</span>
+            <span class="unitLabel">{{ node.function.unit }}</span>
         </div>
         <div class="sliderRow">
             <span>{{ combinedMin }}</span>
@@ -52,8 +54,19 @@
 
 <style lang="scss" scoped>
     .labelRow {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .nodeLabel {
         font-weight: 400;
         font-size: 13pt;
+    }
+
+    .unitLabel {
+        font-style: italic;
+        color: #777;
     }
 
     .sliderRow {

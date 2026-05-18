@@ -8,6 +8,7 @@
 
     import ExpressionInput from "../expression/ExpressionInput.vue";
     import HelpHintWrapper from "../../form/HelpHintWrapper.vue";
+    import type { KnownVariablesInfo } from "../expression/ExpressionCodeMirror.vue";
 
     const node = defineModel<AbstractNode<VariableNodeType, OperationNodeFunctionState | ResultNodeFunctionState, any>>(
         {
@@ -17,7 +18,7 @@
 
     const props = withDefaults(
         defineProps<{
-            knownVariables?: string[];
+            knownVariables?: KnownVariablesInfo[];
         }>(),
         {
             knownVariables: () => []

@@ -7,6 +7,7 @@ import { generateCalculateEvpiRequest, generateCalculateResultHistogramRequest }
 import { useAccountStore } from "./account";
 import { useErrorDialogStore } from "./error_dialog";
 import { useComputationStore } from "./computation";
+import { useSnackbarStore } from "./snackbar";
 
 const R_STORE_ID = "rCode";
 
@@ -54,6 +55,7 @@ const getDefaultState = (): RStoreState => {
 };
 
 export const useRStore = defineStore(R_STORE_ID, () => {
+    const snackbar = useSnackbarStore();
     const getRCodeForExpression = common.getExpressionRCodeGenerator();
     const doCalculateResultHistogramRequest = generateCalculateResultHistogramRequest();
     const doCalculateEvpiRequest = generateCalculateEvpiRequest();
@@ -154,6 +156,7 @@ export const useRStore = defineStore(R_STORE_ID, () => {
                 onSuccess: (data: common.CalculateResultHistogramData) => {
                     state.value.resultHistogram.status = R_EXECUTION_SUCCESS;
                     state.value.resultHistogram.data = data;
+                    snackbar.addSuccessMessage("Successfully calculated result histogram!");
                 },
                 onFailed: (error: common.RExecutionError) => {
                     state.value.resultHistogram.status = R_EXECUTION_FAILED;
@@ -191,6 +194,7 @@ export const useRStore = defineStore(R_STORE_ID, () => {
                 onSuccess: (data: common.CalculateEvpiData) => {
                     state.value.evpi.status = R_EXECUTION_SUCCESS;
                     state.value.evpi.data = data;
+                    snackbar.addSuccessMessage("EVPI successfully calculated!");
                 },
                 onFailed: (error: common.RExecutionError) => {
                     state.value.evpi.status = R_EXECUTION_FAILED;

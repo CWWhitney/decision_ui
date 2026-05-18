@@ -6,25 +6,31 @@
     import { useComputationStore } from "../../state/computation";
     import { useOpenModelDialogStore } from "../../state/open_model";
     import { useSaveModelDialogStore } from "../../state/save_model_dialog";
+    import { useUnsavedModelDialogStore } from "../..//state/unsaved_model";
     import { useRStore } from "../../state/r";
 
     const openModelDialog = useOpenModelDialogStore();
     const saveModelDialog = useSaveModelDialogStore();
+    const unsavedModelDialog = useUnsavedModelDialogStore();
     const computation = useComputationStore();
     const rStore = useRStore();
     const router = useRouter();
 
     const onKeyDown = (e: KeyboardEvent) => {
-        // new file (alt + n)
-        if (e.altKey && e.key === "n") {
-            e.preventDefault();
-            resetState();
-        }
-
         // open file dialog (ctrl + o)
         if ((e.ctrlKey || e.metaKey) && e.key === "o") {
             e.preventDefault();
-            openModelDialog.openDialog();
+            unsavedModelDialog.openDialog(() => {
+                openModelDialog.openDialog();
+            });
+        }
+
+        // new file (ctrl + shift + o)
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "O") {
+            e.preventDefault();
+            unsavedModelDialog.openDialog(() => {
+                resetState();
+            });
         }
 
         // save current (ctrl + s)
@@ -39,7 +45,7 @@
             saveModelDialog.saveCurrent();
         }
 
-        // export as file (ctrl + shift + s)
+        // save as file (ctrl + shift + s)
         if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "S") {
             e.preventDefault();
             saveModelDialog.openDialog();

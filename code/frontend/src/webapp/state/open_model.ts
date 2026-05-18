@@ -7,6 +7,7 @@ import { useErrorDialogStore } from "./error_dialog";
 import { useAccountStore } from "./account";
 import { generateDeleteModelRequest, generateGetModelRequest, generateListModelsRequest } from "../rest/models";
 import { useSaveModelDialogStore } from "./save_model_dialog";
+import { useUnsavedModelDialogStore } from "./unsaved_model";
 
 export const OPEN_MODEL_FROM_ACCOUNT_TAB = "account";
 export const OPEN_MODEL_FROM_FILE_TAB = "file";
@@ -30,6 +31,7 @@ export const useOpenModelDialogStore = defineStore(OPEN_MODEL_DIALOG_STORE_ID, (
     const account = useAccountStore();
     const errorDialog = useErrorDialogStore();
     const saveModelDialog = useSaveModelDialogStore();
+    const unsavedModelDialog = useUnsavedModelDialogStore();
     const validateModelFile = common.validateSchema(common.ModelFileSchema);
     const doListModelsRequest = generateListModelsRequest();
     const doGetModelRequest = generateGetModelRequest();
@@ -108,6 +110,9 @@ export const useOpenModelDialogStore = defineStore(OPEN_MODEL_DIALOG_STORE_ID, (
                 onSuccess: (modelId: number, modelfile: common.ModelFileState) => {
                     loadModelFileToState(modelId, modelfile);
                     closeDialog();
+                    setTimeout(() => {
+                        unsavedModelDialog.markModelAsSaved();
+                    }, 100);
                 },
                 onError: (message: string) => {
                     errorDialog.openDialog(

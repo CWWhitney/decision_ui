@@ -2,20 +2,49 @@
     import { useEditorStore } from "../../state/editor";
     import TopMenuItem from "../../components/menu/TopMenuItem.vue";
     import { resetState } from "../../state";
+    import { useAccountStore } from "../../state/account";
     import { useOpenModelDialogStore } from "../../state/open_model";
     import { useSaveModelDialogStore } from "../../state/save_model_dialog";
+    import { computed } from "vue";
+    import { useUnsavedModelDialogStore } from "../../state/unsaved_model";
 
     const openModelDialog = useOpenModelDialogStore();
     const saveModelDialog = useSaveModelDialogStore();
+    const unsavedModelDialog = useUnsavedModelDialogStore();
+
+    const account = useAccountStore();
     const editor = useEditorStore();
+
+    const autosaveTitle = computed(() => {
+        if (!account.isLoggedIn) {
+            return "Autosave unavailable (login required)";
+        } else {
+            if (!saveModelDialog.isAutosaveAvailable) {
+                return "Autosave unavailable (model needs to be saved once)";
+            }
+            return "Autosave every 5 Minutes";
+        }
+    });
+
+    const onNewClick = () => {
+        unsavedModelDialog.openDialog(() => {
+            resetState();
+        });
+    };
+
+    const onOpenClick = () => {
+        unsavedModelDialog.openDialog(() => {
+            openModelDialog.openDialog();
+        });
+    };
 </script>
 
 <template>
     <v-card class="card">
         <v-list class="list">
-            <TopMenuItem title="New" shortcut="ALT + N" @click="resetState" />
+            <TopMenuItem title="New" shortcut="CTRL + SHIFT + O" @click="onNewClick" />
             <v-divider />
-            <TopMenuItem title="Open..." shortcut="CTRL + O" @click="openModelDialog.openDialog()" />
+            <TopMenuItem title="Open..." shortcut="CTRL + O" @click="onOpenClick" />
             <TopMenuItem title="Save" shortcut="CTRL + S" @click="saveModelDialog.saveCurrent()" />
             <TopMenuItem title="Save As..." shortcut="CTRL + SHIFT + S" @click="saveModelDialog.openDialog()" />
             <v-divider />
@@ -24,7 +53,7 @@
                 :disabled="!saveModelDialog.isAutosaveAvailable"
                 @click="editor.toggleAutosave"
             >
-                <template #title>Autosave every 5 Minutes</template>
+                <template #title>{{ autosaveTitle }}</template>
                 <template #append>
                     <v-switch
                         v-model="editor.persisted.autosave"
@@ -40,4 +69,8 @@
     </v-card>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+    .autosaveToggle :deep(.v-list-item__content) {
+        margin-right: 1em;
+    }
+</style>

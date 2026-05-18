@@ -9,7 +9,7 @@ You may change the parameter of an estimate by double-clicking on the correspond
 The table contains the following columns:
 
 - `Label` \
-  the node title that is show as a label in the work space of the model editor
+  The node title that is shown as a label in the work space of the model editor.
 - `Variable Name` \
   The variable name that is used for this node both in other formula expressions and in the generated R code.
 - `Distribution` \
@@ -21,6 +21,8 @@ The table contains the following columns:
 - `Upper` \
   Upper bound of the 90% confidence interval, i.e., the 95%-[quantile](https://en.wikipedia.org/wiki/Quantile)
   of the distribution
+- `Unit` \
+  The unit of measurement for this variable
 - `Comment` \
   A comment that describes the estimate in more detail.
 

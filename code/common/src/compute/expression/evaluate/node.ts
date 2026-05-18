@@ -81,7 +81,11 @@ export const getExpressionMatchesForOperationFunction = (
             expressionMatch: matchExpression(node.function.expression)
         };
     } catch (e) {
-        throw new Error(`${e.message} for node '${node.visualization.title}'`);
+        if (e instanceof Error) {
+            throw new Error(`${e.message} for node '${node.visualization.title}'`);
+        } else {
+            throw new Error(`${e} for node '${node.visualization.title}'`);
+        }
     }
 };
 
@@ -103,7 +107,11 @@ export const getExpressionMatchesForLoopFunction = (
             loopExpressionMatch: matchExpression(node.function.loopExpression)
         };
     } catch (e) {
-        throw new Error(`${e.message} for node '${node.visualization.title}'`);
+        if (e instanceof Error) {
+            throw new Error(`${e.message} for node '${node.visualization.title}'`);
+        } else {
+            throw new Error(`${e} for node '${node.visualization.title}'`);
+        }
     }
 };
 
@@ -120,7 +128,11 @@ export const getExpressionMatchesForResultFunction = (
             expressionMatch: matchExpression(node.function.expression)
         };
     } catch (e) {
-        throw new Error(`${e.message} for node '${node.visualization.title}'`);
+        if (e instanceof Error) {
+            throw new Error(`${e.message} for node '${node.visualization.title}'`);
+        } else {
+            throw new Error(`${e} for node '${node.visualization.title}'`);
+        }
     }
 };
 
@@ -181,11 +193,12 @@ export const getTypedTensorForEstimateNode = (
 
 export const getTypedTensorForNodeWithExpression = (
     node: AbstractNode<VariableNodeType, OperationNodeFunctionState | ResultNodeFunctionState, any>,
+    visitedNodeIds: string[],
     expressionMatches: OperationFunctionExpressionMatches | ResultFunctionExpressionMatches,
     getVariableDependencies: (nodeId: string) => VariableDependencies,
     getNodeIdForVariable: (variable: string) => NodeId,
     evaluateExpressionMatches: (match: SucceededMatchResult, expressionContext: ExpressionTensorContext) => TypedTensor,
-    getTypedTensorForNode: (nodeId: string) => TypedTensor,
+    getTypedTensorForNode: (nodeId: string, visitedNodeIds: string[]) => TypedTensor,
     computationContext: ComputationContext
 ): TypedTensor => {
     const expressionContext: ExpressionTensorContext = {
@@ -194,20 +207,30 @@ export const getTypedTensorForNodeWithExpression = (
         index: null
     };
     for (const variable of getVariableDependencies(node.id)) {
-        expressionContext.tensorByVariable[variable] = getTypedTensorForNode(getNodeIdForVariable(variable));
+        const variableNodeId = getNodeIdForVariable(variable);
+        if (visitedNodeIds.includes(variableNodeId)) {
+            throw new Error(
+                `Cyclic variable dependency detected. Please make sure there are no ` +
+                    `infinite loops in your expressions (e.g., node A depends on node B, which depends on node A)`
+            );
+        }
+        expressionContext.tensorByVariable[variable] = getTypedTensorForNode(variableNodeId, [
+            ...visitedNodeIds,
+            node.id
+        ]);
     }
-
     return tf.tidy(() => evaluateExpressionMatches(expressionMatches.expressionMatch, expressionContext));
 };
 
 export const getTypedTensorForLoopOperationNode = (
     node: AbstractNode<VariableNodeType, LoopNodeFunctionState, any>,
+    visitedNodeIds: string[],
     expressionMatches: LoopFunctionExpressionMatches,
     getNode: (nodeId: string) => Node,
     getVariableDependencies: (nodeId: string) => VariableDependencies,
     getNodeIdForVariable: (variable: string) => NodeId,
     evaluateExpressionMatch: (match: SucceededMatchResult, expressionContext: ExpressionTensorContext) => TypedTensor,
-    getTypedTensorForNode: (nodeId: string) => TypedTensor,
+    getTypedTensorForNode: (nodeId: string, visitedNodeIds: string[]) => TypedTensor,
     computationContext: ComputationContext
 ): TypedTensor => {
     const expressionContext: ExpressionTensorContext = {
@@ -217,7 +240,17 @@ export const getTypedTensorForLoopOperationNode = (
     };
     // determine all required variable values as tensors
     for (const variable of getVariableDependencies(node.id)) {
-        expressionContext.tensorByVariable[variable] = getTypedTensorForNode(getNodeIdForVariable(variable));
+        const variableNodeId = getNodeIdForVariable(variable);
+        if (visitedNodeIds.includes(variableNodeId)) {
+            throw new Error(
+                `Cyclic variable dependency detected. Please make sure there are no ` +
+                    `infinite loops in your expressions (e.g., node A depends on node B, which depends on node A)`
+            );
+        }
+        expressionContext.tensorByVariable[variable] = getTypedTensorForNode(variableNodeId, [
+            ...visitedNodeIds,
+            node.id
+        ]);
     }
 
     // evaluate iterations expression
@@ -297,12 +330,13 @@ export const getTypedTensorForLoopOperationNode = (
 
 export const getTypedTensorForNodeRecursion = (
     nodeId: string,
+    visitedNodeIds: string[],
     getNode: (nodeId: string) => Node,
     getVariableDependencies: (nodeId: string) => VariableDependencies,
     getNodeIdForVariable: (variable: string) => NodeId,
     getExpressionMatchesForNode: (nodeId: string) => NodeFunctionExpressionMatches,
     evaluateExpressionMatch: (match: SucceededMatchResult, expressionContext: ExpressionTensorContext) => TypedTensor,
-    getTypedTensorForNode: (nodeId: string) => TypedTensor,
+    getTypedTensorForNode: (nodeId: string, visitedNodeIds: string[]) => TypedTensor,
     computationContext: ComputationContext
 ): TypedTensor => {
     const node = getNode(nodeId);
@@ -314,6 +348,7 @@ export const getTypedTensorForNodeRecursion = (
     } else if (node.function.type == OPERATION_FUNCTION_TYPE || node.function.type == RESULT_FUNCTION_TYPE) {
         return getTypedTensorForNodeWithExpression(
             node as AbstractNode<VariableNodeType, OperationNodeFunctionState | ResultNodeFunctionState, any>,
+            visitedNodeIds,
             getExpressionMatchesForNode(nodeId) as OperationFunctionExpressionMatches | ResultFunctionExpressionMatches,
             getVariableDependencies,
             getNodeIdForVariable,
@@ -324,6 +359,7 @@ export const getTypedTensorForNodeRecursion = (
     } else if (node.function.type == LOOP_FUNCTION_TYPE) {
         return getTypedTensorForLoopOperationNode(
             node as AbstractNode<VariableNodeType, LoopNodeFunctionState, any>,
+            visitedNodeIds,
             getExpressionMatchesForNode(nodeId) as LoopFunctionExpressionMatches,
             getNode,
             getVariableDependencies,

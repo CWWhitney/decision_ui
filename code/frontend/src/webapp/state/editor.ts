@@ -13,6 +13,7 @@ import * as common from "@decision-support-ui/common";
 import { useGraphStore } from "./graph";
 import { getHandlePositions } from "../common/layout";
 import { useValidatedSessionStorage } from "./io";
+import { makeSafeComputedGetterByKey } from "../common/computed";
 
 export const EDITOR_STORE_ID = "editor";
 
@@ -48,6 +49,17 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
     );
 
     // computed
+
+    const _computedNodeNamesWithVariableDuplicates = computed(() =>
+        common.fromEntriesGrouped(
+            common
+                .findDuplicatesBy(
+                    graphStore.state.nodes.filter(n => n.type == common.VARIABLE_NODE_TYPE),
+                    n => n.function.variable
+                )
+                .map(n => [n.function.variable, n.visualization.title])
+        )
+    );
 
     const computedVisibleNodes = computed(() =>
         common.filterNodesVisibleInSubgraph(transient.value.subgraphId, graphStore.state.nodes)
@@ -105,7 +117,7 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
         const computationEdges = common.getComputationEdges(
             graphStore.state.nodes,
             graphStore.getComputedVariableDependencies,
-            graphStore.isVariableNameValid,
+            graphStore.isVariableNameKnown,
             graphStore.getComputedNodeIdFromVariableName
         );
 
@@ -159,6 +171,41 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
         }
         return null;
     });
+
+    const getComputedVariableNameError: (nodeId: common.NodeId) => string | null = makeSafeComputedGetterByKey(
+        (nodeId: common.NodeId) => {
+            const node = graphStore.getComputedNode(nodeId);
+            if (node.type == common.VARIABLE_NODE_TYPE) {
+                return common.getVariableNameError(
+                    node.function.variable,
+                    _computedNodeNamesWithVariableDuplicates.value
+                );
+            }
+            return null;
+        }
+    );
+
+    const getComputedVariableUnitWarning: (nodeId: common.NodeId) => string | null = makeSafeComputedGetterByKey(
+        (nodeId: common.NodeId) => {
+            const node = graphStore.getComputedNode(nodeId);
+            if (node.type == common.VARIABLE_NODE_TYPE) {
+                const variableDependencies = graphStore.getComputedVariableDependencies(nodeId);
+                const dependentNodes = variableDependencies.map(v =>
+                    graphStore.getComputedNode(graphStore.getComputedNodeIdFromVariableName(v))
+                );
+                const dependentUnits = new Set(
+                    dependentNodes
+                        .map(n => (n.type == common.VARIABLE_NODE_TYPE ? n.function.unit : ""))
+                        .filter(d => d !== "")
+                );
+                if (dependentUnits.size > 1) {
+                    const unitString = [...dependentUnits].map(u => `'${u}'`).join(", ");
+                    return `This formula combines variables with different units of measurement: ${unitString}.`;
+                }
+            }
+            return null;
+        }
+    );
 
     // actions
 
@@ -279,6 +326,8 @@ export const useEditorStore = defineStore(EDITOR_STORE_ID, () => {
         computedVueFlowNodes,
         computedVueFlowEdges,
         computedSubgraphTitle,
+        getComputedVariableNameError,
+        getComputedVariableUnitWarning,
         toggleLocked,
         toggleSnapToGrid,
         toggleAutoAddComputationEdges,

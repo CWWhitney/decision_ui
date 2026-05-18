@@ -122,9 +122,9 @@ The file menu provides the following functions:
 - "Reset Zoom" - set zoom level to its default value
 - "Lock Graph" / "Unlock Graph" - disallow and allow modifying the model
 - "Enable Free Movement" / "Enable Snap-to-Grid" - disable and enable the snap-to-grid function
-- "Change Edge Style" - toggle between different edge visualization styles
+- "Change Arrow (Edge) Style" - toggle between different arrow visualization styles
 - "Change Background" - toggle between different background styles
-- "Disable Auto-Connect Nodes" / "Enable Auto-Connect Nodes" - disable and enable automatically adding edges between nodes that are computational dependencies (meaning, a node references another node's variable)
+- "Disable Auto-Connect Nodes" / "Enable Auto-Connect Nodes" - disable and enable automatically adding arrows (edges) between nodes that are computational dependencies (meaning, a node references another node's variable)
 
 ## Run Menu
 

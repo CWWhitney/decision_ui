@@ -26,7 +26,7 @@ Inside the work space, you may:
 - move a node around by holding the left mouse button
 - select multiple nodes by holding the `CTRL` key and clicking each node individually
 - select multiple nodes by holding the `SHIFT` key and drawing a box around the nodes
-- remove a node or edge by selecting it and pressing the `BACKSPACE` key
+- remove a node or arrow (edge) by selecting it and pressing the `BACKSPACE` key
 
 ## Node Palette
 
@@ -90,31 +90,31 @@ You may change the dimensions of a node by selecting it, and then dragging one o
 
 ![Node Toolbar](./node-resize.webp)
 
-## Adding Edges
+## Adding Arrows (Edges)
 
-There are two types of edges:
+There are two types of arrows:
 
-- manually drawn edges between nodes (dashed lines)
-- automatically deduced edges between nodes (solid lines)
+- manually drawn arrows between nodes (dashed lines)
+- automatically deduced arrows between nodes (solid lines)
 
-You can manually draw edges between nodes by hovering over specific sections on the border of a node. Hovering over
+You can manually draw arrows between nodes by hovering over specific sections on the border of a node. Hovering over
 these special sections will cause the mouse cursor to change into a cross or plus sign:
 
 ![Node Toolbar](./node-edge-handles.webp)
 
-Then, you can click and drag your mouse towards another node, which will create the edge:
+Then, you can click and drag your mouse towards another node, which will create the arrow:
 
 ![Node Toolbar](./node-edge-drop.webp)
 
-You can remove a manual edge by selecting it with a left mouse click and confirming the removal by pressing the `BACKSPACE` key.
+You can remove a manual arrow by selecting it with a left mouse click and confirming the removal by pressing the `BACKSPACE` key.
 
-## Automatic Edges between Nodes
+## Automatic Arrows between Nodes
 
-Usually, you do not need to manually draw edges between nodes. Edges are automatically inferred based on whether one node references another node in its function definition. In rare circumstances, it might be useful to manually draw an edge between two nodes, e.g., to highlight a conceptual dependency, even if there is no actual computational dependency present between these nodes.
+Usually, you do not need to manually draw arrows between nodes. Arrows are automatically inferred based on whether one node references another node in its function definition. In rare circumstances, it might be useful to manually draw an arrow between two nodes, e.g., to highlight a conceptual dependency, even if there is no actual computational dependency present between these nodes.
 
-If both a manual edge and automatic edge is available, drawing the automatic edge is prioritized. However, the manual edge is still remembered. If the function definition of those nodes changes, the automatic edge might disappear and the manual edge might be shown instead.
+If both a manual arrow and automatic arrow is available, drawing the automatic arrow is prioritized. However, the manual arrow is still remembered. If the function definition of those nodes changes, the automatic arrow might disappear and the manual arrow might be shown instead.
 
-You can disable automatic edges for all nodes from the "View" menu. You may disable automatic edges for one specific node from the "General" tab in its [Node Edit Dialog](./node-edit-dialog).
+You can disable automatic arrows for all nodes from the "View" menu. You may disable automatic arrows for one specific node from the "General" tab in its [Node Edit Dialog](./node-edit-dialog).
 
 ## Action Bars
 
@@ -125,7 +125,7 @@ From left to right, the left action bar provides the following functions:
 - "Undo" - reverts your most recent change to the current model
 - "Redo" - reapplies changes that were previously undone by using the "undo" function
 - "Create Subgraph from Selection" - creates a new subgraph node and moves all selected nodes inside this subgraph
-- "Remove" - removes selected nodes or edges
+- "Remove" - removes selected nodes or arrows (edges)
 
 From left to right, the right action bar provides the following functions:
 

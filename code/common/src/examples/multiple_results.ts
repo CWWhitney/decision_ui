@@ -16,6 +16,7 @@ export const getMultipleResultsExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "Estimate_1",
+                        unit: "",
                         distribution: "posnorm",
                         lower: 10,
                         upper: 100,
@@ -49,6 +50,7 @@ export const getMultipleResultsExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "Estimate_2",
+                        unit: "",
                         distribution: "posnorm",
                         lower: 400,
                         upper: 600,
@@ -82,6 +84,7 @@ export const getMultipleResultsExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "estimate",
                         variable: "Estimate_3",
+                        unit: "",
                         distribution: "posnorm",
                         lower: 100,
                         upper: 500,
@@ -115,6 +118,7 @@ export const getMultipleResultsExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "result",
                         variable: "Result_1",
+                        unit: "",
                         expression: "Estimate_1"
                     },
                     visualization: {
@@ -141,6 +145,7 @@ export const getMultipleResultsExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "result",
                         variable: "Result_2",
+                        unit: "",
                         expression: "Estimate_2"
                     },
                     visualization: {
@@ -167,6 +172,7 @@ export const getMultipleResultsExampleModelFile = (): ModelFileState => {
                     function: {
                         type: "result",
                         variable: "Result_3",
+                        unit: "",
                         expression: "Estimate_3"
                     },
                     visualization: {
