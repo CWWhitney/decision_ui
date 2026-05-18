@@ -17,19 +17,19 @@
     const router = useRouter();
 
     const onKeyDown = (e: KeyboardEvent) => {
-        // new file (alt + n)
-        if (e.altKey && e.key === "n") {
-            e.preventDefault();
-            unsavedModelDialog.openDialog(() => {
-                resetState();
-            });
-        }
-
         // open file dialog (ctrl + o)
         if ((e.ctrlKey || e.metaKey) && e.key === "o") {
             e.preventDefault();
             unsavedModelDialog.openDialog(() => {
                 openModelDialog.openDialog();
+            });
+        }
+
+        // new file (ctrl + shift + o)
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "O") {
+            e.preventDefault();
+            unsavedModelDialog.openDialog(() => {
+                resetState();
             });
         }
 

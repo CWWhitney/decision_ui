@@ -159,6 +159,7 @@
                 :apply-default="false"
                 :zoom-on-double-click="false"
                 :min-zoom="0.25"
+                :multi-selection-key-code="e => e.ctrlKey || e.metaKey"
                 elevate-edges-on-select
                 tabindex="0"
                 @init="onInit"

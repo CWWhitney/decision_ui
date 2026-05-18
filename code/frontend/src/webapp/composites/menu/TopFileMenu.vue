@@ -42,7 +42,7 @@
 <template>
     <v-card class="card">
         <v-list class="list">
-            <TopMenuItem title="New" shortcut="ALT + N" @click="onNewClick" />
+            <TopMenuItem title="New" shortcut="CTRL + SHIFT + O" @click="onNewClick" />
             <v-divider />
             <TopMenuItem title="Open..." shortcut="CTRL + O" @click="onOpenClick" />
             <TopMenuItem title="Save" shortcut="CTRL + S" @click="saveModelDialog.saveCurrent()" />
