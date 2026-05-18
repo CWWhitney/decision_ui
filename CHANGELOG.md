@@ -26,6 +26,10 @@ Fixes
 - Fix variable name filter did not correctly filter out special non-letter characters
 - Help buttons of login dialog, open model dialog and save dialog did navigate to incorrect help page
 
+Other changes
+
+- Updated AI support prompt template with most recent ohm-js grammar
+
 ## v0.3.0 - 2026-04-07
 
 New Features
