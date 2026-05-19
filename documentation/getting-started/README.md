@@ -55,7 +55,7 @@ Alternatively, the "[R Backend](../user-interface/r-backend)" page allows evalua
 
 To create your own model, open the "File" menu in the top left corner and select "New" to start with an empty model.
 
-First, you need to add at least on "Estimate" and one "Result" node. You can find detailed information about each node type in the "[Model Editor](../user-interface/model-editor)" documentation. Also, take a look at the examples to get a better understanding of how nodes can be used in common scenarios.
+First, you need to add at least one "Estimate" and one "Result" node. You can find detailed information about each node type in the "[Model Editor](../user-interface/model-editor)" documentation. Also, take a look at the examples to get a better understanding of how nodes can be used in common scenarios.
 
 ## Save and Load a Model
 
